@@ -1,9 +1,14 @@
 <template>
   <div>
-    <h1>Next Number: {{this.state.grid.nextNumber}}</h1>
+    <h1 id="title">
+      Next Number:
+      <div class="cell" :class="this.state.grid.getClass(this.state.grid.nextNumber)">
+        {{this.state.grid.nextNumber}}
+      </div>
+    </h1>
     <div id="playing-grid">
       <div v-for="row in rows" :key="row" class="row">
-        <my-cell v-for="col in columns" :key="col" :row="row" :col="col"/>
+        <my-cell v-for="col in columns" :key="col" :row="row" :col="col" :ref="'cell'+row+col"/>
       </div>
     </div>
   </div>
@@ -55,6 +60,9 @@ export default {
     });
 
   },
+  mounted(){
+    console.log("Refs", this.$refs);
+  },
   data() {
     return {
     }
@@ -68,10 +76,19 @@ export default {
 </script>
 
 <style lang="scss">
-  $size: 75px;
+  @import "../scss/cell";
+  #title{
+    font-size: 1.5rem;
+    div{
+      transform: scale(0.7);
+      border: 1px solid #EFEFEF;
+    }
+  }
   #playing-grid{
+    position: relative;
     background: #EFEFEF;
-    max-width: ($size * 4);
+    width: ($size * 4);
+    height: ($size * 4);
     margin: auto;
     padding: 15px 0px;
     border-radius: 5px;

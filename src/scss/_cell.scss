@@ -1,0 +1,32 @@
+
+$size: 75px;
+div.cell{
+  display: block;
+  position: absolute;
+  font-family: "lato";
+  background-color: white;
+  margin: 2px 3px;
+  width: $size * 0.8;
+  height: $size;
+  line-height: $size;
+  border-radius: 2px;
+  font-weight: bold;
+  font-size: 1.2rem;
+
+  &.blue{
+    color: white;
+    background-color: #66CCFF;
+  }
+  &.red{
+    color: white;
+    background-color: #FF6680;
+  }
+  &.white{
+    color: black;
+    background-color: #FFFFFF;
+  }
+  &.empty{
+    color: #DDD;
+    background-color: #DDD;
+  }
+}
