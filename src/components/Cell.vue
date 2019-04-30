@@ -32,13 +32,12 @@ export default {
       styleObject:{
         top: this.getTop() + "px",
         left: this.getLeft() + "px",
-      },
-      padding: 5
+      }
     };
   },
   methods: {
     getTop(){
-      return ((this.row -1) * 75);
+      return (this.row -1) * 75;
     },
     getLeft(){
       return (this.col - 1) * (75 * 0.8);

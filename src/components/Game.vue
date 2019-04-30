@@ -2,7 +2,7 @@
   <div>
     <h1 id="title">
       Next Number:
-      <div class="cell" :class="this.state.grid.getClass(this.state.grid.nextNumber)">
+      <div id="preview" class="cell" :class="this.state.grid.getClass(this.state.grid.nextNumber)">
         {{this.state.grid.nextNumber}}
       </div>
     </h1>
@@ -79,7 +79,9 @@ export default {
   @import "../scss/cell";
   #title{
     font-size: 1.5rem;
-    div{
+    #preview{
+      display: inline-block;
+      position: static;
       transform: scale(0.7);
       border: 1px solid #EFEFEF;
     }
