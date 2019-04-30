@@ -1,5 +1,8 @@
 <template>
-  <div class="cell" v-bind:class="getClass()">
+  <div
+    class="cell"
+    :style="styleObject"
+    :class="getClass()">
     {{ this.Value() }}
   </div>
 </template>
@@ -10,7 +13,13 @@ export default {
   name: 'Cell',
   props:{
     row: Number,
-    col: Number
+    col: Number,
+    initialValue: Number,
+  },
+  mounted(){
+    if(this.initialValue){
+      this.setValue(this.initialValue);
+    }
   },
   data() {
     return {
@@ -18,51 +27,29 @@ export default {
       setValue: (v) => this.state.grid[this.row - 1][this.col - 1] = v,
       getClass(){
         let value = this.state.grid[this.row - 1][this.col - 1];
-        if(value === 1){
-          return 'blue';
-        }else if(value === 2){
-          return 'red';
-        }else if(value === 3){
-          return 'white';
-        }else if(value === 0){
-          return 'empty';
-        }
-      }
+        return this.state.grid.getClass(value);
+      },
+      styleObject:{
+        top: this.getTop() + "px",
+        left: this.getLeft() + "px",
+      },
+      padding: 5
     };
+  },
+  methods: {
+    getTop(){
+      return ((this.row -1) * 75);
+    },
+    getLeft(){
+      return (this.col - 1) * (75 * 0.8);
+    }
   }
 }
 </script>
 
 <style lang="scss">
-  $size: 75px;
+  @import "../scss/cell";
   div.cell{
-    font-family: "lato";
-    background-color: white;
-    display: inline-block;
-    margin: 2px 3px;
-    width: $size * 0.8;
-    height: $size;
-    line-height: $size;
-    border-radius: 2px;
-    font-weight: bold;
-    font-size: 1.2rem;
-
-    &.blue{
-      color: white;
-      background-color: #66CCFF;
-    }
-    &.red{
-      color: white;
-      background-color: #FF6680;
-    }
-    &.white{
-      color: black;
-      background-color: #FFFFFF;
-    }
-    &.empty{
-      color: #DDD;
-      background-color: #DDD;
-    }
+    transform: scale(0.9) translateX(30px);
   }
-
 </style>

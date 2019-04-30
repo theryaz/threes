@@ -11,7 +11,7 @@ const r_indexes = [3,2,1,0];
 
 function getRandom(min,max){
   return Math.floor(Math.random() * max) + min;
-};
+}
 var Grid = {
   nextNumber: getRandom(1,3),
   0:{
@@ -225,6 +225,17 @@ var Grid = {
       Grid.set(targetCell, Grid.nextNumber);
       Grid.nextNumber = getRandom(1,3);
       // console.log("Number Added to",targetCell);
+    }
+  },
+  getClass(value){
+    if(value === 1){
+      return 'blue';
+    }else if(value === 2){
+      return 'red';
+    }else if(value === 3){
+      return 'white';
+    }else if(value === 0){
+      return 'empty';
     }
   }
 };
