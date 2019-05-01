@@ -6,6 +6,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
+    "deploy": "vue-cli-service build && aws s3 sync --delete --acl public-read dist s3://threes.wifinear.me && aws cloudfront create-invalidation --distribution-id E19U1FOP3EIXXL --paths /index.html",
     "compile:sass": "node-sass 'your main scss file location' 'your compiled css file location' -w"
   },
   "dependencies": {
@@ -13,9 +14,11 @@
     "vue": "^2.6.10"
   },
   "devDependencies": {
+    "@vue/cli": "^3.7.0",
     "@vue/cli-plugin-babel": "^3.7.0",
     "@vue/cli-plugin-eslint": "^3.7.0",
     "@vue/cli-service": "^3.7.0",
+    "@vue/cli-service-global": "^3.7.0",
     "babel-eslint": "^10.0.1",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
