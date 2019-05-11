@@ -136,8 +136,8 @@ const Grid = {
   createCell(coords, value){
     if(!coords){
       coords = {
-        r: getRandom(1,3),
-        c: getRandom(1,3)
+        r: getRandom(0,3),
+        c: getRandom(0,3)
       };
     }
     if(!value){
