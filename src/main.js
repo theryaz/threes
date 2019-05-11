@@ -20,7 +20,13 @@ const DIRECTION = {
   RIGHT: 'moveRight',
 };
 const Grid = {
-  score: 0,
+  score: () => {
+    return Grid.cells
+    .map(cell => cell.value)
+    .reduce((a,b) => {
+      return a + b;
+    });
+  },
   valueCount: (value) => {
     return Grid.cells
     .map(cell => cell.value)
@@ -203,7 +209,7 @@ const Grid = {
       return;
 
     }else{
-      // console.log(`No Valid Move: ${Grid.above(coords).value} == ${Grid.valueAt(coords)}`);
+      console.log(`No Valid Move ${direction}`);
     }
   },
   moveUp(){
