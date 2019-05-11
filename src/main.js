@@ -21,7 +21,39 @@ const DIRECTION = {
 };
 const Grid = {
   score: 0,
+  valueCount: (value) => {
+    return Grid.cells
+    .map(cell => cell.value)
+    .reduce((a, b) => {
+      if(b === value) return a + 1;
+      else return a;
+    }, 0);
+  },
   nextNumber: getRandom(1,3),
+  getNextNumber: () => {
+    let nextNumber = Grid.nextNumber;
+
+    let ones = (100 - (Grid.valueCount(1) * 20));
+    let twos = (100 - (Grid.valueCount(2) * 20));
+    let seed = getRandom(0, 100);
+
+    console.log(`${ones}% ones`);
+    console.log(`${twos}% twos`);
+    console.log(`${seed} rolled`);
+    if(seed < ones && seed < twos){
+      if(ones > twos) Grid.nextNumber = 1;
+      else Grid.nextNumber = 2;
+    }else if (seed < twos) {
+      Grid.nextNumber = 2;
+    }else if (seed < ones){
+      Grid.nextNumber = 1;
+    }else{
+      Grid.nextNumber = 3;
+    }
+    console.log("Selected",Grid.nextNumber);
+    // Grid.nextNumber = getRandom(1,3);
+    return nextNumber;
+  },
   ref: null,
   cells: [],
   at(coords, index = false){
@@ -32,18 +64,18 @@ const Grid = {
   createCell(coords, value){
     if(!coords){
       coords = {
-        row: getRandom(1,3),
-        col: getRandom(1,3)
+        r: getRandom(1,3),
+        c: getRandom(1,3)
       };
     }
     if(!value){
       value = getRandom(1,3);
     }
-    console.log("Create Cell", coords, value);
+    // console.log("Create Cell", coords, value);
     let c = new CellComponent({
       propsData:{
-        row: coords.row,
-        col: coords.col,
+        row: coords.r,
+        col: coords.c,
         value: value,
       }
     });
@@ -177,22 +209,22 @@ const Grid = {
   moveUp(){
     // console.log("moveUp");
     Grid.topToBottom(Grid.above);
-    // Grid.addNumberUp();
+    Grid.addNumberUp();
   },
   moveDown(){
     console.log("moveDown");
     Grid.bottomToTop(Grid.below);
-    // Grid.addNumberDown();
+    Grid.addNumberDown();
   },
   moveLeft(){
     // console.log("moveLeft");
     Grid.leftToRight(Grid.left);
-    // Grid.addNumberLeft();
+    Grid.addNumberLeft();
   },
   moveRight(){
     // console.log("moveRight");
     Grid.rightToLeft(Grid.right);
-    // Grid.addNumberRight();
+    Grid.addNumberRight();
   },
   addNumberUp(){
     let options = [];
@@ -242,10 +274,10 @@ const Grid = {
   addNumberTo(options){
     // console.log("addNumberTo",options);
     if(options.length > 0){
-      let targetCell = options[getRandom(0,options.length)];
-      Grid.set(targetCell, Grid.nextNumber);
-      Grid.nextNumber = getRandom(1,3);
-      // console.log("Number Added to",targetCell);
+      let targetCoords = options[getRandom(0,options.length)];
+      let cell = Grid.createCell(targetCoords, Grid.getNextNumber());
+      Grid.spawnCellInGrid(cell);
+      // console.log("Number Add to",targetCoords);
     }
   },
   getClass(value){

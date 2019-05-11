@@ -21,7 +21,7 @@ export default {
     value: 0,
   },
   mounted(){
-    console.log("Cell Created", this.row, this.col, this.value);
+    // console.log("Cell Created", this.row, this.col, this.value);
   },
   data() {
     return {
@@ -51,7 +51,6 @@ export default {
     moveUp(){
       let newRow = this.row - 1;
       if(newRow < 0) {
-        console.log("moveUp: can't move", this.row, this.col, this.value);
         return;
       }
       // console.log(`Cell ${this.value}: moveUp`);
@@ -60,7 +59,6 @@ export default {
     moveDown(){
       let newRow = this.row + 1;
       if(newRow > 3) {
-        console.log("moveDown: can't move", this.row, this.col, this.value);
         return;
       }
       // console.log(`Cell ${this.value}: moveDown`);
@@ -69,7 +67,6 @@ export default {
     moveLeft(){
       let newCol = this.col - 1;
       if(newCol < 0) {
-        console.log("moveLeft: can't move", this.row, this.col, this.value);
         return;
       }
       // console.log(`Cell ${this.value}: moveLeft`);
@@ -78,7 +75,6 @@ export default {
     moveRight(){
       let newCol = this.col + 1;
       if(newCol > 3) {
-        console.log("moveRight: can't move", this.row, this.col, this.value);
         return;
       }
       // console.log(`Cell ${this.value}: moveRight`);
