@@ -45,36 +45,43 @@ export default {
       }
     },
     setValue(v){ this.value = v; },
+    isAt(coords){
+      return (this.row == coords.r && this.col == coords.c);
+    },
     moveUp(){
       let newRow = this.row - 1;
-      if(newRow < 0) return;
-      console.log("Cell: moveUp");
-      let thisCell = this.state.grid[this.row][this.col];
-      this.state.grid[newRow][this.col] = thisCell;
+      if(newRow < 0) {
+        console.log("moveUp: can't move", this.row, this.col, this.value);
+        return;
+      }
+      // console.log(`Cell ${this.value}: moveUp`);
       this.row = newRow;
     },
     moveDown(){
       let newRow = this.row + 1;
-      if(newRow > 3) return;
-      console.log("Cell: moveDown");
-      let thisCell = this.state.grid[this.row][this.col];
-      this.state.grid[newRow][this.col] = thisCell;
+      if(newRow > 3) {
+        console.log("moveDown: can't move", this.row, this.col, this.value);
+        return;
+      }
+      // console.log(`Cell ${this.value}: moveDown`);
       this.row = newRow;
     },
     moveLeft(){
       let newCol = this.col - 1;
-      if(newCol < 0) return;
-      console.log("Cell: moveLeft");
-      let thisCell = this.state.grid[this.row][this.col];
-      this.state.grid[this.row][newCol] = thisCell;
+      if(newCol < 0) {
+        console.log("moveLeft: can't move", this.row, this.col, this.value);
+        return;
+      }
+      // console.log(`Cell ${this.value}: moveLeft`);
       this.col = newCol;
     },
     moveRight(){
       let newCol = this.col + 1;
-      if(newCol > 3) return;
-      console.log("Cell: moveRight");
-      let thisCell = this.state.grid[this.row][this.col];
-      this.state.grid[this.row][newCol] = thisCell;
+      if(newCol > 3) {
+        console.log("moveRight: can't move", this.row, this.col, this.value);
+        return;
+      }
+      // console.log(`Cell ${this.value}: moveRight`);
       this.col = newCol;
     },
     logState(){
@@ -82,8 +89,8 @@ export default {
     },
     destroy(){
       console.log("Destroying Cell", this.row, this.col);
-      this.$destroy();
       this.$el.parentNode.removeChild(this.$el);
+      // this.$destroy();
     }
   }
 }

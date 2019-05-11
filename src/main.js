@@ -23,41 +23,11 @@ const Grid = {
   score: 0,
   nextNumber: getRandom(1,3),
   ref: null,
-  0:{
-    0: null,
-    1: null,
-    2: null,
-    3: null,
-  },
-  1:{
-    0: null,
-    1: null,
-    2: null,
-    3: null,
-  },
-  2:{
-    0: null,
-    1: null,
-    2: null,
-    3: null,
-  },
-  3:{
-    0: null,
-    1: null,
-    2: null,
-    3: null,
-  },
-  Grid: () => {
-    // Util to return Grid values only
-    return {
-      0: Grid[0],
-      1: Grid[1],
-      2: Grid[2],
-      3: Grid[3],
-    };
-  },
-  at(coords){
-    return Grid[coords.r][coords.c];
+  cells: [],
+  at(coords, index = false){
+    let fn = 'find';
+    if(index === true) fn = 'findIndex';
+    return Grid.cells[fn](cell => cell.isAt(coords));
   },
   createCell(coords, value){
     if(!coords){
@@ -80,9 +50,9 @@ const Grid = {
     return c;
   },
   spawnCellInGrid(cell){
-    if(Grid[cell.row][cell.col] != null) return false;
+    if(Grid.at({r: cell.row, c: cell.col}) != null) return false;
     cell.$mount();
-    Grid[cell.row][cell.col] = cell;
+    Grid.cells.push(cell);
     Grid.ref.appendChild(cell.$el);
     return true;
   },
@@ -93,54 +63,37 @@ const Grid = {
       let cell = Grid.createCell();
       Grid.spawnCellInGrid(cell);
     }
-    console.log("Grid Initialized", Grid.Grid());
+    console.log("Grid Initialized", Grid.cells);
   },
   clear(coords){
-    let cell = Grid.at(coords);
-    if(cell === null) return false;
-    cell.destroy();
-    Grid[coords.r][coords.c] = null;
+    let cellIndex = Grid.at(coords, true);
+    let cell = Grid.cells[cellIndex].destroy();
+    Grid.cells.splice(cellIndex, 1);
+  },
+  coordsOutOfBounds(coords){
+    return (coords.r > 3 || coords.r < 0 || coords.c > 3 || coords.c < 0);
   },
   valueAt(coords){
-    if(coords.r > 3 || coords.r < 0 || coords.c > 3 || coords.c < 0) return -1;
-    if(Grid[coords.r][coords.c] == null) return 0;
-    else return Grid[coords.r][coords.c].value;
+    if(Grid.coordsOutOfBounds(coords)) return -1;
+    let cell = Grid.at(coords);
+    if(cell == null) return 0;
+    else return cell.value;
   },
   above(coords){
     let new_coords = {r: coords.r - 1, c: coords.c};
-    // console.log("above",coords, new_coords);
-    if(Grid.valueAt(new_coords) >= 0){
-      return {coords: new_coords, cell: Grid[coords.r - 1][coords.c]};
-    }else{
-      return {coords: new_coords, cell: {value: -1}};
-    }
+    return Grid.at(new_coords);
   },
   below(coords){
     let new_coords = {r: coords.r + 1, c: coords.c};
-    // console.log("above",coords, new_coords);
-    if(Grid.valueAt(new_coords) >= 0){
-      return {coords: new_coords, cell: Grid[coords.r + 1][coords.c]};
-    }else{
-      return {coords: new_coords, cell: {value: -1}};
-    }
+    return Grid.at(new_coords);
   },
   left(coords){
     let new_coords = {r: coords.r, c: coords.c - 1};
-    // console.log("above",coords, new_coords);
-    if(Grid.valueAt(new_coords) >= 0){
-      return {coords: new_coords, cell: Grid[coords.r][coords.c - 1]};
-    }else{
-      return {coords: new_coords, cell: {value: -1}};
-    }
+    return Grid.at(new_coords);
   },
   right(coords){
     let new_coords = {r: coords.r, c: coords.c + 1};
-    // console.log("above",coords, new_coords);
-    if(Grid.valueAt(new_coords) >= 0){
-      return {coords: new_coords, cell: Grid[coords.r][coords.c + 1]};
-    }else{
-      return {coords: new_coords, cell: {value: -1}};
-    }
+    return Grid.at(new_coords);
   },
   // Methods to scan the grid from corner to corner and exec the move method on each cell
   topToBottom(cellAt){
@@ -178,16 +131,14 @@ const Grid = {
   moveDirection(cellAt, coords, direction){
     // cellAt is a is one of above, below, left, or right to return that cell
     // relative to the provided coords.
-    // Grid.right({r: 0, c: 0}) = {coords: {r: 0, c: 1}, value: x}
-    // We then check if the cell at coords can be moved into the cellAt the desired direction
+
     let startCell = Grid.at(coords);
-    let destCell = cellAt(coords).cell;
+    let destCell = cellAt(coords);
     if(startCell == null) return;
 
-    console.log("startCell", startCell);
-    console.log("destCell", destCell);
+    // console.log("startCell", startCell);
+    // console.log("destCell", destCell);
     if(destCell == null){
-      console.log("startCell[direction]();", direction);// Target Cell is Empty
       startCell[direction]();
       return;
     }
@@ -195,27 +146,30 @@ const Grid = {
     let destCoords = {
       r: destCell.row,
       c: destCell.col,
-    }
+    };
 
-    if(Grid.valueAt(coords) >= 3){
-      if(destCell.value == Grid.valueAt(coords)){
-        // console.log(`${destCell.value} == ${Grid.valueAt(coords)}`);
-        startCell.setValue(destCell.value * 2);
-        console.log("startCell[direction]();", direction);
-        startCell[direction]();
-        return Grid.clear(destCoords);
-      }
+    if(Grid.valueAt(coords) >= 3 && destCell.value == Grid.valueAt(coords)){
+      console.log("Combining",startCell.value,"to",destCell.value);
+      Grid.clear(destCoords);
+      startCell.value = destCell.value * 2;
+      startCell[direction]();
+      return;
+
     }else if(Grid.valueAt(coords) == 2 && destCell.value == 1){
-      startCell.setValue(3);
-      console.log("startCell[direction]();", direction);
+      console.log("Combining",startCell.value,"to",destCell.value);
+      Grid.clear(destCoords);
+      startCell.value = 3;
       startCell[direction]();
-      return Grid.clear(destCoords);
+      return;
+
     }else if(Grid.valueAt(coords) == 1 && destCell.value == 2){
-      // console.log(`${destCell.value} == 2 && ${Grid.valueAt(coords)} == 1)`);
-      startCell.setValue(3);
-      console.log("startCell[direction]();", direction);
+
+      console.log("Combining",startCell.value,"to",destCell.value);
+      Grid.clear(destCoords);
+      startCell.value = 3;
       startCell[direction]();
-      return Grid.clear(destCoords);
+      return;
+
     }else{
       // console.log(`No Valid Move: ${Grid.above(coords).value} == ${Grid.valueAt(coords)}`);
     }
