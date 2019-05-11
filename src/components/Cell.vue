@@ -48,6 +48,12 @@ export default {
     isAt(coords){
       return (this.row == coords.r && this.col == coords.c);
     },
+    coords(){
+      return{
+        r: this.row,
+        c: this.col,
+      };
+    },
     moveUp(){
       let newRow = this.row - 1;
       if(newRow < 0) {

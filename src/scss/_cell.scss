@@ -1,3 +1,4 @@
+@import "colors";
 
 $size: 100px;
 $padding: 4px;
@@ -26,12 +27,12 @@ div.cell{
     color: black;
     background-color: #FFFFFF;
     &.blue{
-      color: white;
-      background-color: #66CCFF;
+      color: $background;
+      background-color: $blue;
     }
     &.red{
-      color: white;
-      background-color: #FF6680;
+      color: $background;
+      background-color: $red;
     }
   }
 

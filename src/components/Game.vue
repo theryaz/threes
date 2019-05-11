@@ -1,5 +1,17 @@
 <template>
   <div>
+    <div v-if="this.state.grid.gameOver" id="game-over-fill">
+      <div class="card">
+        <h3>Score: {{ this.state.grid.score }}</h3>
+        <h3>High Score: {{ this.state.grid.highScore }}</h3>
+        <div class="new-high-score" v-if="this.state.grid.score == this.state.grid.highScore">
+          Wow! New high score!
+        </div>
+        <div class="buttons">
+          <button class="common primary" v-on:click="initializeGame()">Play Again</button>
+        </div>
+      </div>
+    </div>
     <h1 id="title">
       Next Number:
       <div id="preview" class="cell">
@@ -23,6 +35,7 @@ export default {
   },
   beforeMount(){
     window.addEventListener('keydown', (e) => {
+        if(this.state.grid.gameOver) return;
         e = e || window.event;
         if (e.keyCode == '38') {
           this.state.grid.moveUp();
@@ -58,6 +71,8 @@ export default {
 </script>
 
 <style lang="scss">
+  @import "../scss/colors";
+  @import "../scss/buttons";
   @import "../scss/cell";
   #title{
     font-size: 1.5rem;
@@ -75,6 +90,41 @@ export default {
     height: ($height * 4);
     margin: auto;
     border-radius: 2px;
+  }
+
+  #game-over-fill{
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(1, 1, 1, 0.2);
+    width: 100%;
+    height: 100vh;
+    z-index: 1000;
+    text-align: center;
+    display: flex;
+    div.card{
+      display: flex;
+      flex-direction: column;
+      background-color: $background;
+      margin: auto;
+      padding: 10px;
+      border-radius: 5px;
+      min-width: $size * 3;
+      min-height: $size * 3;
+      box-shadow: 2px 2px 20px -1px #333;
+      h3{
+        flex-grow: 1;
+      }
+      div.buttons{
+        margin: 1.0rem 0;
+      }
+    }
+  }
+
+  .new-high-score{
+    font-size: 1rem;
+    font-weight: bold;
+    letter-spacing: 2px;
   }
 
 </style>

@@ -20,12 +20,78 @@ const DIRECTION = {
   RIGHT: 'moveRight',
 };
 const Grid = {
-  score: () => {
-    return Grid.cells
+  gameOverCheckTimeout: null,
+  highScore: 0,
+  score: 0,
+  getScore: () => {
+    let score = Grid.score = Grid.cells
     .map(cell => cell.value)
     .reduce((a,b) => {
       return a + b;
     });
+    Grid.setHighScore(score);
+  },
+  setHighScore: (score) => {
+    let highScore = +localStorage.getItem('highScore');
+    if(!highScore) highScore = 100;
+    if(score > highScore){
+      Grid.highScore = score;
+      localStorage.setItem('highScore', score);
+    }else{
+      Grid.highScore = highScore;
+      localStorage.setItem('highScore', highScore);
+    }
+  },
+  gameOver: false,
+  gameOverCheck: function(){
+    if(Grid.gameOverCheckTimeout) clearTimeout(Grid.gameOverCheckTimeout);
+    Grid.gameOverCheckTimeout = setTimeout(() => {
+      console.log("Check Game Over");
+      let gameOver = false;
+      if(Grid.cells.length < 16){
+        console.log("The grid isn't even full.");
+        return;
+      }
+
+      let allCellsStuck = true;
+      for(let cell of Grid.cells){
+        if(allCellsStuck != true) break;
+        let adjacentCells = [
+          Grid.above(cell.coords()),
+          Grid.below(cell.coords()),
+          Grid.left(cell.coords()),
+          Grid.right(cell.coords()),
+        ];
+        adjacentCells = adjacentCells.filter(x => (x !== undefined && x !== null));
+        if(cell.value === 1){
+          for(let adjacentCell of adjacentCells){
+            if(adjacentCell.value === 2){
+              allCellsStuck = false;
+              break;
+            }
+          }
+        }else if(cell.value === 2){
+          for(let adjacentCell of adjacentCells){
+            if(adjacentCell.value === 1){
+              allCellsStuck = false;
+              break;
+            }
+          }
+        }else{
+          for(let adjacentCell of adjacentCells){
+            if(adjacentCell.value === cell.value){
+              allCellsStuck = false;
+              break;
+            }
+          }
+        }
+      }
+      if(allCellsStuck){
+        console.log("Game Over!");
+        Grid.getScore();
+        Grid.gameOver = allCellsStuck;
+      }
+    }, 1000);
   },
   valueCount: (value) => {
     return Grid.cells
@@ -97,6 +163,9 @@ const Grid = {
   initializeGame(gridRef, n = 9){
     Grid.ref = gridRef;
     Grid.score = 0;
+    Grid.cells.map(cell => cell.destroy());
+    Grid.cells = [];
+    Grid.gameOver = false;
     for(let i = 0; i < n; i++){
       let cell = Grid.createCell();
       Grid.spawnCellInGrid(cell);
@@ -216,21 +285,25 @@ const Grid = {
     // console.log("moveUp");
     Grid.topToBottom(Grid.above);
     Grid.addNumberUp();
+    Grid.gameOverCheck();
   },
   moveDown(){
     console.log("moveDown");
     Grid.bottomToTop(Grid.below);
     Grid.addNumberDown();
+    Grid.gameOverCheck();
   },
   moveLeft(){
     // console.log("moveLeft");
     Grid.leftToRight(Grid.left);
     Grid.addNumberLeft();
+    Grid.gameOverCheck();
   },
   moveRight(){
     // console.log("moveRight");
     Grid.rightToLeft(Grid.right);
     Grid.addNumberRight();
+    Grid.gameOverCheck();
   },
   addNumberUp(){
     let options = [];
