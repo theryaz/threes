@@ -1,13 +1,13 @@
 <template>
-  <div
-    v-on:click="logState()"
-    class="cell"
-    v-bind:class="[
-    this.state.grid.getClass(this.value),
+  <div class="cell" v-bind:class="[
     getRow(),
-    getCol(),
-    ]">
+    getCol()
+  ]">
+    <div
+    v-on:click="logState()"
+    v-bind:class="[this.state.grid.getClass(this.value)]">
     {{ value }}
+  </div>
   </div>
 </template>
 

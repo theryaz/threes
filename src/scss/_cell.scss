@@ -1,40 +1,40 @@
 
-$size: 75px;
+$size: 100px;
+$padding: 2px;
 $height: $size;
 $width: $size * 0.8;
 
 div.cell{
+  // border: 1px solid green;
+  background-color: none;
+  box-sizing: border-box;
+  padding: $padding;
   top: 0;
   left: 0;
   display: block;
   position: absolute;
   font-family: "lato";
-  background-color: white;
-  margin: 2px 3px;
   width: $width;
   height: $height;
-  line-height: $height;
   border-radius: 2px;
   font-weight: bold;
   font-size: 1.2rem;
   transition: all 0.1s ease-out;
 
-  &.blue{
-    color: white;
-    background-color: #66CCFF;
-  }
-  &.red{
-    color: white;
-    background-color: #FF6680;
-  }
-  &.white{
+  div{
+    line-height: ($height - ($padding * 2));
     color: black;
     background-color: #FFFFFF;
+    &.blue{
+      color: white;
+      background-color: #66CCFF;
+    }
+    &.red{
+      color: white;
+      background-color: #FF6680;
+    }
   }
-  &.empty{
-    color: #DDD;
-    background-color: #DDD;
-  }
+
 
   &.r0{ top: 0; }
   &.r1{ top: 1 * $size; }

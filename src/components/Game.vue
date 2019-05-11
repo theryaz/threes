@@ -2,8 +2,10 @@
   <div>
     <h1 id="title">
       Next Number:
-      <div id="preview" class="cell" :class="this.state.grid.getClass(this.state.grid.nextNumber)">
-        {{this.state.grid.nextNumber}}
+      <div id="preview" class="cell">
+        <div :class="this.state.grid.getClass(this.state.grid.nextNumber)">
+          {{this.state.grid.nextNumber}}
+        </div>
       </div>
     </h1>
     <div id="playing-grid" ref="grid">
@@ -69,10 +71,10 @@ export default {
   #playing-grid{
     position: relative;
     background: #EFEFEF;
-    width: ($size * 4);
-    height: ($size * 4) + 5px;
+    width: ($width * 4);
+    height: ($height * 4);
     margin: auto;
-    border-radius: 5px;
+    border-radius: 2px;
   }
 
 </style>
