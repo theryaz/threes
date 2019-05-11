@@ -6,15 +6,13 @@
         {{this.state.grid.nextNumber}}
       </div>
     </h1>
-    <div id="playing-grid">
-      <div v-for="row in rows" :key="row" class="row">
-        <my-cell v-for="col in columns" :key="col" :row="row" :col="col" :ref="'cell'+row+col"/>
-      </div>
+    <div id="playing-grid" ref="grid">
     </div>
   </div>
 </template>
 
 <script>
+
 export default {
   name: 'Game',
   props: {
@@ -22,27 +20,6 @@ export default {
     rows: Number,
   },
   beforeMount(){
-    // Init Grid with 9 numbers
-    let initial_nums = [];
-    for(let init = 0; init < 9; init++){
-      initial_nums.push({
-        coordinates: [this.getRandom(0,3),this.getRandom(0,3)],
-        value: this.getRandom(1,3)
-      });
-    }
-
-    // Test Grid
-    // initial_nums = [
-    //   {coordinates: [0,0], value: 2},
-    //   {coordinates: [1,0], value: 2},
-    //   {coordinates: [0,1], value: 1},
-    //   {coordinates: [1,1], value: 1},
-    // ];
-
-    for(let i of initial_nums){
-      this.state.grid[i.coordinates[0]][i.coordinates[1]] = i.value;
-    }
-
     window.addEventListener('keydown', (e) => {
         e = e || window.event;
         if (e.keyCode == '38') {
@@ -62,14 +39,17 @@ export default {
   },
   mounted(){
     console.log("Refs", this.$refs);
+    this.initializeGame();
   },
   data() {
-    return {
-    }
+    return {}
   },
   methods:{
     getRandom(min,max){
       return Math.floor(Math.random() * max) + min;
+    },
+    initializeGame(){
+      this.state.grid.initializeGame(this.$refs.grid, 9);
     }
   }
 }
