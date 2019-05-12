@@ -27,9 +27,19 @@ const Grid = {
     let score = Grid.score = Grid.cells
     .map(cell => cell.value)
     .reduce((a,b) => {
-      return a + b;
+      if(b < 3){
+        return a;
+      }else{
+        return a + Grid.scoreValue(b);
+      }
     });
     Grid.setHighScore(score);
+  },
+  scoreValue(value){
+    // 3^(log₂(x/3)+1)
+    let score = Math.pow(3,Math.log2(value / 3) + 1);
+    console.log(`Calculated ${value} as worth ${score} points`);
+    return score;
   },
   setHighScore: (score) => {
     let highScore = +localStorage.getItem('highScore');
