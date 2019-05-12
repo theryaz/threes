@@ -3,8 +3,6 @@ import Vuex from 'vuex';
 
 import App from './App.vue'
 
-import { Grid } from './model/grid';
-
 Vue.config.productionTip = false
 
 // Vue.use(Vuex);
@@ -18,17 +16,17 @@ Vue.config.productionTip = false
 //   }
 // });
 
-const applicationState = {
-  grid: Grid
-};
-
-Vue.mixin({
-  data(){
-    return{
-      state: applicationState
-    }
-  }
-})
+// const applicationState = {
+//   grid: Grid
+// };
+//
+// Vue.mixin({
+//   data(){
+//     return{
+//       state: applicationState
+//     }
+//   }
+// })
 
 new Vue({
   render: h => h(App),

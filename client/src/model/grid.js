@@ -8,58 +8,65 @@ function getRandom(min,max){
   return Math.floor(Math.random() * max) + min;
 }
 
-export const Grid = {
-  gameOverCheckTimeout: null,
-  highScore: 0,
-  score: 0,
-  getScore: () => {
-    let score = Grid.score = Grid.cells
+export class Grid{
+  constructor(remote=false){
+    console.log("Initialized Grid!");
+    this.gameOverCheckTimeout = null;
+    this.highScore = 0;
+    this.score = 0;
+    this.gameOver = false;
+    this.ref = null;
+    this.cells = [];
+    this.nextNumber = getRandom(1,3);
+  }
+
+  getScore(){
+    let score = this.score = this.cells
     .map(cell => cell.value)
     .reduce((a,b) => {
       if(b < 3){
         return a;
       }else{
-        return a + Grid.scoreValue(b);
+        return a + this.scoreValue(b);
       }
     });
-    Grid.setHighScore(score);
-  },
+    this.setHighScore(score);
+  }
   scoreValue(value){
     // 3^(log₂(x/3)+1)
     let score = Math.pow(3,Math.log2(value / 3) + 1);
     console.log(`Calculated ${value} as worth ${score} points`);
     return score;
-  },
-  setHighScore: (score) => {
+  }
+  setHighScore(score){
     let highScore = +localStorage.getItem('highScore');
     if(!highScore) highScore = 100;
     if(score > highScore){
-      Grid.highScore = score;
+      this.highScore = score;
       localStorage.setItem('highScore', score);
     }else{
-      Grid.highScore = highScore;
+      this.highScore = highScore;
       localStorage.setItem('highScore', highScore);
     }
-  },
-  gameOver: false,
-  gameOverCheck: function(){
-    if(Grid.gameOverCheckTimeout) clearTimeout(Grid.gameOverCheckTimeout);
-    Grid.gameOverCheckTimeout = setTimeout(() => {
+  }
+  gameOverCheck(){
+    if(this.gameOverCheckTimeout) clearTimeout(this.gameOverCheckTimeout);
+    this.gameOverCheckTimeout = setTimeout(() => {
       console.log("Check Game Over");
       let gameOver = false;
-      if(Grid.cells.length < 16){
+      if(this.cells.length < 16){
         console.log("The grid isn't even full.");
         return;
       }
 
       let allCellsStuck = true;
-      for(let cell of Grid.cells){
+      for(let cell of this.cells){
         if(allCellsStuck != true) break;
         let adjacentCells = [
-          Grid.above(cell.coords()),
-          Grid.below(cell.coords()),
-          Grid.left(cell.coords()),
-          Grid.right(cell.coords()),
+          this.above(this, cell.coords()),
+          this.below(this, cell.coords()),
+          this.left(this, cell.coords()),
+          this.right(this, cell.coords()),
         ];
         adjacentCells = adjacentCells.filter(x => (x !== undefined && x !== null));
         if(cell.value === 1){
@@ -87,51 +94,48 @@ export const Grid = {
       }
       if(allCellsStuck){
         console.log("Game Over!");
-        Grid.getScore();
-        Grid.gameOver = allCellsStuck;
+        this.getScore();
+        this.gameOver = allCellsStuck;
       }
     }, 1000);
-  },
-  valueCount: (value) => {
-    return Grid.cells
+  }
+  valueCount(value){
+    return this.cells
     .map(cell => cell.value)
     .reduce((a, b) => {
       if(b === value) return a + 1;
       else return a;
     }, 0);
-  },
-  nextNumber: getRandom(1,3),
-  getNextNumber: () => {
-    let nextNumber = Grid.nextNumber;
+  }
+  getNextNumber(){
+    let nextNumber = this.nextNumber;
 
-    let ones = (100 - (Grid.valueCount(1) * 20));
-    let twos = (100 - (Grid.valueCount(2) * 20));
+    let ones = (100 - (this.valueCount(1) * 20));
+    let twos = (100 - (this.valueCount(2) * 20));
     let seed = getRandom(0, 100);
 
     console.log(`${ones}% ones`);
     console.log(`${twos}% twos`);
     console.log(`${seed} rolled`);
     if(seed < ones && seed < twos){
-      if(ones > twos) Grid.nextNumber = 1;
-      else Grid.nextNumber = 2;
+      if(ones > twos) this.nextNumber = 1;
+      else this.nextNumber = 2;
     }else if (seed < twos) {
-      Grid.nextNumber = 2;
+      this.nextNumber = 2;
     }else if (seed < ones){
-      Grid.nextNumber = 1;
+      this.nextNumber = 1;
     }else{
-      Grid.nextNumber = 3;
+      this.nextNumber = 3;
     }
-    console.log("Selected",Grid.nextNumber);
-    // Grid.nextNumber = getRandom(1,3);
+    console.log("Selected",this.nextNumber);
+    // this.nextNumber = getRandom(1,3);
     return nextNumber;
-  },
-  ref: null,
-  cells: [],
-  at(coords, index = false){
+  }
+  at(self, coords, index = false){
     let fn = 'find';
     if(index === true) fn = 'findIndex';
-    return Grid.cells[fn](cell => cell.isAt(coords));
-  },
+    return this.cells[fn](cell => cell.isAt(coords));
+  }
   createCell(coords, value){
     if(!coords){
       coords = {
@@ -148,98 +152,99 @@ export const Grid = {
         row: coords.r,
         col: coords.c,
         value: value,
+        grid: this
       }
     });
     return c;
-  },
+  }
   spawnCellInGrid(cell){
-    if(Grid.at({r: cell.row, c: cell.col}) != null) return false;
+    if(this.at(this, {r: cell.row, c: cell.col}) != null) return false;
     cell.$mount();
-    Grid.cells.push(cell);
-    Grid.ref.appendChild(cell.$el);
+    this.cells.push(cell);
+    this.ref.appendChild(cell.$el);
     return true;
-  },
+  }
   initializeGame(gridRef, n = 9){
-    Grid.ref = gridRef;
-    Grid.score = 0;
-    Grid.cells.map(cell => cell.destroy());
-    Grid.cells = [];
-    Grid.gameOver = false;
+    this.ref = gridRef;
+    this.score = 0;
+    this.cells.map(cell => cell.destroy());
+    this.cells = [];
+    this.gameOver = false;
     for(let i = 0; i < n; i++){
-      let cell = Grid.createCell();
-      Grid.spawnCellInGrid(cell);
+      let cell = this.createCell();
+      this.spawnCellInGrid(cell);
     }
-    console.log("Grid Initialized", Grid.cells);
-  },
+    console.log("Grid Initialized", this.cells);
+  }
   clear(coords){
-    let cellIndex = Grid.at(coords, true);
-    let cell = Grid.cells[cellIndex].destroy();
-    Grid.cells.splice(cellIndex, 1);
-  },
+    let cellIndex = this.at(this, coords, true);
+    let cell = this.cells[cellIndex].destroy();
+    this.cells.splice(cellIndex, 1);
+  }
   coordsOutOfBounds(coords){
     return (coords.r > 3 || coords.r < 0 || coords.c > 3 || coords.c < 0);
-  },
+  }
   valueAt(coords){
-    if(Grid.coordsOutOfBounds(coords)) return -1;
-    let cell = Grid.at(coords);
+    if(this.coordsOutOfBounds(coords)) return -1;
+    let cell = this.at(this, coords);
     if(cell == null) return 0;
     else return cell.value;
-  },
-  above(coords){
+  }
+  above(self, coords){
     let new_coords = {r: coords.r - 1, c: coords.c};
-    return Grid.at(new_coords);
-  },
-  below(coords){
+    return self.at(self, new_coords);
+  }
+  below(self, coords){
     let new_coords = {r: coords.r + 1, c: coords.c};
-    return Grid.at(new_coords);
-  },
-  left(coords){
+    return self.at(self, new_coords);
+  }
+  left(self, coords){
     let new_coords = {r: coords.r, c: coords.c - 1};
-    return Grid.at(new_coords);
-  },
-  right(coords){
+    return self.at(self, new_coords);
+  }
+  right(self, coords){
     let new_coords = {r: coords.r, c: coords.c + 1};
-    return Grid.at(new_coords);
-  },
+    return self.at(self, new_coords);
+  }
   // Methods to scan the grid from corner to corner and exec the move method on each cell
   topToBottom(cellAt){
     // iterate top left to bottom right
     for(let r of INDEXES){
       for(let c of INDEXES){
-        Grid.moveDirection(cellAt, {r,c}, DIRECTION.UP);
+        this.moveDirection(cellAt, {r,c}, DIRECTION.UP);
       }
     }
-  },
+  }
   bottomToTop(cellAt){
     // iterate top left to bottom right
     for(let r of R_INDEXES){
       for(let c of R_INDEXES){
-        Grid.moveDirection(cellAt, {r,c}, DIRECTION.DOWN);
+        this.moveDirection(cellAt, {r,c}, DIRECTION.DOWN);
       }
     }
-  },
+  }
   leftToRight(cellAt){
     // iterate bottom left to top right
     for(let r of R_INDEXES){
       for(let c of INDEXES){
-        Grid.moveDirection(cellAt, {r,c}, DIRECTION.LEFT);
+        this.moveDirection(cellAt, {r,c}, DIRECTION.LEFT);
       }
     }
-  },
+  }
   rightToLeft(cellAt){
     // iterate top left to bottom right
     for(let r of INDEXES){
       for(let c of R_INDEXES){
-        Grid.moveDirection(cellAt, {r,c}, DIRECTION.RIGHT);
+        this.moveDirection(cellAt, {r,c}, DIRECTION.RIGHT);
       }
     }
-  },
+  }
   moveDirection(cellAt, coords, direction){
     // cellAt is a is one of above, below, left, or right to return that cell
     // relative to the provided coords.
 
-    let startCell = Grid.at(coords);
-    let destCell = cellAt(coords);
+    let startCell = this.at(this, coords);
+    let destCell = cellAt(this, coords);
     if(startCell == null) return;
 
     // console.log("startCell", startCell);
@@ -254,24 +259,24 @@ export const Grid = {
       c: destCell.col,
     };
 
-    if(Grid.valueAt(coords) >= 3 && destCell.value == Grid.valueAt(coords)){
+    if(this.valueAt(coords) >= 3 && destCell.value == this.valueAt(coords)){
       console.log("Combining",startCell.value,"to",destCell.value);
-      Grid.clear(destCoords);
+      this.clear(destCoords);
       startCell.value = destCell.value * 2;
       startCell[direction]();
       return;
 
-    }else if(Grid.valueAt(coords) == 2 && destCell.value == 1){
+    }else if(this.valueAt(coords) == 2 && destCell.value == 1){
       console.log("Combining",startCell.value,"to",destCell.value);
-      Grid.clear(destCoords);
+      this.clear(destCoords);
       startCell.value = 3;
       startCell[direction]();
       return;
 
-    }else if(Grid.valueAt(coords) == 1 && destCell.value == 2){
+    }else if(this.valueAt(coords) == 1 && destCell.value == 2){
 
       console.log("Combining",startCell.value,"to",destCell.value);
-      Grid.clear(destCoords);
+      this.clear(destCoords);
       startCell.value = 3;
       startCell[direction]();
       return;
@@ -279,85 +284,85 @@ export const Grid = {
     }else{
       console.log(`No Valid Move ${direction}`);
     }
-  },
+  }
   moveUp(){
     // console.log("moveUp");
-    Grid.topToBottom(Grid.above);
-    Grid.addNumberUp();
-    Grid.gameOverCheck();
-  },
+    this.topToBottom(this.above);
+    this.addNumberUp();
+    this.gameOverCheck();
+  }
   moveDown(){
     console.log("moveDown");
-    Grid.bottomToTop(Grid.below);
-    Grid.addNumberDown();
-    Grid.gameOverCheck();
-  },
+    this.bottomToTop(this.below);
+    this.addNumberDown();
+    this.gameOverCheck();
+  }
   moveLeft(){
     // console.log("moveLeft");
-    Grid.leftToRight(Grid.left);
-    Grid.addNumberLeft();
-    Grid.gameOverCheck();
-  },
+    this.leftToRight(this.left);
+    this.addNumberLeft();
+    this.gameOverCheck();
+  }
   moveRight(){
     // console.log("moveRight");
-    Grid.rightToLeft(Grid.right);
-    Grid.addNumberRight();
-    Grid.gameOverCheck();
-  },
+    this.rightToLeft(this.right);
+    this.addNumberRight();
+    this.gameOverCheck();
+  }
   addNumberUp(){
     let options = [];
     let r = 3;
     for(let c of INDEXES){
       let coords = {r,c};
-      if(Grid.valueAt(coords) == 0){
+      if(this.valueAt(coords) == 0){
         options.push(coords);
       }
     }
-    Grid.addNumberTo(options);
-  },
+    this.addNumberTo(options);
+  }
   addNumberDown(){
     let options = [];
     let r = 0;
     for(let c of INDEXES){
       let coords = {r,c};
-      if(Grid.valueAt(coords) == 0){
+      if(this.valueAt(coords) == 0){
         options.push(coords);
       }
     }
-    Grid.addNumberTo(options);
-  },
+    this.addNumberTo(options);
+  }
   addNumberLeft(){
     // console.log("addNumberLeft");
     let options = [];
     let c = 3;
     for(let r of INDEXES){
       let coords = {r,c};
-      if(Grid.valueAt(coords) == 0){
+      if(this.valueAt(coords) == 0){
         options.push(coords);
       }
     }
-    Grid.addNumberTo(options);
-  },
+    this.addNumberTo(options);
+  }
   addNumberRight(){
     let options = [];
     let c = 0;
     for(let r of INDEXES){
       let coords = {r,c};
-      if(Grid.valueAt(coords) == 0){
+      if(this.valueAt(coords) == 0){
         options.push(coords);
       }
     }
-    Grid.addNumberTo(options);
-  },
+    this.addNumberTo(options);
+  }
   addNumberTo(options){
     // console.log("addNumberTo",options);
     if(options.length > 0){
       let targetCoords = options[getRandom(0,options.length)];
-      let cell = Grid.createCell(targetCoords, Grid.getNextNumber());
-      Grid.spawnCellInGrid(cell);
+      let cell = this.createCell(targetCoords, this.getNextNumber());
+      this.spawnCellInGrid(cell);
       // console.log("Number Add to",targetCoords);
     }
-  },
+  }
   getClass(value){
     if(value === 1){
       return 'blue';

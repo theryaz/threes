@@ -4,8 +4,7 @@
     getCol()
   ]">
     <div
-    v-on:click="logState()"
-    v-bind:class="[this.state.grid.getClass(this.value)]">
+    v-bind:class="[this.grid.getClass(this.value)]">
     {{ value }}
   </div>
   </div>
@@ -19,9 +18,10 @@ export default {
     row: 0,
     col: 0,
     value: 0,
+    grid: null
   },
   mounted(){
-    // console.log("Cell Created", this.row, this.col, this.value);
+    console.log("Cell Created", this.row, this.col, this.value, this.grid);
   },
   data() {
     return {
@@ -85,9 +85,6 @@ export default {
       }
       // console.log(`Cell ${this.value}: moveRight`);
       this.col = newCol;
-    },
-    logState(){
-      console.log("Cell State:",this.row, this.col, this.value);
     },
     destroy(){
       console.log("Destroying Cell", this.row, this.col);

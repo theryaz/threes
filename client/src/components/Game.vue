@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div v-if="this.state.grid.gameOver" id="game-over-fill">
+    <div v-if="grid.gameOver" id="game-over-fill">
       <div class="card">
-        <h3>Score: {{ this.state.grid.score }}</h3>
-        <h3>High Score: {{ this.state.grid.highScore }}</h3>
-        <div class="new-high-score" v-if="this.state.grid.score == this.state.grid.highScore">
+        <h3>Score: {{ grid.score }}</h3>
+        <h3>High Score: {{ grid.highScore }}</h3>
+        <div class="new-high-score" v-if="grid.score == grid.highScore">
           Wow! New high score!
         </div>
         <div class="buttons">
@@ -15,8 +15,8 @@
     <h1 id="title">
       Next Number:
       <div id="preview" class="cell">
-        <div :class="this.state.grid.getClass(this.state.grid.nextNumber)">
-          {{this.state.grid.nextNumber}}
+        <div :class="grid.getClass(grid.nextNumber)">
+          {{grid.nextNumber}}
         </div>
       </div>
     </h1>
@@ -27,6 +27,8 @@
 
 <script>
 
+import { Grid } from '../model/grid';
+
 export default {
   name: 'Game',
   props: {
@@ -35,19 +37,19 @@ export default {
   },
   beforeMount(){
     window.addEventListener('keydown', (e) => {
-        if(this.state.grid.gameOver) return;
+        if(this.grid.gameOver) return;
         e = e || window.event;
         if (e.keyCode == '38') {
-          this.state.grid.moveUp();
+          this.grid.moveUp();
         }
         else if (e.keyCode == '40') {
-          this.state.grid.moveDown();
+          this.grid.moveDown();
         }
         else if (e.keyCode == '37') {
-          this.state.grid.moveLeft();
+          this.grid.moveLeft();
         }
         else if (e.keyCode == '39') {
-          this.state.grid.moveRight();
+          this.grid.moveRight();
         }
     });
 
@@ -57,14 +59,16 @@ export default {
     this.initializeGame();
   },
   data() {
-    return {}
+    return {
+      grid: new Grid()
+    }
   },
   methods:{
     getRandom(min,max){
       return Math.floor(Math.random() * max) + min;
     },
     initializeGame(){
-      this.state.grid.initializeGame(this.$refs.grid, 9);
+      this.grid.initializeGame(this.$refs.grid, 9);
     }
   }
 }
