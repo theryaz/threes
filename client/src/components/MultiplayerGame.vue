@@ -5,10 +5,10 @@
     </div>
     <div id="game-grid">
       <div id="game-a">
-        <Game></Game>
+        <Game :isMultiplayer="false"></Game>
       </div>
       <div id="game-b">
-        <Game></Game>
+        <Game :isMultiplayer="false" :isRemote="true"></Game>
       </div>
     </div>
   </div>
@@ -18,8 +18,7 @@
 export default {
   name: 'MultiplayerGame',
   data:() => {
-    return{
-    }
+    return{}
   }
 }
 </script>

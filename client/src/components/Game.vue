@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="game-component">
     <div v-if="grid.gameOver" id="game-over-fill">
       <div class="card">
         <h3>Score: {{ grid.score }}</h3>
@@ -7,7 +7,7 @@
         <div class="new-high-score" v-if="grid.score == grid.highScore">
           Wow! New high score!
         </div>
-        <div class="buttons">
+        <div class="buttons" v-if="isMultiplayer !== true">
           <button class="common primary" v-on:click="initializeGame()">Play Again</button>
         </div>
       </div>
@@ -31,8 +31,14 @@ import { Grid } from '../model/grid';
 
 export default {
   name: 'Game',
+  props:{
+    isMultiplayer: Boolean,
+    isRemote: Boolean,
+  },
   beforeMount(){
-    window.addEventListener('keydown', (e) => {
+    console.log("this.isRemote", this.isRemote);
+    if(this.isRemote !== true){
+      window.addEventListener('keydown', (e) => {
         if(this.grid.gameOver) return;
         e = e || window.event;
         if (e.keyCode == '38') {
@@ -47,7 +53,8 @@ export default {
         else if (e.keyCode == '39') {
           this.grid.moveRight();
         }
-    });
+      });
+    }
 
   },
   mounted(){
@@ -92,8 +99,11 @@ export default {
     border-radius: 2px;
   }
 
+  .game-component{
+    position: relative;
+  }
   #game-over-fill{
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     background-color: rgba(1, 1, 1, 0.2);

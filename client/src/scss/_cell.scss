@@ -17,12 +17,12 @@ div.cell{
   font-family: "lato";
   width: $width;
   height: $height;
-  border-radius: 2px;
   font-weight: bold;
   font-size: 1.2rem;
   transition: all 0.1s ease-out;
 
   div{
+    border-radius: 5px;
     line-height: ($height - ($padding * 2));
     color: black;
     background-color: #FFFFFF;
