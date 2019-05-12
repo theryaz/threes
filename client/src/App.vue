@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Game :rows="4" :columns="4"/>
+    <router-view></router-view>
   </div>
 </template>
 
@@ -22,7 +22,6 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 
 </style>
