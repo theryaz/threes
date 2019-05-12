@@ -31,10 +31,6 @@ import { Grid } from '../model/grid';
 
 export default {
   name: 'Game',
-  props: {
-    columns: Number,
-    rows: Number,
-  },
   beforeMount(){
     window.addEventListener('keydown', (e) => {
         if(this.grid.gameOver) return;

@@ -60,14 +60,14 @@ button.common{
 			border: 2px solid $font-color-fade;
 		}
 	}
-	&.positive-primary{
+	&.red-primary{
 		color: $background;
-		border: 2px solid $positive;
-		background-color: $positive;
+		border: 2px solid $red;
+		background-color: $red;
 		font-weight: bold;
 		&:hover{
-			color: $positive;
-			border: 2px solid $positive;
+			color: $red;
+			border: 2px solid $red;
 			background-color: $background;
 		}
 		&:disabled, &.disabled{
@@ -78,15 +78,15 @@ button.common{
 			border: 2px solid $font-color-fade;
 		}
 	}
-	&.positive-secondary{
-		color: $positive;
-		border: 2px solid $positive;
+	&.red-secondary{
+		color: $red;
+		border: 2px solid $red;
 		background-color: $background;
 		font-weight: bold;
 		&:hover{
 			color: $background;
-			border: 2px solid $positive;
-			background-color: $positive;
+			border: 2px solid $red;
+			background-color: $red;
 		}
 		&:disabled, &.disabled{
 			pointer-events: none;
@@ -96,14 +96,14 @@ button.common{
 			border: 2px solid $font-color-fade;
 		}
 	}
-	&.negative-primary{
+	&.blue-primary{
 		color: $background;
-		border: 2px solid $negative;
-		background-color: $negative;
+		border: 2px solid $blue;
+		background-color: $blue;
 		font-weight: bold;
 		&:hover{
-			color: $negative;
-			border: 2px solid $negative;
+			color: $blue;
+			border: 2px solid $blue;
 			background-color: $background;
 		}
 		&:disabled, &.disabled{
@@ -114,15 +114,15 @@ button.common{
 			border: 2px solid $font-color-fade;
 		}
 	}
-	&.negative-secondary{
-		color: $negative;
-		border: 2px solid $negative;
+	&.blue-secondary{
+		color: $blue;
+		border: 2px solid $blue;
 		background-color: $background;
 		font-weight: bold;
 		&:hover{
 			color: $background;
-			border: 2px solid $negative;
-			background-color: $negative;
+			border: 2px solid $blue;
+			background-color: $blue;
 		}
 		&:disabled, &.disabled{
 			pointer-events: none;

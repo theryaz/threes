@@ -87,7 +87,7 @@ export default {
       this.col = newCol;
     },
     destroy(){
-      console.log("Destroying Cell", this.row, this.col);
+      // console.log("Destroying Cell", this.row, this.col);
       this.$el.parentNode.removeChild(this.$el);
       // this.$destroy();
     }
