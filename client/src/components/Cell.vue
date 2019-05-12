@@ -21,7 +21,7 @@ export default {
     grid: null
   },
   mounted(){
-    console.log("Cell Created", this.row, this.col, this.value, this.grid);
+    // console.log("Cell Created", this.row, this.col, this.value, this.grid);
   },
   data() {
     return {

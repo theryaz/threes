@@ -4,31 +4,12 @@ import Vuex from 'vuex';
 import App from './App.vue'
 
 Vue.config.productionTip = false
+Vue.use(Vuex);
 
-// Vue.use(Vuex);
-
-// const store = new Vuex.Store({
-//   state: {
-//
-//   },
-//   mutations: {
-//
-//   }
-// });
-
-// const applicationState = {
-//   grid: Grid
-// };
-//
-// Vue.mixin({
-//   data(){
-//     return{
-//       state: applicationState
-//     }
-//   }
-// })
+import { Store } from './store';
+const store = new Vuex.Store(Store);
 
 new Vue({
+  store,
   render: h => h(App),
-  // store
-}).$mount('#app')
+}).$mount('#app');
