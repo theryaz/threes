@@ -1,4 +1,19 @@
+@import "./colors";
+@import "./animations";
 a{
   color: inherit;
   text-decoration: none;
+}
+
+.loader{
+	text-align: center;
+	i{
+		font-size: 3.0rem;
+		color: $primary-color;
+	}
+  &.larger{
+    i{
+      font-size: 4.5rem;
+    }
+  }
 }

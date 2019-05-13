@@ -7,7 +7,7 @@
         <div class="new-high-score" v-if="grid.score == grid.highScore">
           Wow! New high score!
         </div>
-        <div class="buttons" v-if="isMultiplayer !== true">
+        <div class="buttons" v-if="options.isMultiplayer !== true">
           <button class="common primary" v-on:click="initializeGame()">Play Again</button>
         </div>
       </div>
@@ -32,12 +32,11 @@ import { Grid } from '../model/grid';
 export default {
   name: 'Game',
   props:{
-    isMultiplayer: Boolean,
-    isRemote: Boolean,
+    options: Object
   },
   beforeMount(){
-    console.log("this.isRemote", this.isRemote);
-    if(this.isRemote !== true){
+    console.log("this.options.isRemote", this.options.isRemote);
+    if(this.options.isRemote !== true){
       window.addEventListener('keydown', (e) => {
         if(this.grid.gameOver) return;
         e = e || window.event;
