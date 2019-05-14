@@ -6,8 +6,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "deploy": "vue-cli-service build && aws s3 sync --delete --acl public-read dist s3://threes.wifinear.me && aws cloudfront create-invalidation --distribution-id E19U1FOP3EIXXL --paths /index.html",
-    "compile:sass": "node-sass 'your main scss file location' 'your compiled css file location' -w"
+    "deploy": "vue-cli-service build && aws s3 sync --delete --acl public-read dist s3://play.threeswithfriends.com && aws cloudfront create-invalidation --distribution-id E3P2WX3OJLCJD3 --paths /index.html"
   },
   "dependencies": {
     "core-js": "^2.6.5",
