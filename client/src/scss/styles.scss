@@ -17,3 +17,10 @@ a{
     }
   }
 }
+
+input.common{
+	background-color: inherit;
+	border: none;
+	border-bottom: 1px solid $font-color;
+	color: $font-color;
+}
