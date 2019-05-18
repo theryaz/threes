@@ -72,7 +72,7 @@ export default {
   methods:{
     hostGame(){
       console.log("hostGame");
-      this.$socket.emit('host');
+      this.$socket.emit('hostGame');
     },
     joinGame(){
       console.log("joinGame", this.joinGameId);
