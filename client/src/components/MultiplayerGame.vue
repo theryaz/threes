@@ -72,9 +72,15 @@ export default {
   methods:{
     hostGame(){
       console.log("hostGame");
+      this.$socket.emit('host');
     },
     joinGame(){
       console.log("joinGame", this.joinGameId);
+    },
+  },
+  sockets:{
+    connect(){
+      console.log("Socket Connected!");
     },
   }
 }
