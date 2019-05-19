@@ -12,7 +12,21 @@ class Player{
   hostGame(){
     let game = new Game(this.id);
     console.log(`Player ${this.id} hosting game ${game.id}`);
+    this.socket.send(JSON.stringify({
+      channel: 'hostGame',
+      payload: {
+        gameId: game.id
+      }
+    }));
     return game;
+  }
+  joinGame(gameId){
+    this.socket.send(JSON.stringify({
+      channel: 'joinGame',
+      payload: {
+        gameId
+      }
+    }));
   }
 }
 

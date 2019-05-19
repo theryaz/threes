@@ -3,6 +3,6 @@ export const MultiplayerGameState = {
   isHost: true,
   isLoading: false,
   gameOptions:{
-    uuid: null
+    id: null
   }
 };

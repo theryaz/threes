@@ -1,4 +1,4 @@
-import socketClient from '../../websocketClient';
+import socketClient from '../../socketClient';
 import * as MultiplayerGameMutationTypes from './multiplayer-game.mutation-types';
 
 export const MultiplayerGameActions = {
@@ -7,8 +7,5 @@ export const MultiplayerGameActions = {
   [MultiplayerGameMutationTypes.HOST_GAME]({commit}){
     commit(MultiplayerGameMutationTypes.HOST_GAME);
     socketClient.send("hostGame");
-    setTimeout(() => {
-      commit(MultiplayerGameMutationTypes.HOST_GAME_SUCCESS, {uuid: "12345"});
-    }, 1000);
   },
 };

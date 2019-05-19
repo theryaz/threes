@@ -1,14 +1,15 @@
 class SocketClient{
   constructor(address){
     this.listeners = {};
+    this.address;
     this.connection = new WebSocket(address);
-    this.connection.onmessage = (data) => {
+    this.connection.onmessage = ({data}) => {
       let message = JSON.parse(data);
       let channel = message.channel;
       let payload = message.payload;
       if(Array.isArray(this.listeners[channel])){
-        for(let listener of this.listeners){
-          listener.apply(null, payload);
+        for(let listener of this.listeners[channel]){
+          listener.call(null, payload);
         }
       }
     };

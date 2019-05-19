@@ -5,12 +5,12 @@ export const MultiplayerGameMutations = {
   },
   [MultiplayerGameMutationTypes.HOST_GAME_SUCCESS]({multiplayerGameState}, payload){
     multiplayerGameState.gameOptions = {
-      uuid: payload.uuid,
+      id: payload.id,
     };
     multiplayerGameState.isLoading = false;
   },
   [MultiplayerGameMutationTypes.HOST_GAME_FAILURE]({multiplayerGameState}){
     multiplayerGameState.isLoading = false;
-    multiplayerGameState.hostError = multiplayerGameState.rror;
+    multiplayerGameState.hostError = multiplayerGameState.error;
   },
 };
