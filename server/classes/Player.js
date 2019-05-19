@@ -1,6 +1,7 @@
 const uuid = require('uuid/v4');
 const { getName } = require('../shared/util');
 const Game = require('./Game');
+const { PlayerList, GameList } = require('../storage');
 
 class Player{
   constructor(socket){
@@ -20,11 +21,20 @@ class Player{
     }));
     return game;
   }
-  joinGame(gameId){
+  joinGame(game){
+    let hostPlayer = PlayerList.find(x => x.id === game.hostId);
+    hostPlayer.socket.send(JSON.stringify({
+      channel: 'playerJoined',
+      payload:{
+        playerId: this.id
+      }
+    }));
+    game.guestId = this.id;
     this.socket.send(JSON.stringify({
       channel: 'joinGame',
       payload: {
-        gameId
+        gameId: game.id,
+        remotePlayerId: game.hostId,
       }
     }));
   }

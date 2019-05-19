@@ -1,3 +1,11 @@
 export const HOST_GAME = 'HOST_GAME';
 export const HOST_GAME_SUCCESS = 'HOST_GAME_SUCCESS';
 export const HOST_GAME_FAILURE = 'HOST_GAME_FAILURE';
+
+export const CANCEL_HOST_GAME = 'CANCEL_HOST_GAME';
+
+export const JOIN_GAME = 'JOIN_GAME';
+export const JOIN_GAME_SUCCESS = 'JOIN_GAME_SUCCESS';
+export const JOIN_GAME_FAILURE = 'JOIN_GAME_FAILURE';
+
+export const PLAYER_JOINED = 'PLAYER_JOINED';

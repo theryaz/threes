@@ -2,9 +2,7 @@ const util = require('./shared/util.js');
 const games = {};
 
 const { Player, Game, SocketRouter } = require('./classes');
-
-const PlayerList = [];
-const GameList = [];
+const { PlayerList, GameList } = require('./storage');
 
 module.exports = function(socket){
   console.log(`Got a connection! ${PlayerList.length + 1} Players Connected.`);
@@ -28,8 +26,14 @@ module.exports = function(socket){
     let game = player.hostGame();
     GameList.push(game);
   }
-  function joinGame(gameId){
-    player.joinGame(gameId);
+  function joinGame({id}){
+    console.log("Joing Game", id);
+    let game = GameList.find(x => x.id == id);
+    if(game){
+      player.joinGame(game);
+    }else{
+      console.log("Game Not Found", GameList);
+    }
   }
 
 };

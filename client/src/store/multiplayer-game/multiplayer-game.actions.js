@@ -8,4 +8,8 @@ export const MultiplayerGameActions = {
     commit(MultiplayerGameMutationTypes.HOST_GAME);
     socketClient.send("hostGame");
   },
+  [MultiplayerGameMutationTypes.JOIN_GAME]({commit}, payload){
+    commit(MultiplayerGameMutationTypes.JOIN_GAME);
+    socketClient.send("joinGame", {id: payload.id});
+  },
 };

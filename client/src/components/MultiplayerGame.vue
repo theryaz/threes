@@ -6,9 +6,9 @@
     </div>
     <template v-else>
       <div id="game-heading">
-        <h3>MultiplayerGame ID: {{state.gameOptions.uuid}}</h3>
+        <h3>MultiplayerGame ID: {{state.gameOptions.id}}</h3>
       </div>
-      <div v-if="state.uuid == null">
+      <div v-if="state.gameOptions.id == null">
         <div id="controls">
           <div class="button">
             <button v-on:click="hostGame" class="common red-primary">
@@ -26,14 +26,20 @@
         </div>
       </div>
       <template v-else>
-        <div id="game-grid">
-          <div id="game-a">
-            <Game :paused="!state.isConnected" :options="optionsGameA"></Game>
-          </div>
-          <div id="game-b">
-            <Game :paused="!state.isConnected" :options="optionsGameB"></Game>
-          </div>
+        <div v-if="state.isConnected == false">
+          <h5>Waiting for Player to Join...</h5>
+          <button v-on:click="cancelHost" class="common red-primary">Cancel</button>
         </div>
+        <template v-else>
+          <div id="game-grid">
+            <div id="game-a">
+              <Game :options="optionsGameA"></Game>
+            </div>
+            <div id="game-b">
+              <Game :options="optionsGameB"></Game>
+            </div>
+          </div>
+        </template>
       </template>
     </template>
   </div>
@@ -48,7 +54,8 @@ export default {
   name: 'MultiplayerGame',
   mounted(){
     socketClient.on('hostGame', this.hostGameAck);
-    socketClient.on('joinGame', this.joinGame);
+    socketClient.on('joinGame', this.joinGameAck);
+    socketClient.on('playerJoined', this.playerJoined);
   },
   data:() => {
     return{
@@ -71,6 +78,9 @@ export default {
     }
   },
   methods:{
+    cancelHost(){
+      this.$store.commit(MultiplayerGameMutationTypes.CANCEL_HOST_GAME);
+    },
     hostGame(){
       this.$store.dispatch(MultiplayerGameMutationTypes.HOST_GAME);
     },
@@ -80,6 +90,14 @@ export default {
     },
     joinGame(){
       console.log("joinGame", this.joinGameId);
+      this.$store.dispatch(MultiplayerGameMutationTypes.JOIN_GAME, {id: this.joinGameId});
+    },
+    joinGameAck(payload){
+      this.$store.commit(MultiplayerGameMutationTypes.JOIN_GAME_SUCCESS, {gameId: payload.gameId, remotePlayerId: payload.remotePlayerId});
+    },
+    playerJoined(payload){
+      console.log("playerJoined", payload);
+      this.$store.commit(MultiplayerGameMutationTypes.PLAYER_JOINED, payload);
     },
   },
   sockets:{
