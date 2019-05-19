@@ -40,14 +40,14 @@
 </template>
 
 <script>
+import socketClient from '../websocketClient';
 import { mapState } from 'vuex';
 import * as MultiplayerGameMutationTypes from '../store/multiplayer-game/multiplayer-game.mutation-types';
 
 export default {
   name: 'MultiplayerGame',
   mounted(){
-    // console.log("MultiplayerGame Dispatch HOST_GAME", MultiplayerGameMutationTypes.HOST_GAME);
-    // this.$store.dispatch(MultiplayerGameMutationTypes.HOST_GAME);
+    socketClient.on('joinGame', this.joinGame);
   },
   data:() => {
     return{
@@ -71,8 +71,7 @@ export default {
   },
   methods:{
     hostGame(){
-      console.log("hostGame");
-      this.$socket.emit('hostGame');
+      this.$store.dispatch(MultiplayerGameMutationTypes.HOST_GAME);
     },
     joinGame(){
       console.log("joinGame", this.joinGameId);
