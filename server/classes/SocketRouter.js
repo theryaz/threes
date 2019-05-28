@@ -5,7 +5,7 @@ class SocketRouter{
   handleMessage(context, data){
     let message = JSON.parse(data);
     if(this.channelMap[message.channel] === undefined){
-      console.log(`Got message for channel with no handler: ${message.channel}`, this.channelMap);
+      logger.debug(`Got message for channel with no handler: ${message.channel}`, this.channelMap);
       return;
     }
     this.channelMap[message.channel].call(context, message.payload);

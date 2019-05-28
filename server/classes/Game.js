@@ -7,7 +7,7 @@ class Game{
     this.guestId = null;
   }
   joinGame(playerId){
-    console.log(`Player ${playerId} joining game ${this.id}`);
+    logger.debug(`Player ${playerId} joining game ${this.id}`);
   }
 }
 

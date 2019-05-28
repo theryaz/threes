@@ -8,6 +8,7 @@
       <div id="game-heading">
         <h3>MultiplayerGame ID: {{state.gameOptions.id}}</h3>
       </div>
+      <GameList></GameList>
       <div v-if="state.gameOptions.id == null">
         <div id="controls">
           <div class="button">
@@ -16,9 +17,6 @@
             </button>
           </div>
           <div class="button">
-            <div>
-              <input type="text" id="id-input" class="common" placeholder="Game ID" v-model="joinGameId"/>
-            </div>
             <button v-on:click="joinGame" class="common blue-primary">
               Join Game
             </button>
@@ -53,8 +51,8 @@ import * as MultiplayerGameMutationTypes from '../store/multiplayer-game/multipl
 export default {
   name: 'MultiplayerGame',
   mounted(){
-    socketClient.on('hostGame', this.hostGameAck);
-    socketClient.on('joinGame', this.joinGameAck);
+    socketClient.on('hostGame', this.hostGameSuccess);
+    socketClient.on('joinGame', this.jonGameSuccess);
     socketClient.on('playerJoined', this.playerJoined);
   },
   data:() => {
@@ -84,7 +82,7 @@ export default {
     hostGame(){
       this.$store.dispatch(MultiplayerGameMutationTypes.HOST_GAME);
     },
-    hostGameAck(payload){
+    hostGameSuccess(payload){
       console.log("payload", payload);
       this.$store.commit(MultiplayerGameMutationTypes.HOST_GAME_SUCCESS, {id: payload.gameId})
     },
@@ -92,17 +90,12 @@ export default {
       console.log("joinGame", this.joinGameId);
       this.$store.dispatch(MultiplayerGameMutationTypes.JOIN_GAME, {id: this.joinGameId});
     },
-    joinGameAck(payload){
+    jonGameSuccess(payload){
       this.$store.commit(MultiplayerGameMutationTypes.JOIN_GAME_SUCCESS, {gameId: payload.gameId, remotePlayerId: payload.remotePlayerId});
     },
     playerJoined(payload){
       console.log("playerJoined", payload);
       this.$store.commit(MultiplayerGameMutationTypes.PLAYER_JOINED, payload);
-    },
-  },
-  sockets:{
-    connect(){
-      console.log("Socket Connected!");
     },
   }
 }

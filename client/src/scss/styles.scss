@@ -24,3 +24,30 @@ input.common{
 	border-bottom: 1px solid $font-color;
 	color: $font-color;
 }
+
+
+table.common{
+  margin: auto;
+  border-collapse: collapse;
+  th{
+    text-align: left;
+  }
+  td{
+    padding: 15px 5px;
+    &.center{
+      text-align: center;
+    }
+    &.left{
+      text-align: left;
+    }
+    &.right{
+      text-align: right;
+    }
+  }
+  tr{
+    border-bottom: 1px dotted $font-color-fade;
+  }
+  tr:first-child{
+    border-bottom: none;
+  }
+}

@@ -8,11 +8,11 @@ class Player{
     this.socket = socket;
     this.id = uuid();
     this.gameId = null;
-    console.log(`Player connected (${this.id})`);
+    logger.debug(`Player connected (${this.id})`);
   }
   hostGame(){
     let game = new Game(this.id);
-    console.log(`Player ${this.id} hosting game ${game.id}`);
+    logger.debug(`Player ${this.id} hosting game ${game.id}`);
     this.socket.send(JSON.stringify({
       channel: 'hostGame',
       payload: {

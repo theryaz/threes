@@ -5,7 +5,7 @@ const { Player, Game, SocketRouter } = require('./classes');
 const { PlayerList, GameList } = require('./storage');
 
 module.exports = function(socket){
-  console.log(`Got a connection! ${PlayerList.length + 1} Players Connected.`);
+  logger.debug(`Got a connection! ${PlayerList.length + 1} Players Connected.`);
 
   let player = new Player(socket);
   PlayerList.push(player);
@@ -18,7 +18,7 @@ module.exports = function(socket){
   socket.on('close', () => {
     let i = PlayerList.findIndex((x) => x.id === player.id);
     PlayerList.splice(i, 1);
-    console.log(`Connection closed. ${PlayerList.length + 1} Players Connected.`);
+    logger.debug(`Connection closed. ${PlayerList.length + 1} Players Connected.`);
   });
 
 
@@ -26,13 +26,13 @@ module.exports = function(socket){
     let game = player.hostGame();
     GameList.push(game);
   }
-  function joinGame({id}){
-    console.log("Joing Game", id);
-    let game = GameList.find(x => x.id == id);
+  function joinGame({gameId}){
+    logger.debug("Joing Game", gameId);
+    let game = GameList.find(x => x.id == gameId);
     if(game){
       player.joinGame(game);
     }else{
-      console.log("Game Not Found", GameList);
+      logger.debug("Game Not Found", GameList);
     }
   }
 

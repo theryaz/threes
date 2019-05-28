@@ -8,7 +8,7 @@ const GameList = [];
 
 module.exports = function(io){
   return function(socket){
-    console.log("Got a connection!");
+    logger.debug("Got a connection!");
 
     let player = new Player(socket);
     PlayerList.push(player);
@@ -19,7 +19,7 @@ module.exports = function(io){
     });
 
     socket.on('joinGame', (gameId) => {
-      console.log(`Player Joining Game ${gameId}`);
+      logger.debug(`Player Joining Game ${gameId}`);
       // player.joinGame();
     });
   };

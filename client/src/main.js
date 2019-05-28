@@ -5,7 +5,9 @@ import VueRouter from 'vue-router';
 import './scss/styles.scss';
 import App from './App.vue'
 import Game from './components/Game.vue'
+import GameList from './components/GameList.vue'
 Vue.component('Game', Game);
+Vue.component('GameList', GameList);
 
 
 Vue.use(Vuex);
