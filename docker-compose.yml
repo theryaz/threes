@@ -1,0 +1,27 @@
+version: "3"
+services:
+  client:
+    image: node
+    volumes:
+      - ./client:/app
+    working_dir: /app
+    ports:
+      - "127.3.3.3:80:8080"
+    command: npm run dev
+  server:
+    image: node:11.15.0
+    environment:
+      - MONGO_URL=mongodb://mongo/threeswithfriends
+    ports:
+      - 127.3.3.4:80:4280
+      - 127.3.3.4:4290:4290
+    working_dir: /app
+    volumes:
+      - ./server:/app
+    command: npm start
+  mongo:
+    image: mongo:4.0.9
+    volumes:
+      - ./db:/data/db
+    logging:
+      driver: syslog

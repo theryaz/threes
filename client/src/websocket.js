@@ -1,1 +1,1 @@
-export const socket = new WebSocket("localhost:9090")
+export const socket = new WebSocket("api.local.threeswithfriends.com:4290")

@@ -4,7 +4,7 @@ const logger = require('./shared/winston');
 
 const version = require('./package.json').version;
 const PORT = process.env.PORT || 8000;
-const WS_PORT = process.env.PORT || 9090;
+const WS_PORT = process.env.PORT || 4290;
 const { PlayerList, GameList } = require('./storage');
 const routes = require('./routes');
 const { errorHandler } = require('./errors');

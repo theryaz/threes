@@ -31,4 +31,4 @@ class SocketClient{
 
 }
 
-export default new SocketClient("ws://localhost:9090");
+export default new SocketClient("ws://api.local.threeswithfriends.com:4290");
