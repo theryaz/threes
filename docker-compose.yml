@@ -1,17 +1,20 @@
 version: "3"
 services:
   client:
-    image: node
+    image: node:11.15.0
     volumes:
-      - ./client:/app
+      - ./client-ts:/app
     working_dir: /app
     ports:
       - "127.3.3.3:80:8080"
-    command: npm run dev
+    command: npm start
   server:
     image: node:11.15.0
     environment:
       - MONGO_URL=mongodb://mongo/threeswithfriends
+      - JWT_SECRET=changeme
+      - LOG_LEVEL=silly
+      - NODE_ENV=local
     ports:
       - 127.3.3.4:80:4280
       - 127.3.3.4:4290:4290
