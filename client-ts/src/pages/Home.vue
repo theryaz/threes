@@ -5,15 +5,6 @@
         <Game />
       </v-col>
     </v-row>
-    <v-row>
-      <v-col class="text-center">
-        <router-link to="/multiplayer">
-          <v-btn color="primary">
-              Play Online
-          </v-btn>
-        </router-link>
-      </v-col>
-    </v-row>
   </v-container>
 </template>
 <style lang="scss">

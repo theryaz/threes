@@ -5,7 +5,7 @@ import store from "./store";
 import "./registerServiceWorker";
 import vuetify from './plugins/vuetify';
 
-import './scss/styles.scss';
+// import './scss/styles.scss';
 
 Vue.config.productionTip = false;
 

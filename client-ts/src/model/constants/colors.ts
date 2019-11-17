@@ -9,11 +9,14 @@ const FONT_COLOR = "#111";
 const FONT_COLOR_INVERT = "#FFFFFF";
 const SHADOW = "#000000";
 
+const CRIMSON = "#B3001B";
+
 export const IS_DARK = false;
 export const COLORS = {
   primary: PRIMARY_GREEN,
   secondary: SECONDARY,
   accent: ACCENT,
+  crimson: CRIMSON,
   SHADOW,
   light:{
     FONT_COLOR,
