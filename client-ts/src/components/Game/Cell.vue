@@ -1,10 +1,10 @@
 <template>
-  <div class="cell" v-bind:class="[
+  <div class="cell" :class="[
     getRow(),
     getCol()
   ]">
     <div
-    v-bind:class="[this.grid.getClass(this.value)]">
+    :style="cellStyle">
     {{ value }}
   </div>
   </div>
@@ -14,6 +14,7 @@
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { Grid } from './model/Grid';
 import { ICell } from '../../model/views';
+import { IS_DARK, COLORS } from "../../model/constants";
 
 @Component
 export default class Cell extends Vue implements ICell{
@@ -89,6 +90,28 @@ export default class Cell extends Vue implements ICell{
     console.log("Destroying Cell", this.row, this.col);
     this.$el.parentNode.removeChild(this.$el);
     // this.$destroy();
+  }
+  get cellStyle(){
+    switch(this.value){
+      case 1:
+        return{
+          'color': COLORS['light'].FONT_COLOR_INVERT,
+          'background-color': COLORS['light'].cell.one,
+        };
+      case 2:
+        return {
+          'color': COLORS['light'].FONT_COLOR_INVERT,
+          'background-color': COLORS['light'].cell.two,
+        }
+      default:
+        return {
+          'color': COLORS[this.theme].FONT_COLOR,
+          'background-color': COLORS[this.theme].cell.background,
+        };
+    }
+  }
+  get theme(){
+    return IS_DARK ? 'dark' : 'light';
   }
 }
 </script>

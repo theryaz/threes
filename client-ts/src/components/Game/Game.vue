@@ -1,5 +1,5 @@
 <template>
-  <div class="game-component">
+  <div class="game-component" :style="componentStyle">
     <div v-if="grid.gameOver || paused" id="game-overlay">
       <div class="card" v-if="grid.gameOver">
         <h3>Score: {{ grid.score }}</h3>
@@ -31,8 +31,9 @@
 <script lang="ts">
 
 import { Grid } from './model/Grid';
-
 import { Component, Vue, Prop } from "vue-property-decorator";
+
+import { COLORS } from '../../model/constants';
 
 @Component
 export default class Game extends Vue{
@@ -72,6 +73,14 @@ export default class Game extends Vue{
   initializeGame(){
     this.grid.initializeGame(this.$refs.grid, 9);
   }
+  get componentStyle(){
+    return {
+      background: COLORS[this.theme].gameBackground,
+    };
+  }
+  get theme(){
+    return this.$vuetify.theme.dark ? 'dark' : 'light';
+  }
 }
 </script>
 
@@ -85,7 +94,6 @@ export default class Game extends Vue{
       display: inline-block;
       position: static;
       transform: scale(0.7);
-      border: 1px solid #EFEFEF;
     }
   }
   #playing-grid{
@@ -99,9 +107,11 @@ export default class Game extends Vue{
   }
 
   .game-component{
-    max-width: ($width * 4);
+    max-width: ($width * 5);
     position: relative;
     margin: auto;
+    box-shadow: 0px 0px 5px -2px $shadow;
+    text-align: center;
   }
   #game-overlay{
     position: absolute;

@@ -26,14 +26,14 @@ div.cell{
     border-radius: 5px;
     line-height: ($height - ($padding * 2));
     color: black;
-    background-color: #FFFFFF;
+    // background-color: #FFFFFF;
     &.blue{
       color: $background;
-      background-color: $blue;
+      // background-color: $blue;
     }
     &.red{
       color: $background;
-      background-color: $red;
+      // background-color: $red;
     }
   }
 

@@ -1,25 +1,26 @@
 import Vue from 'vue';
 import Vuetify from 'vuetify/lib';
+import { IS_DARK, COLORS } from '../model/constants';
 
 Vue.use(Vuetify);
 
 export default new Vuetify({
   theme:{
-    dark: true,
+    dark: IS_DARK,
     themes: {
       light: {
-        primary: '#04BB8B',
-        secondary: '#037971',
-        accent: '#023436',
+        primary: COLORS.primary,
+        secondary: COLORS.secondary,
+        accent: COLORS.accent,
         // error: '',
         // warning: '',
         // info: '',
         // success: '',
       },
       dark: {
-        primary: '#04BB8B',
-        secondary: '#037971',
-        accent: '#023436',
+        primary: COLORS.primary,
+        secondary: COLORS.secondary,
+        accent: COLORS.accent,
         // error: '',
         // warning: '',
         // info: '',
@@ -28,6 +29,6 @@ export default new Vuetify({
     },
   },
   icons: {
-    iconfont: 'fa',
+    iconfont: "fa",
   },
 });
