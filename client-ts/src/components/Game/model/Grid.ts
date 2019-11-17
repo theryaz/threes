@@ -107,7 +107,7 @@ export class Grid{
       }
     }, 1000);
   }
-  valueCount(value){
+  valueCount(value: number){
     return this.cells
     .map(cell => cell.value)
     .reduce((a, b) => {
@@ -115,7 +115,7 @@ export class Grid{
       else return a;
     }, 0);
   }
-  getNextNumber(){
+  setNextNumber(){
     let nextNumber = this.nextNumber;
 
     let ones = (100 - (this.valueCount(1) * 20));
@@ -139,10 +139,11 @@ export class Grid{
     // this.nextNumber = getRandom(1,3);
     return nextNumber;
   }
-  at(self, coords: ICoords, index = false){
-    let fn = 'find';
-    if(index === true) fn = 'findIndex';
-    return this.cells[fn](cell => cell.isAt(coords));
+  at(self: Grid, coords: ICoords): ICell | undefined{
+    return this.cells.find(cell => cell.isAt(coords));
+  }
+  indexAt(self: Grid, coords: ICoords): number | undefined{
+    return this.cells.findIndex(cell => cell.isAt(coords));
   }
   createRandomCell(){
     return this.createCell({
@@ -181,37 +182,38 @@ export class Grid{
     console.log("Grid Initialized", this.cells);
   }
   clear(coords: ICoords){
-    let cellIndex = this.at(this, coords, true);
+    let cellIndex = this.indexAt(this, coords);
+    if(cellIndex === undefined) return;
     let cell = this.cells[cellIndex].destroy();
     this.cells.splice(cellIndex, 1);
   }
-  coordsOutOfBounds(coords){
+  coordsOutOfBounds(coords: ICoords){
     return (coords.r > 3 || coords.r < 0 || coords.c > 3 || coords.c < 0);
   }
-  valueAt(coords){
+  valueAt(coords: ICoords){
     if(this.coordsOutOfBounds(coords)) return -1;
     let cell = this.at(this, coords);
     if(cell == null) return 0;
     else return cell.value;
   }
-  above(self, coords){
+  above(self: Grid, coords: ICoords): ICell{
     let new_coords = {r: coords.r - 1, c: coords.c};
     return self.at(self, new_coords);
   }
-  below(self, coords){
+  below(self: Grid, coords: ICoords): ICell{
     let new_coords = {r: coords.r + 1, c: coords.c};
     return self.at(self, new_coords);
   }
-  left(self, coords){
+  left(self: Grid, coords: ICoords): ICell{
     let new_coords = {r: coords.r, c: coords.c - 1};
     return self.at(self, new_coords);
   }
-  right(self, coords){
+  right(self: Grid, coords: ICoords): ICell{
     let new_coords = {r: coords.r, c: coords.c + 1};
     return self.at(self, new_coords);
   }
   // Methods to scan the grid from corner to corner and exec the move method on each cell
-  topToBottom(cellAt){
+  topToBottom(cellAt: ICell){
     // iterate top left to bottom right
     for(let r of INDEXES){
       for(let c of INDEXES){
@@ -219,7 +221,7 @@ export class Grid{
       }
     }
   }
-  bottomToTop(cellAt){
+  bottomToTop(cellAt: ICell){
     // iterate top left to bottom right
     for(let r of R_INDEXES){
       for(let c of R_INDEXES){
@@ -227,7 +229,7 @@ export class Grid{
       }
     }
   }
-  leftToRight(cellAt){
+  leftToRight(cellAt: ICell){
     // iterate bottom left to top right
     for(let r of R_INDEXES){
       for(let c of INDEXES){
@@ -235,7 +237,7 @@ export class Grid{
       }
     }
   }
-  rightToLeft(cellAt){
+  rightToLeft(cellAt: ICell){
     // iterate top left to bottom right
     for(let r of INDEXES){
       for(let c of R_INDEXES){
@@ -362,12 +364,12 @@ export class Grid{
     // console.log("addNumberTo",options);
     if(options.length > 0){
       let targetCoords = options[getRandom(0,options.length)];
-      let cell = this.createCell(targetCoords, this.getNextNumber());
+      let cell = this.createCell(targetCoords, this.setNextNumber());
       this.spawnCellInGrid(cell);
       // console.log("Number Add to",targetCoords);
     }
   }
-  getClass(value){
+  getClass(value: number){
     if(value === 1){
       return 'blue';
     }else if(value === 2){

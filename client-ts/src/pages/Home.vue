@@ -6,17 +6,10 @@
       </v-col>
     </v-row>
     <v-row>
-      <!-- <v-col cols="6" class="text-center">
-        <router-link to="/play">
-          <v-btn color="secondary">
-              Play Alone
-          </v-btn>
-        </router-link>
-      </v-col> -->
-      <v-col cols="12" class="text-center">
+      <v-col class="text-center">
         <router-link to="/multiplayer">
           <v-btn color="primary">
-              Play with a friend
+              Play Online
           </v-btn>
         </router-link>
       </v-col>

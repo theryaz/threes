@@ -18,9 +18,7 @@
     <h1 id="title">
       Next Number:
       <div id="preview" class="cell">
-        <div :class="grid.getClass(grid.nextNumber)">
-          {{grid.nextNumber}}
-        </div>
+        <Cell :value="grid.nextNumber" />
       </div>
     </h1>
     <div id="playing-grid" ref="grid">
@@ -30,12 +28,17 @@
 
 <script lang="ts">
 
+import Cell from './Cell.vue';
 import { Grid } from './model/Grid';
 import { Component, Vue, Prop } from "vue-property-decorator";
 
 import { COLORS } from '../../model/constants';
 
-@Component
+@Component({
+  components:{
+    Cell
+  }
+})
 export default class Game extends Vue{
   @Prop({type: Boolean, default: false}) private isRemote: boolean;
   @Prop({type: Boolean, default: false}) private isMultiplayer: boolean;

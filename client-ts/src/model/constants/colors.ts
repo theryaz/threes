@@ -9,7 +9,7 @@ const FONT_COLOR = "#111";
 const FONT_COLOR_INVERT = "#FFFFFF";
 const SHADOW = "#000000";
 
-export const IS_DARK = true;
+export const IS_DARK = false;
 export const COLORS = {
   primary: PRIMARY_GREEN,
   secondary: SECONDARY,
@@ -22,7 +22,7 @@ export const COLORS = {
     cell:{
       background: '#FFFFFF',
       one: ONE_BLUE,
-      two: TWO_RED,
+      two: PRIMARY_GREEN,
     }
   },
   dark:{
@@ -32,7 +32,7 @@ export const COLORS = {
     cell:{
       background: '#454545',
       one: ONE_BLUE,
-      two: TWO_RED,
+      two: PRIMARY_GREEN,
     }
   }
 }
