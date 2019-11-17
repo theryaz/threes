@@ -30,7 +30,7 @@
 
 <script>
 
-import { Grid } from '../model/grid';
+import { Grid } from '../model/Grid';
 
 export default {
   name: 'Game',

@@ -7,7 +7,7 @@
         <div class="new-high-score" v-if="grid.score == grid.highScore">
           Wow! New high score!
         </div>
-        <div class="buttons" v-if="options.isMultiplayer !== true">
+        <div class="buttons" v-if="isMultiplayer !== true">
           <button class="common primary" v-on:click="initializeGame()">Play Again</button>
         </div>
       </div>
@@ -29,22 +29,24 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
-import { Grid } from '../model/grid';
 
+import { Grid } from './model/Grid';
+
+import { Component, Vue, Prop } from "vue-property-decorator";
+
+@Component
 export default class Game extends Vue{
-  @Prop() paused: boolean;
-  @Prop() options = {
-    isRemote: false,
-    isMultiplayer: false,
-  };
-  grid: Grid = new Grid();
+  @Prop({type: Boolean, default: false}) private isRemote: boolean;
+  @Prop({type: Boolean, default: false}) private isMultiplayer: boolean;
+  @Prop() private paused: Boolean;
+  private grid = new Grid();
 
   beforeMount(){
-    if(this.options.isRemote == true || this.paused == true) return;
-    window.addEventListener('keydown', (e: KeyboardEvent) => {
+    console.log("Game.vue Grid: ", this.grid);
+    if(this.isRemote == true || this.paused == true) return;
+    window.addEventListener('keydown', (e) => {
       if(this.grid.gameOver) return;
-      e = e || <KeyboardEvent>window.event;
+      e = e || window.event;
       if (e.keyCode == 38) {
         this.grid.moveUp();
       }
@@ -58,13 +60,14 @@ export default class Game extends Vue{
         this.grid.moveRight();
       }
     });
+
   }
   mounted(){
     console.log("Refs", this.$refs);
     this.initializeGame();
   }
   getRandom(min,max){
-    return Math.floor(Math.random() * max) + min;
+      return Math.floor(Math.random() * max) + min;
   }
   initializeGame(){
     this.grid.initializeGame(this.$refs.grid, 9);
@@ -72,10 +75,10 @@ export default class Game extends Vue{
 }
 </script>
 
-<style scoped lang="scss">
-  @import "../scss/colors";
-  @import "../scss/buttons";
-  @import "../scss/cell";
+<style lang="scss">
+  @import "src/scss/colors";
+  @import "src/scss/buttons";
+  @import "src/scss/cell";
   #title{
     font-size: 1.5rem;
     #preview{
@@ -87,7 +90,8 @@ export default class Game extends Vue{
   }
   #playing-grid{
     position: relative;
-    background: #EFEFEF;
+    // border: 1px solid #EFEFEF;
+    // background: #EFEFEF;
     width: ($width * 4);
     height: ($height * 4);
     margin: auto;
@@ -95,7 +99,9 @@ export default class Game extends Vue{
   }
 
   .game-component{
+    max-width: ($width * 4);
     position: relative;
+    margin: auto;
   }
   #game-overlay{
     position: absolute;
@@ -132,4 +138,5 @@ export default class Game extends Vue{
     font-weight: bold;
     letter-spacing: 2px;
   }
+
 </style>

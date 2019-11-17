@@ -12,15 +12,20 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
+import { Grid } from './model/Grid';
+import { ICell } from '../../model/views';
 
 @Component
-export default class Cell extends Vue{
+export default class Cell extends Vue implements ICell{
   @Prop() row = 0;
   @Prop() col = 0;
   @Prop() value = 0;
-  @Prop() grid = null;
+  @Prop(Grid) grid: Grid;
+  created(){
+    console.log("[Cell.vue] created", this.row, this.col, this.value, this.grid);
+  };
   mounted(){
-    // console.log("Cell Created", this.row, this.col, this.value, this.grid);
+    console.log("[Cell.vue] mounted", this.row, this.col, this.value, this.grid);
   };
   getRow(){
     switch (this.row) {
@@ -38,7 +43,7 @@ export default class Cell extends Vue{
       case 3: return 'c3';
     }
   }
-  setValue(v){ this.value = v; },
+  setValue(v){ this.value = v; }
   isAt(coords){
     return (this.row == coords.r && this.col == coords.c);
   }
@@ -53,7 +58,7 @@ export default class Cell extends Vue{
     if(newRow < 0) {
       return;
     }
-    // console.log(`Cell ${this.value}: moveUp`);
+    console.log(`Cell ${this.value}: moveUp`);
     this.row = newRow;
   }
   moveDown(){
@@ -61,7 +66,7 @@ export default class Cell extends Vue{
     if(newRow > 3) {
       return;
     }
-    // console.log(`Cell ${this.value}: moveDown`);
+    console.log(`Cell ${this.value}: moveDown`);
     this.row = newRow;
   }
   moveLeft(){
@@ -69,7 +74,7 @@ export default class Cell extends Vue{
     if(newCol < 0) {
       return;
     }
-    // console.log(`Cell ${this.value}: moveLeft`);
+    console.log(`Cell ${this.value}: moveLeft`);
     this.col = newCol;
   }
   moveRight(){
@@ -77,11 +82,11 @@ export default class Cell extends Vue{
     if(newCol > 3) {
       return;
     }
-    // console.log(`Cell ${this.value}: moveRight`);
+    console.log(`Cell ${this.value}: moveRight`);
     this.col = newCol;
   }
   destroy(){
-    // console.log("Destroying Cell", this.row, this.col);
+    console.log("Destroying Cell", this.row, this.col);
     this.$el.parentNode.removeChild(this.$el);
     // this.$destroy();
   }
@@ -90,7 +95,4 @@ export default class Cell extends Vue{
 
 <style lang="scss">
   @import "src/scss/cell";
-  // div.cell{
-  // transform: scale(0.9) translateX(30px);
-  // }
 </style>
