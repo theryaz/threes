@@ -15,12 +15,16 @@
         <h3>Game Paused</h3>
       </div>
     </div>
-    <h1 id="title">
-      Next Number:
-      <div id="preview" class="cell">
-        <Cell :value="grid.nextNumber" />
-      </div>
-    </h1>
+    <table id="title">
+      <tr>
+        <td class="text-right">Next Number:</td>
+        <td></v-spacer>
+          <div id="preview" class="cell">
+            <Cell :value="grid.nextNumber" />
+          </div>
+        </td>
+      </tr>
+    </table>
     <div id="playing-grid" ref="grid">
     </div>
   </div>
@@ -92,17 +96,18 @@ export default class Game extends Vue{
   @import "src/scss/buttons";
   @import "src/scss/cell";
   #title{
-    font-size: 1.5rem;
+    width: 100%;
+    font-size: 1.25rem;
+    font-weight: bold;
     #preview{
       display: inline-block;
       position: static;
       transform: scale(0.7);
     }
   }
+
   #playing-grid{
     position: relative;
-    // border: 1px solid #EFEFEF;
-    // background: #EFEFEF;
     width: ($width * 4);
     height: ($height * 4);
     margin: auto;
