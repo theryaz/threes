@@ -16,7 +16,7 @@
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import PlayerCard from '../components/PlayerCard';
+import PlayerCard from '../components/PlayerCard.vue';
 
 @Component({
   components: { PlayerCard }
