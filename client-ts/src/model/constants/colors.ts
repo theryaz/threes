@@ -11,12 +11,14 @@ const SHADOW = "#000000";
 
 const CRIMSON = "#B3001B";
 
-export const IS_DARK = false;
+export const IS_DARK = true;
+
 export const COLORS = {
   primary: PRIMARY_GREEN,
   secondary: SECONDARY,
   accent: ACCENT,
   crimson: CRIMSON,
+  blue: ONE_BLUE,
   SHADOW,
   light:{
     FONT_COLOR,

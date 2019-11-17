@@ -1,6 +1,8 @@
 import express from 'express';
+import http from 'http';
 import body_parser from 'body-parser';
 import cors from 'cors';
+import socket from 'socket.io';
 
 import graphqlHTTP from 'express-graphql';
 import { graphqlSchema } from './schema';
@@ -21,8 +23,13 @@ import { errorHandler } from './errors';
 export class App{
 
 	public app: express.Application;
+	public httpServer;
+	public io: SocketIO.Server;
 	constructor(){
 		this.app = express();
+		this.httpServer = http.createServer(this.app);
+		this.io = socket(this.httpServer);
+		this.socketHandlers();
 		this.middleware();
 		this.routes();
 		this.postMiddleware();
@@ -54,6 +61,13 @@ export class App{
 	private postMiddleware(): void{
 		this.app.use(errorHandler);
 	}
+
+	private socketHandlers(): void{
+		logger.info("Setup Socket.io handlers");
+		this.io.on('connection', (socket) => {
+			logger.info("A User Connected! " + socket.client.id);
+		});
+	}
 }
 
-export default new App().app;
+export default new App().httpServer;

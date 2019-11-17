@@ -1,6 +1,6 @@
 <template>
   <div class="game-component" :style="componentStyle">
-    <div v-if="grid.gameOver || paused" id="game-overlay">
+    <div v-if="grid.gameOver" id="game-overlay">
       <div class="card" v-if="grid.gameOver">
         <h3>Score: {{ grid.score }}</h3>
         <h3>High Score: {{ grid.highScore }}</h3>
@@ -11,23 +11,22 @@
           <button class="common primary" v-on:click="initializeGame()">Play Again</button>
         </div>
       </div>
-      <div class="card" v-if="paused">
-        <h3>Game Paused</h3>
-      </div>
     </div>
     <div id="title">
-      <slot>
         <table>
           <tr>
-            <td class="text-right">Next Number:</td>
-            <td></v-spacer>
+            <td class="text-right">
+              <slot>
+                Next Number:
+              </slot>
+            </td>
+            <td>
               <div id="preview" class="cell">
                 <Cell :value="grid.nextNumber" />
               </div>
             </td>
           </tr>
         </table>
-      </slot>
     </div>
     <div id="playing-grid" ref="grid">
     </div>
@@ -39,24 +38,33 @@
 import Cell from './Cell.vue';
 import { Grid } from './model/Grid';
 import { Component, Vue, Prop } from "vue-property-decorator";
+import { mapState } from 'vuex';
+import { getModule } from 'vuex-module-decorators';
+
+import UserModule from '../../store/user/user.store';
+const userStore = getModule(UserModule);
 
 import { COLORS } from '../../model/constants';
 
 @Component({
   components:{
     Cell
+  },
+  computed:{
+    ...mapState(['userStore']),
   }
 })
 export default class Game extends Vue{
+  @Prop({type: Boolean, default: false}) private paused: boolean;
   @Prop({type: Boolean, default: false}) private isRemote: boolean;
   @Prop({type: Boolean, default: false}) private isMultiplayer: boolean;
-  @Prop() private paused: Boolean;
   private grid = new Grid();
 
   beforeMount(){
     console.log("Game.vue Grid: ", this.grid);
-    if(this.isRemote == true || this.paused == true) return;
+    if(this.isRemote) return;
     window.addEventListener('keydown', (e) => {
+      if(this.paused == true ) return;
       if(this.grid.gameOver) return;
       e = e || window.event;
       if (e.keyCode == 38) {
@@ -124,7 +132,7 @@ export default class Game extends Vue{
   }
 
   .game-component{
-    max-width: ($width * 5);
+    width: ($width * 5);
     position: relative;
     margin: auto;
     box-shadow: 0px 0px 5px -2px $shadow;
