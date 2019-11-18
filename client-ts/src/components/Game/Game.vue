@@ -1,32 +1,42 @@
 <template>
   <div class="game-component" :style="componentStyle">
-    <div v-if="grid.gameOver" id="game-overlay">
-      <div class="card" v-if="grid.gameOver">
-        <h3>Score: {{ grid.score }}</h3>
-        <h3>High Score: {{ grid.highScore }}</h3>
-        <div class="new-high-score" v-if="grid.score == grid.highScore">
-          Wow! New high score!
-        </div>
-        <div class="buttons" v-if="isMultiplayer !== true">
-          <button class="common primary" v-on:click="initializeGame()">Play Again</button>
-        </div>
-      </div>
-    </div>
+     <v-dialog v-model="grid.gameOver" max-width="290">
+      <v-card>
+        <v-card-title class="headline">
+          <div class="new-high-score" v-if="grid.score == grid.highScore">
+            Wow! New high score!
+          </div>
+          <div v-else class="new-high-score">
+            Game over
+          </div>
+        </v-card-title>
+        <v-card-text>
+          Score: <strong>{{ grid.score }}</strong>
+          <br />
+          High Score: {{ grid.highScore }}
+          
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary darken-1" text @click="initializeGame()">Play Again</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <div id="title">
-        <table>
-          <tr>
-            <td class="text-right">
-              <slot>
-                Next Number:
-              </slot>
-            </td>
-            <td>
-              <div id="preview" class="cell">
-                <Cell :value="grid.nextNumber" />
-              </div>
-            </td>
-          </tr>
-        </table>
+      <table>
+        <tr>
+          <td class="text-right">
+            <slot>
+              Next Number:
+            </slot>
+          </td>
+          <td>
+            <div id="preview" class="cell">
+              <Cell :value="grid.nextNumber" />
+            </div>
+          </td>
+        </tr>
+      </table>
     </div>
     <div id="playing-grid" ref="grid">
     </div>
