@@ -1,5 +1,9 @@
+import { Role } from "../enums";
+
 export interface JwtData{
-	userId: string,
+	username: string,
+	email: string,
+	role: Role
 }
 
 export interface Jwt{

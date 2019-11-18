@@ -20,6 +20,8 @@ try{
 import { logRoute } from './middleware';
 import { errorHandler } from './errors';
 
+import userRouter from './routes/user.router';
+
 export class App{
 
 	public app: express.Application;
@@ -51,6 +53,7 @@ export class App{
 				version: version
 			});
 		});
+		this.app.use("/v1/user", userRouter.router);
 		this.app.use('/graphql',
 				graphqlHTTP({
 					schema: graphqlSchema,
