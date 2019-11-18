@@ -21,8 +21,8 @@ export class UserRouter{
 		this.router.route("/register")
 			.post(sanitizeBody,
 			asyncWrap(async (req, res) => {
-				const { username, email, password } = req.body;
-				const jwt = await User.registerUser({ username, email, password, role: Role.User });
+				const { username, email, password, avatarIcon } = req.body;
+				const jwt = await User.registerUser({ username, email, password, role: Role.User, avatarIcon });
 				res.json({
 					jwt
 				});
@@ -35,10 +35,12 @@ export class UserRouter{
 				if(user === null || user.checkPassword(password) === false){
 					throw new UnauthorizedError();
 				}
-				const jwt = await user.createJwt();
+				const jwt = user.createJwt();
 				res.json({
+					username: user.username,
 					avatarUrl: user.avatarUrl,
 					avatarIcon: user.avatarIcon,
+					role: user.role,
 					jwt,
 				});
 			}));

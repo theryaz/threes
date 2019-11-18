@@ -46,7 +46,7 @@ export class User{
   
   static async registerUser({ username, email, password, role, avatarUrl, avatarIcon }: RegisterUserParams){
     const salt = randomString(16);
-    const user = await UserModel.create({ username, email } as User);
+    const user = await UserModel.create({ username, email, role, avatarUrl, avatarIcon } as User);
     user.setPassword(password);
     await user.save();
     return createJwt({

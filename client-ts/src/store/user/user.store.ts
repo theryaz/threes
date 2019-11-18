@@ -7,7 +7,10 @@ import apiService from '../../services/api.service';
 
 interface LoginPayload{
 	jwt: string,
+	username: string,
 	role: string,
+	avatarUrl: string | null,
+	avatarIcon: string,
 }
 
 interface LoginParams{
@@ -39,36 +42,62 @@ export default class UserModule extends VuexModule{
 		return this.jwt !== null;
 	}
 
-
-  @Action({rawError: true, commit: UserMutationTypes.LOGIN_SUCCESS}) async login({ email, password }: LoginParams){
+	@Action({ rawError: true }) async logout(){
+		this.context.commit(UserMutationTypes.LOGOUT);
+	}
+	@Mutation [UserMutationTypes.LOGOUT](){
+		this.loading = true;
+		this.jwt = null;
+		this.username = null;
+		this.avatarIcon = null;
+		this.avatarUrl = null;
+		this.role = null;
+		window.localStorage.removeItem("userAuth");
+	}
+	
+  @Action({ rawError: true }) async login({ email, password }: LoginParams){
 		this.context.commit(UserMutationTypes.LOGIN);
 		try{
-			let response = await apiService.post('/v1/login', { email, password });
-			return {
+			let response = await apiService.post('/v1/user/login', { email, password });
+			const payload: LoginPayload = {
 				jwt: response.body.jwt,
+				username: response.body.username,
+				avatarIcon: response.body.avatarIcon,
+				avatarUrl: response.body.avatarUrl,
 				role: response.body.role,
 			};
+			this.context.commit(UserMutationTypes.LOGIN_SUCCESS, payload);
 		}catch(error){
 			this.context.commit(UserMutationTypes.LOGIN_FAILURE);
 			throw error;
 		}
 	}
-	@Action({rawError: true}) async loadAuth(payload: LoginPayload){
+	@Action({rawError: true}) async loadAuth(){
+		console.log("Load Auth");
+		const userAuth = window.localStorage.getItem("userAuth");
+		if(!userAuth){
+			console.log("No user auth exists");
+			return;
+		}
+		const payload = JSON.parse(userAuth);
 		this.context.commit(UserMutationTypes.LOGIN_SUCCESS, payload);
   }
 
 	@Mutation [UserMutationTypes.LOGIN](){
 		this.loading = true;
 	}
-	@Mutation [UserMutationTypes.LOGIN_SUCCESS]({ jwt, role }: LoginPayload){
+	@Mutation [UserMutationTypes.LOGIN_SUCCESS](payload: LoginPayload){
 		this.loading = false;
-		this.jwt = jwt;
-		this.role = role;
+		this.jwt = payload.jwt;
+		this.username = payload.username;
+		this.avatarIcon = payload.avatarIcon;
+		this.avatarUrl = payload.avatarUrl;
+		this.role = payload.role;
+		window.localStorage.setItem("userAuth", JSON.stringify(payload));
 	}
 	@Mutation [UserMutationTypes.LOGIN_FAILURE](){
 		this.loading = false;
   }
-
   
   @Action({rawError: true, commit: UserMutationTypes.REGISTER_SUCCESS}) async register({ email, password }: LoginParams){
 		this.context.commit(UserMutationTypes.REGISTER);

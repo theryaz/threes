@@ -7,15 +7,21 @@
   </v-app>
 </template>
 <script lang="ts">
+import { mapState } from 'vuex';
+import { getModule } from 'vuex-module-decorators';
 import { Component, Vue } from 'vue-property-decorator';
 import NavBar from './components/NavBar.vue';
+
+import UserModule from './store/user/user.store';
+const userStore = getModule(UserModule);
+
 @Component({
   components: { NavBar }
 })
 export default class App extends Vue{
-  showNav: boolean = true;
-  items = [
-    { title: 'Home', icon: 'fa fa-home'}
-  ];
+  beforeMount(){
+    console.log("beforeMount loadAuth");
+    userStore.loadAuth();
+  }
 }
 </script>

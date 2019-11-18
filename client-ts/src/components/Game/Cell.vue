@@ -5,7 +5,7 @@
   ]">
     <div
     :style="cellStyle">
-    {{ value }}
+    {{ Value }}
   </div>
   </div>
 </template>
@@ -23,13 +23,23 @@ export default class Cell extends Vue implements ICell{
   @Prop() value = 0;
   @Prop(Grid) grid: Grid;
   created(){
-    console.log("[Cell.vue] created", this.row, this.col, this.value, this.grid);
+    // console.log("[Cell.vue] created", this.row, this.col, this.value, this.grid);
   };
   mounted(){
-    console.log("[Cell.vue] mounted", this.row, this.col, this.value, this.grid);
+    // console.log("[Cell.vue] mounted", this.row, this.col, this.value, this.grid);
   };
+
+  get Row(){
+    return this.row;
+  }
+  get Col(){
+    return this.col;
+  }
+  get Value(){
+    return this.value;
+  }
   getRow(){
-    switch (this.row) {
+    switch (this.Row) {
       case 0: return 'r0';
       case 1: return 'r1';
       case 2: return 'r2';
@@ -37,7 +47,7 @@ export default class Cell extends Vue implements ICell{
     }
   }
   getCol(){
-    switch (this.col) {
+    switch (this.Col) {
       case 0: return 'c0';
       case 1: return 'c1';
       case 2: return 'c2';
@@ -92,7 +102,7 @@ export default class Cell extends Vue implements ICell{
     // this.$destroy();
   }
   get cellStyle(){
-    switch(this.value){
+    switch(this.Value){
       case 1:
         return{
           'color': COLORS['light'].FONT_COLOR_INVERT,

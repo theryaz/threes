@@ -15,7 +15,7 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 export default class PlayerCard extends Vue{
   @Prop({default: "crimson"}) color: string;
   @Prop({default: null}) avatarUrl: string;
-  @Prop({default: "fa-user-astronaut"}) avatarIcon: string;
+  @Prop({default: "fa-user"}) avatarIcon: string;
   @Prop({default: "Player"}) username: string;
 }
 </script>

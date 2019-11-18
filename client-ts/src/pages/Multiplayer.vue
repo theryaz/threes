@@ -38,13 +38,16 @@ const userStore = getModule(UserModule);
 
 @Component({
   components: { PlayerCard, RegisterDialog, LoginDialog },
+  computed:{
+    ...mapState(['userStore']),
+  }
 })
 export default class Multiplayer extends Vue{
   private showRegisterDialog: boolean = false;
   private showLoginDialog: boolean = false;
 
   beforeMount(){
-    if(this.userStore.username === null){
+    if(userStore.isLoggedIn === false){
       this.showRegisterDialog = true;
     }
   }
@@ -73,9 +76,11 @@ export default class Multiplayer extends Vue{
     this.showRegisterDialog = false;
     this.showLoginDialog = true;
   }
-  onLogin(formData){
+  onLogin({ email, password }){
     console.log("[Multiplayer.vue] onLogin");
-    this.showLoginDialog = false;
+    userStore.login({ email, password }).then(result => {
+      this.showLoginDialog = false;
+    });
   }
   onGoRegister(formData){
     console.log("[Multiplayer.vue] onGoRegister");
