@@ -31,7 +31,7 @@
           </td>
           <td>
             <div id="preview" class="cell">
-              <!-- <Cell :value="grid.nextNumber" /> -->
+              <Cell :value="grid.nextNumber" />
             </div>
           </td>
         </tr>

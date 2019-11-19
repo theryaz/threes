@@ -31,7 +31,7 @@
           </td>
           <td>
             <div id="preview" class="cell">
-              <!-- <Cell :value="grid.nextNumber" /> -->
+              <Cell :value="grid.nextNumber" />
             </div>
           </td>
         </tr>
@@ -148,6 +148,7 @@ export default class Game extends Vue{
 
   .game-component{
     width: ($width * 5);
+    height: ($height * 5.4);
     position: relative;
     margin: auto;
     box-shadow: 0px 0px 5px -2px $shadow;
