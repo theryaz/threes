@@ -9,6 +9,10 @@ import SocketModule from '../store/socket/socket.store';
 import * as SocketMutationTypes from '../store/socket/socket.types';
 const socketStore = getModule(SocketModule);
 
+import GameModule from '../store/game/game.store';
+import * as GameMutationTypes from '../store/game/game.types';
+const gameStore = getModule(GameModule);
+
 class ApiService{
 	public socket: SocketIOClient.Socket = io.connect(API_URL);
 	constructor(private baseUrl: string){
@@ -20,6 +24,17 @@ class ApiService{
 		this.socket.on(SocketMutationTypes.CONNECTED, socketStore.onConnected);
 		this.socket.on(SocketMutationTypes.DISCONNECTED, socketStore.onDisconnected);
 		this.socket.on(SocketMutationTypes.EVENT, socketStore.onEvent);
+		
+		this.socket.on(GameMutationTypes.SET_REMOTE_PLAYER_INFO, gameStore.onSetRemotePlayerInfo);
+		this.socket.on(GameMutationTypes.START_GAME, gameStore.onStartGame);
+		this.socket.on(GameMutationTypes.APPLY_REMOTE_STATE, gameStore.applyRemoteState);
+		this.socket.on(GameMutationTypes.REMOTE_GAME_END, gameStore.onRemoteGameEnd);
+		this.socket.on(GameMutationTypes.REMOTE_GAME_PAUSE, gameStore.onRemoteGamePause);
+
+		this.socket.on(GameMutationTypes.REMOTE_MOVE_UP, gameStore.onRemoteMoveUp);
+		this.socket.on(GameMutationTypes.REMOTE_MOVE_DOWN, gameStore.onRemoteMoveDown);
+		this.socket.on(GameMutationTypes.REMOTE_MOVE_LEFT, gameStore.onRemoteMoveLeft);
+		this.socket.on(GameMutationTypes.REMOTE_MOVE_RIGHT, gameStore.onRemoteMoveRight);
 	}
 
 

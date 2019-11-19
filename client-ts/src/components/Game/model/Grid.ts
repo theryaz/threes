@@ -13,7 +13,7 @@ export class Grid{
   private highScore: number;
   private score: number;
   public gameOver: boolean;
-  private ref: any;
+  public ref: any;
   private cells: ICell[];
   private nextNumber: any;
 
@@ -26,6 +26,18 @@ export class Grid{
     this.ref = null;
     this.cells = [];
     this.nextNumber = getRandom(1,3);
+  }
+
+  applyCellState(cellState: ICell[]){
+    console.log("Applying Cell State", cellState);
+    if(cellState.length != this.cells.length){
+      console.error("Cell lengths do not match", cellState, this.cells);
+    }
+    for(let i in this.cells){
+      this.cells[i].row = cellState[i].row;
+      this.cells[i].col = cellState[i].col;
+      this.cells[i].value = cellState[i].value;
+    }
   }
 
   getScore(){
@@ -43,7 +55,7 @@ export class Grid{
   scoreValue(value: number){
     // 3^(log₂(x/3)+1)
     let score = Math.pow(3,Math.log2(value / 3) + 1);
-    console.log(`Calculated ${value} as worth ${score} points`);
+    // console.log(`Calculated ${value} as worth ${score} points`);
     return score;
   }
   setHighScore(score: number){
@@ -60,10 +72,10 @@ export class Grid{
   gameOverCheck(){
     if(this.gameOverCheckTimeout) clearTimeout(this.gameOverCheckTimeout);
     this.gameOverCheckTimeout = setTimeout(() => {
-      console.log("Check Game Over");
+      // console.log("Check Game Over");
       let gameOver = false;
       if(this.cells.length < 16){
-        console.log("The grid isn't even full.");
+        // console.log("The grid isn't even full.");
         return;
       }
 
@@ -101,7 +113,7 @@ export class Grid{
         }
       }
       if(allCellsStuck){
-        console.log("Game Over!");
+        // console.log("Game Over!");
         this.getScore();
         this.gameOver = allCellsStuck;
       }
@@ -122,9 +134,9 @@ export class Grid{
     let twos = (100 - (this.valueCount(2) * 20));
     let seed = getRandom(0, 100);
 
-    console.log(`${ones}% ones`);
-    console.log(`${twos}% twos`);
-    console.log(`${seed} rolled`);
+    // console.log(`${ones}% ones`);
+    // console.log(`${twos}% twos`);
+    // console.log(`${seed} rolled`);
     if(seed < ones && seed < twos){
       if(ones > twos) this.nextNumber = 1;
       else this.nextNumber = 2;
@@ -135,7 +147,7 @@ export class Grid{
     }else{
       this.nextNumber = 3;
     }
-    console.log("Selected",this.nextNumber);
+    // console.log("Selected",this.nextNumber);
     // this.nextNumber = getRandom(1,3);
     return nextNumber;
   }
@@ -152,13 +164,13 @@ export class Grid{
     }, getRandom(1,3));
   }
   createCell(coords: ICoords, value: number){
-    console.log("Create Cell", coords, value);
+    // console.log("Create Cell", coords, value);
     let c = <ICell> new Cell();
     c.row = coords.r;
     c.col = coords.c;
     c.value = value;
     c.grid = this;
-    console.log("Created Cell", c);
+    // console.log("Created Cell", c);
     return c;
   }
   spawnCellInGrid(cell: ICell){
@@ -169,7 +181,7 @@ export class Grid{
     return true;
   }
   initializeGame(gridRef: HTMLDivElement, n = 9){
-    console.log("[Grid.ts] initialize Game gridRef: " + gridRef);
+    // console.log("[Grid.ts] initialize Game gridRef: " + gridRef);
     this.ref = gridRef;
     this.score = 0;
     this.cells.map((cell: ICell) => cell.destroy());
@@ -179,7 +191,7 @@ export class Grid{
       let cell = this.createRandomCell();
       this.spawnCellInGrid(cell);
     }
-    console.log("Grid Initialized", this.cells);
+    // console.log("Grid Initialized", this.cells);
   }
   clear(coords: ICoords){
     let cellIndex = this.indexAt(this, coords);
@@ -266,14 +278,14 @@ export class Grid{
     };
 
     if(this.valueAt(coords) >= 3 && destCell.value == this.valueAt(coords)){
-      console.log("Combining",startCell.value,"to",destCell.value);
+      // console.log("Combining",startCell.value,"to",destCell.value);
       this.clear(destCoords);
       startCell.value = destCell.value * 2;
       startCell[direction]();
       return;
 
     }else if(this.valueAt(coords) == 2 && destCell.value == 1){
-      console.log("Combining",startCell.value,"to",destCell.value);
+      // console.log("Combining",startCell.value,"to",destCell.value);
       this.clear(destCoords);
       startCell.value = 3;
       startCell[direction]();
@@ -281,14 +293,14 @@ export class Grid{
 
     }else if(this.valueAt(coords) == 1 && destCell.value == 2){
 
-      console.log("Combining",startCell.value,"to",destCell.value);
+      // console.log("Combining",startCell.value,"to",destCell.value);
       this.clear(destCoords);
       startCell.value = 3;
       startCell[direction]();
       return;
 
     }else{
-      console.log(`No Valid Move ${direction}`);
+      // console.log(`No Valid Move ${direction}`);
     }
   }
   moveUp(){
@@ -298,7 +310,7 @@ export class Grid{
     this.gameOverCheck();
   }
   moveDown(){
-    console.log("moveDown");
+    // console.log("moveDown");
     this.bottomToTop(this.below);
     this.addNumberDown();
     this.gameOverCheck();

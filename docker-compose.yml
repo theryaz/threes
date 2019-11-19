@@ -3,8 +3,8 @@ services:
   client:
     image: node:11.15.0
     volumes:
-      - ./client-ts:/app
-    working_dir: /app
+      - .:/app
+    working_dir: /app/client-ts
     ports:
       - "127.3.3.3:80:8080"
     command: npm start
@@ -18,9 +18,9 @@ services:
     ports:
       - 127.3.3.4:80:4280
       - 127.3.3.4:4290:4290
-    working_dir: /app
+    working_dir: /app/server
     volumes:
-      - ./server:/app
+      - .:/app
     command: npm start
   mongo:
     image: mongo:4.0.9

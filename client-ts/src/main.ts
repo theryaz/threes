@@ -11,6 +11,9 @@ Vue.config.productionTip = false;
 import Game from './components/Game/Game.vue';
 Vue.component('Game', Game);
 
+import RemoteGame from './components/Game/RemoteGame.vue';
+Vue.component('RemoteGame', RemoteGame);
+
 new Vue({
   router,
   store,

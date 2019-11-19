@@ -2,14 +2,25 @@
   <v-container id="multiplayer">
     <v-row>
       <v-col cols="6">
-        <Game :paused="isPaused">
+        <Game 
+          :grid="localGrid"
+          :paused="isPaused"
+          v-on:moveUp="onLocalMoveUp"
+          v-on:moveDown="onLocalMoveDown"
+          v-on:moveLeft="onLocalMoveLeft"
+          v-on:moveRight="onLocalMoveRight"
+        >
           <PlayerCard :username="userStore.username" />
         </Game>
       </v-col>
       <v-col cols="6">
-        <Game :isRemote="true">
-          <PlayerCard :username="'Wolf'" color="pink" avatarIcon="fa-dog"/>
-        </Game>
+        <RemoteGame :grid="gameStore.remoteGame.grid">
+          <PlayerCard
+            :username="gameStore.remotePlayer.username"
+            :color="gameStore.remotePlayer.color"
+            :avatarIcon="gameStore.remotePlayer.avatarIcon"
+          />
+        </RemoteGame>
       </v-col>
     </v-row>
     
@@ -29,22 +40,29 @@
 import { mapState } from 'vuex';
 import { getModule } from 'vuex-module-decorators';
 import { Component, Vue } from 'vue-property-decorator';
+import { Grid } from '../components/Game/model/Grid';
 import PlayerCard from '../components/PlayerCard.vue';
 import RegisterDialog from '../components/RegisterDialog.vue';
 import LoginDialog from '../components/LoginDialog.vue';
 
 import UserModule from '../store/user/user.store';
 const userStore = getModule(UserModule);
+import GameModule from '../store/game/game.store';
+import apiService from '../services/api.service';
+const gameStore = getModule(GameModule);
 
 @Component({
   components: { PlayerCard, RegisterDialog, LoginDialog },
   computed:{
     ...mapState(['userStore']),
+    ...mapState(['gameStore']),
   }
 })
 export default class Multiplayer extends Vue{
   private showRegisterDialog: boolean = false;
   private showLoginDialog: boolean = false;
+
+  private localGrid: Grid = new Grid();
 
   beforeMount(){
     if(userStore.isLoggedIn === false){
@@ -86,6 +104,19 @@ export default class Multiplayer extends Vue{
     console.log("[Multiplayer.vue] onGoRegister");
     this.showLoginDialog = false;
     this.showRegisterDialog = true;
+  }
+
+  onLocalMoveUp(){
+    apiService.socket.emit('onMoveUp');
+  }
+  onLocalMoveDown(){
+    apiService.socket.emit('onMoveDown');
+  }
+  onLocalMoveLeft(){
+    apiService.socket.emit('onMoveLeft');
+  }
+  onLocalMoveRight(){
+    apiService.socket.emit('onMoveRight');
   }
 }
 </script>

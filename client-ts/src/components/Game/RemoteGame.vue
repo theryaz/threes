@@ -1,6 +1,6 @@
 <template>
   <div class="game-component" :style="componentStyle">
-     <v-dialog v-model="grid.gameOver" max-width="290">
+    <v-dialog v-model="grid.gameOver" max-width="290">
       <v-card>
         <v-card-title class="headline">
           <div class="new-high-score" v-if="grid.score == grid.highScore">
@@ -63,39 +63,15 @@ import { COLORS } from '../../model/constants';
     ...mapState(['userStore']),
   }
 })
-export default class Game extends Vue{
-  @Prop({type: Boolean, default: false}) private paused: boolean;
-  @Prop({type: Boolean, default: false}) private isRemote: boolean;
-  @Prop({type: Boolean, default: false}) private isMultiplayer: boolean;
+export default class RemoteGame extends Vue{
+  @Prop() private playerConnected: boolean = false;
   @Prop() private grid: Grid;
 
   created(){
-    if(!this.grid) this.grid = new Grid();
-  }
-  beforeMount(){
-    console.log("Game.vue Grid: ", this.grid);
-    if(this.isRemote) return;
-    window.addEventListener('keydown', (e) => {
-      if(this.paused == true ) return;
-      if(this.grid.gameOver) return;
-      e = e || window.event;
-      if (e.keyCode == 38) {
-        this.grid.moveUp();
-        this.$emit('moveUp');
-      }
-      else if (e.keyCode == 40) {
-        this.grid.moveDown();
-        this.$emit('moveDown');
-      }
-      else if (e.keyCode == 37) {
-        this.grid.moveLeft();
-        this.$emit('moveLeft');
-      }
-      else if (e.keyCode == 39) {
-        this.grid.moveRight();
-        this.$emit('moveRight');
-      }
-    });
+    if(!this.grid){
+      console.error("RemoteGame no grid provided as prop!");
+      this.grid = new Grid();
+    }
   }
   mounted(){
     console.log("Refs", this.$refs);
@@ -105,7 +81,7 @@ export default class Game extends Vue{
       return Math.floor(Math.random() * max) + min;
   }
   initializeGame(){
-    this.grid.initializeGame(this.$refs.grid, 9);
+    this.grid.initializeGame(this.$refs.grid, 0);
   }
   get componentStyle(){
     return {
@@ -153,36 +129,7 @@ export default class Game extends Vue{
     box-shadow: 0px 0px 5px -2px $shadow;
     text-align: center;
   }
-  #game-overlay{
-    position: absolute;
-    top: 0;
-    left: 0;
-    background-color: rgba(1, 1, 1, 0.2);
-    width: 100%;
-    height: 100%;
-    z-index: 1000;
-    border-radius: 5px;
-    text-align: center;
-    display: flex;
-    div.card{
-      display: flex;
-      flex-direction: column;
-      background-color: $background;
-      margin: auto;
-      padding: 10px;
-      border-radius: 5px;
-      min-width: $size * 3;
-      min-height: $size * 3;
-      box-shadow: 2px 2px 20px -1px #333;
-      h3{
-        flex-grow: 1;
-      }
-      div.buttons{
-        margin: 1.0rem 0;
-      }
-    }
-  }
-
+  
   .new-high-score{
     font-size: 1rem;
     font-weight: bold;

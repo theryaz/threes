@@ -8,4 +8,5 @@ export interface ICell extends Cell{
   grid: Grid,
   destroy(): void,
   isAt(coords: ICoords): boolean,
+  coords(): ICoords,
 }

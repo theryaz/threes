@@ -1,3 +1,4 @@
-export const CONNECTED = 'connected';
-export const DISCONNECTED = 'disconnected';
+export const CONNECTED = 'connect';
+export const DISCONNECTED = 'disconnect';
+
 export const EVENT = 'EVENT';

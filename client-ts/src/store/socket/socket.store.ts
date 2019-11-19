@@ -15,6 +15,7 @@ export default class SocketModule extends VuexModule{
   socketError: string | null = null;
 
   @Action onConnected(){
+    console.log("onConnected");
     this.context.commit(SocketMutationTypes.CONNECTED);
   }
 	@Mutation [SocketMutationTypes.CONNECTED](){

@@ -21,16 +21,19 @@ import { logRoute } from './middleware';
 import { errorHandler } from './errors';
 
 import userRouter from './routes/user.router';
+import { SocketIOController } from './model/socket.io.controller';
 
 export class App{
 
 	public app: express.Application;
 	public httpServer;
 	public io: SocketIO.Server;
+	public socketIOController: SocketIOController;
 	constructor(){
 		this.app = express();
 		this.httpServer = http.createServer(this.app);
 		this.io = socket(this.httpServer);
+		this.socketIOController = new SocketIOController(this.io);
 		this.socketHandlers();
 		this.middleware();
 		this.routes();
@@ -66,10 +69,7 @@ export class App{
 	}
 
 	private socketHandlers(): void{
-		logger.info("Setup Socket.io handlers");
-		this.io.on('connection', (socket) => {
-			logger.info("A User Connected! " + socket.client.id);
-		});
+		this.socketIOController.initializeSocketIOHandlers();
 	}
 }
 
