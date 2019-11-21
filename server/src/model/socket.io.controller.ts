@@ -3,7 +3,12 @@ const logger = createLogger("socket.io.controller.ts");
 import { CONFIG } from '../model/constants';
 
 import * as GameMutationTypes from '../../../client-ts/src/store/game/game.types';
-import { IPlayerInfo } from '../../../client-ts/src/model/interfaces';
+import { ICell } from '../../../client-ts/src/model/views';
+import { IPlayerInfo, ICoords } from '../../../client-ts/src/model/interfaces';
+
+function getRandom(min: number, max: number){
+  return Math.floor(Math.random() * max) + min;
+}
 
 export class SocketIOController{
 	
@@ -51,21 +56,21 @@ export class SocketIOController{
 			});
 			socket.on('onMoveUp', () => {
 				clientLogger.silly("onMoveUp");
-				socket.emit(GameMutationTypes.REMOTE_MOVE_UP);
+				// socket.emit(GameMutationTypes.REMOTE_MOVE_UP);
 			});
 			socket.on('onMoveDown', () => {
 				clientLogger.silly("onMoveDown");
-				socket.emit(GameMutationTypes.REMOTE_MOVE_DOWN);
+				// socket.emit(GameMutationTypes.REMOTE_MOVE_DOWN);
 			});
 			socket.on('onMoveLeft', () => {
 				clientLogger.silly("onMoveLeft");
-				socket.emit(GameMutationTypes.REMOTE_MOVE_LEFT);
+				// socket.emit(GameMutationTypes.REMOTE_MOVE_LEFT);
 			});
 			socket.on('onMoveRight', () => {
 				clientLogger.silly("onMoveRight");
-				socket.emit(GameMutationTypes.REMOTE_MOVE_RIGHT);
+				// socket.emit(GameMutationTypes.REMOTE_MOVE_RIGHT);
 			});
-			this.testGameInit(socket);
+			// this.testGameInit(socket);
 		});
 	}
 	public async testGameInit(socket: SocketIO.Socket){
@@ -82,4 +87,19 @@ export class SocketIOController{
 		logger.info("testGameInit: " + GameMutationTypes.START_GAME);
 		socket.emit(GameMutationTypes.START_GAME);
 	}
+
+	// Temp Cell Functions
+	createRandomCell(){
+    return this.createCell({
+      r: getRandom(0,3),
+      c: getRandom(0,3),
+    }, getRandom(1,3));
+  }
+  createCell(coords: ICoords, value: number): Partial<ICell>{
+		return {
+			row: coords.r,
+			col: coords.c,
+			value: value,
+		};
+  }
 };

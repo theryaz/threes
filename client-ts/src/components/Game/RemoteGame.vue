@@ -64,7 +64,6 @@ import { COLORS } from '../../model/constants';
   }
 })
 export default class RemoteGame extends Vue{
-  @Prop() private playerConnected: boolean = false;
   @Prop() private grid: Grid;
 
   created(){

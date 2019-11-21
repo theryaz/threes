@@ -69,7 +69,7 @@ export default class Cell extends Vue implements ICell{
     if(newRow < 0) {
       return;
     }
-    console.log(`Cell ${this.value}: moveUp`);
+    // console.log(`Cell ${this.value}: moveUp`);
     this.row = newRow;
   }
   moveDown(){
@@ -77,7 +77,7 @@ export default class Cell extends Vue implements ICell{
     if(newRow > 3) {
       return;
     }
-    console.log(`Cell ${this.value}: moveDown`);
+    // console.log(`Cell ${this.value}: moveDown`);
     this.row = newRow;
   }
   moveLeft(){
@@ -85,7 +85,7 @@ export default class Cell extends Vue implements ICell{
     if(newCol < 0) {
       return;
     }
-    console.log(`Cell ${this.value}: moveLeft`);
+    // console.log(`Cell ${this.value}: moveLeft`);
     this.col = newCol;
   }
   moveRight(){
@@ -93,11 +93,11 @@ export default class Cell extends Vue implements ICell{
     if(newCol > 3) {
       return;
     }
-    console.log(`Cell ${this.value}: moveRight`);
+    // console.log(`Cell ${this.value}: moveRight`);
     this.col = newCol;
   }
   destroy(){
-    console.log("Destroying Cell", this.row, this.col);
+    // console.log("Destroying Cell", this.row, this.col);
     this.$el.parentNode.removeChild(this.$el);
     // this.$destroy();
   }
