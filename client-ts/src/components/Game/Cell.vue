@@ -12,16 +12,14 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-import { Grid } from './model/Grid';
 import { ICell } from '../../model/views';
 import { IS_DARK, COLORS } from "../../model/constants";
 
 @Component
 export default class Cell extends Vue implements ICell{
-  @Prop() row = 0;
-  @Prop() col = 0;
-  @Prop() value = 0;
-  @Prop(Grid) grid: Grid;
+  @Prop({ type: Number, default: 0 }) row;
+  @Prop({ type: Number, default: 0 }) col;
+  @Prop({ type: Number, default: 0 }) value;
   created(){
     // console.log("[Cell.vue] created", this.row, this.col, this.value, this.grid);
   };

@@ -3,7 +3,6 @@
     <v-row>
       <v-col cols="6">
         <Game 
-          :grid="localGrid"
           :paused="isPaused"
           v-on:moveUp="onLocalMoveUp"
           v-on:moveDown="onLocalMoveDown"
@@ -14,13 +13,13 @@
         </Game>
       </v-col>
       <v-col cols="6">
-        <RemoteGame :grid="gameStore.remoteGame.grid">
+        <!-- <RemoteGame :grid="gameStore.remoteGame.grid">
           <PlayerCard
             :username="gameStore.remotePlayer.username"
             :color="gameStore.remotePlayer.color"
             :avatarIcon="gameStore.remotePlayer.avatarIcon"
           />
-        </RemoteGame>
+        </RemoteGame> -->
       </v-col>
     </v-row>
     
@@ -40,7 +39,6 @@
 import { mapState } from 'vuex';
 import { getModule } from 'vuex-module-decorators';
 import { Component, Vue } from 'vue-property-decorator';
-import { Grid } from '../components/Game/model/Grid';
 import PlayerCard from '../components/PlayerCard.vue';
 import RegisterDialog from '../components/RegisterDialog.vue';
 import LoginDialog from '../components/LoginDialog.vue';
@@ -62,7 +60,7 @@ export default class Multiplayer extends Vue{
   private showRegisterDialog: boolean = false;
   private showLoginDialog: boolean = false;
 
-  private localGrid: Grid = new Grid();
+  // private localGrid: Grid = new Grid();
 
   beforeMount(){
     if(userStore.isLoggedIn === false){

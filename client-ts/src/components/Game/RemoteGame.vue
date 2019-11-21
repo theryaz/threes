@@ -45,7 +45,6 @@
 <script lang="ts">
 
 import Cell from './Cell.vue';
-import { Grid } from './model/Grid';
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { mapState } from 'vuex';
 import { getModule } from 'vuex-module-decorators';
@@ -64,13 +63,8 @@ import { COLORS } from '../../model/constants';
   }
 })
 export default class RemoteGame extends Vue{
-  @Prop() private grid: Grid;
 
   created(){
-    if(!this.grid){
-      console.error("RemoteGame no grid provided as prop!");
-      this.grid = new Grid();
-    }
   }
   mounted(){
     console.log("Refs", this.$refs);

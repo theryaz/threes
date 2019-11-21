@@ -4,7 +4,6 @@ import { ICell } from '../../model/views';
 import { IPlayerInfo } from '../../model/interfaces';
 
 import * as GameMutationTypes from './game.types';
-import { Grid } from '@/components/Game/model/Grid';
 
 const noUser: IPlayerInfo = {
 	username: "Waiting for Player",
@@ -30,7 +29,6 @@ export default class GameModule extends VuexModule{
 		color: noUser.color,
 	};
 	remoteGame = {
-		grid: new Grid()
 	}
 
 
@@ -53,14 +51,14 @@ export default class GameModule extends VuexModule{
 	@Action({commit: GameMutationTypes.START_GAME}) onStartGame(){ return; }
 	@Mutation [GameMutationTypes.START_GAME](){
 		// Testing
-		this.remoteGame.grid.initializeGame(this.remoteGame.grid.ref, 9);
+		// this.remoteGame.grid.initializeGame(this.remoteGame.grid.ref, 9);
 	}
 
 	@Action({commit: GameMutationTypes.APPLY_REMOTE_STATE}) applyRemoteState(cellState: ICell[]){
 		return cellState;
 	}
 	@Mutation [GameMutationTypes.APPLY_REMOTE_STATE](cellState: ICell[]){
-		this.remoteGame.grid.applyCellState(cellState);
+		// this.remoteGame.grid.applyCellState(cellState);
 	}
 	
 	@Action onRemoteGameEnd(payload){ return payload; }
@@ -75,19 +73,19 @@ export default class GameModule extends VuexModule{
 
 	@Action({ commit: GameMutationTypes.REMOTE_MOVE_UP }) onRemoteMoveUp(){  }
 	@Mutation [GameMutationTypes.REMOTE_MOVE_UP](){
-		this.remoteGame.grid.moveUp();
+		// this.remoteGame.grid.moveUp();
 	}
 	@Action({ commit: GameMutationTypes.REMOTE_MOVE_DOWN }) onRemoteMoveDown(){  }
 	@Mutation [GameMutationTypes.REMOTE_MOVE_DOWN](){
-		this.remoteGame.grid.moveDown();
+		// this.remoteGame.grid.moveDown();
 	}
 	@Action({ commit: GameMutationTypes.REMOTE_MOVE_LEFT }) onRemoteMoveLeft(){  }
 	@Mutation [GameMutationTypes.REMOTE_MOVE_LEFT](){
-		this.remoteGame.grid.moveLeft();
+		// this.remoteGame.grid.moveLeft();
 	}
 	@Action({ commit: GameMutationTypes.REMOTE_MOVE_RIGHT }) onRemoteMoveRight(){  }
 	@Mutation [GameMutationTypes.REMOTE_MOVE_RIGHT](){
-		this.remoteGame.grid.moveRight();
+		// this.remoteGame.grid.moveRight();
 	}
 
 }
