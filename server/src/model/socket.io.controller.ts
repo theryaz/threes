@@ -4,7 +4,7 @@ import { CONFIG } from '../model/constants';
 
 import * as GameMutationTypes from '../../../client-ts/src/store/game/game.types';
 import { ICell } from '../../../client-ts/src/model/views';
-import { IPlayerInfo, ICoords } from '../../../client-ts/src/model/interfaces';
+import { IPlayerInfo, ICoords, IGameGridState, IGameMove, IGameState } from '../../../client-ts/src/model/interfaces';
 
 function getRandom(min: number, max: number){
   return Math.floor(Math.random() * max) + min;
@@ -34,7 +34,7 @@ export class SocketIOController{
 		}, CONFIG.SOCKETS.EXPIRY_INTERVAL);
 	}
 	private cleanupDeadConnections(){
-		logger.debug("Cleanup Dead connections...");
+		// logger.debug("Cleanup Dead connections...");
 		for(let socket of Object.values(this.clientSockets)){
 			if(socket.disconnected === true){
 				logger.debug("Removed Dead connection: " + socket.client.id);
@@ -54,23 +54,22 @@ export class SocketIOController{
 				clientLogger.info("Disconnected");
 				this.removeClient(socket);
 			});
-			socket.on('onMoveUp', () => {
-				clientLogger.silly("onMoveUp");
-				// socket.emit(GameMutationTypes.REMOTE_MOVE_UP);
+
+			// Setup Client Game Event Handlers
+			socket.on('onGameStart', (initialGridState: IGameGridState) => {
+				clientLogger.silly("onGameStart", initialGridState);
+				socket.emit(GameMutationTypes.REMOTE_GAME_START, initialGridState);
 			});
-			socket.on('onMoveDown', () => {
-				clientLogger.silly("onMoveDown");
-				// socket.emit(GameMutationTypes.REMOTE_MOVE_DOWN);
+			socket.on('onMove', (move: IGameMove) => {
+				clientLogger.silly("onMove: " + move.direction);
+				socket.emit(GameMutationTypes.REMOTE_MOVE, move);
 			});
-			socket.on('onMoveLeft', () => {
-				clientLogger.silly("onMoveLeft");
-				// socket.emit(GameMutationTypes.REMOTE_MOVE_LEFT);
+			socket.on('onLocalGameOver', (score: number) => {
+				clientLogger.silly("onLocalGameOver", score);
+				socket.emit(GameMutationTypes.REMOTE_GAME_OVER, score);
 			});
-			socket.on('onMoveRight', () => {
-				clientLogger.silly("onMoveRight");
-				// socket.emit(GameMutationTypes.REMOTE_MOVE_RIGHT);
-			});
-			// this.testGameInit(socket);
+
+			this.testGameInit(socket);
 		});
 	}
 	public async testGameInit(socket: SocketIO.Socket){
@@ -82,10 +81,6 @@ export class SocketIOController{
 			avatarIcon: "fa-robot",
 			color: "blue",
 		});
-
-		await sleep(1);
-		logger.info("testGameInit: " + GameMutationTypes.START_GAME);
-		socket.emit(GameMutationTypes.START_GAME);
 	}
 
 	// Temp Cell Functions

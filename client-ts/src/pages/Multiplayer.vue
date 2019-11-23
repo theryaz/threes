@@ -4,12 +4,9 @@
       <v-col cols="6">
         <Game 
           :game-state="gameStore.localGameState"
-          v-on:nextNumber="onNextNumber"
+          v-on:gameStart="onLocalGameStart"
           v-on:gameOver="onLocalGameOver"
-          v-on:moveUp="onLocalMoveUp"
-          v-on:moveDown="onLocalMoveDown"
-          v-on:moveLeft="onLocalMoveLeft"
-          v-on:moveRight="onLocalMoveRight"
+          v-on:onMove="onLocalMove"
         >
           <PlayerCard :username="userStore.username" />
         </Game>
@@ -50,6 +47,7 @@ const userStore = getModule(UserModule);
 import GameModule from '../store/game/game.store';
 import * as GameMutationTypes from '../store/game/game.types';
 import apiService from '../services/api.service';
+import { IGameMove, IGameGridState } from '../model/interfaces';
 const gameStore = getModule(GameModule);
 
 @Component({
@@ -107,25 +105,29 @@ export default class Multiplayer extends Vue{
     this.showRegisterDialog = true;
   }
 
-  onNextNumber(nextNumber: number){
-    apiService.socket.emit('onNextNumber', nextNumber);
-    gameStore.onNextNumber(nextNumber);
+  onLocalGameStart(initialGridState: IGameGridState){
+    console.log("onLocalGameStart", initialGridState);
+    gameStore.onGameStart(initialGridState);
+  }
+  onLocalMove(move: IGameMove){
+    console.log("onLocalMove", move);
+    gameStore.onMove(move);
   }
   onLocalGameOver(score: number){
-    apiService.socket.emit('onLocalGameOver');
     gameStore.onGameOver(score);
   }
-  onLocalMoveUp(){
-    apiService.socket.emit('onMoveUp');
+
+  onRemoteGameStart(initialGridState: IGameGridState){
+    console.log("onRemoteGameStart", initialGridState);
+    // gameStore.onRemoteGameStart(initialGridState);
   }
-  onLocalMoveDown(){
-    apiService.socket.emit('onMoveDown');
+  onRemoteMove(move: IGameMove){
+    console.log("onRemoteMove", move);
+    // gameStore.onRemoteMove(move);
   }
-  onLocalMoveLeft(){
-    apiService.socket.emit('onMoveLeft');
-  }
-  onLocalMoveRight(){
-    apiService.socket.emit('onMoveRight');
+  onRemoteGameOver(score: number){
+    console.log("onRemoteGameOver", score);
+    // gameStore.onRemoteGameOver(score);
   }
 }
 </script>

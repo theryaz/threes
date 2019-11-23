@@ -22,9 +22,11 @@
 </template>
 <script lang="ts">
 import { Vuetify, VuetifyObject } from 'vuetify';
-import { ICoords, IGameState, ICellValue } from '../../model/interfaces';
+import apiService from '../../services/api.service';
+import { ICoords, IGameState, ICellValue, IGameMove, IGameGridState } from '../../model/interfaces';
 import { ICell } from '../../model/views';
 import { Direction, INDEXES, R_INDEXES } from './model/constants';
+import * as GameMutationTypes from '../../store/game/game.types';
 
 import Cell from './Cell.vue';
 import { Component, Vue, Prop } from "vue-property-decorator";
@@ -62,31 +64,64 @@ export default class Game extends Vue{
 
   beforeMount(){
     // console.log("Game.vue Grid");
-    if(!this.gameState.keyboardEnabled) return;
+    this.setupInputs(); 
+  }
+  mounted(){
+    this.initializeGame();
+  }
+  setupInputs(){
+    if(this.gameState.keyboardEnabled){
+      this.enableKeyboardInput();
+    }else if(this.gameState.isRemote){
+      this.enableRemoteInput();
+    }else{
+      console.error("No Input type enabled for game");
+    }
+  }
+  enableKeyboardInput(){
+    console.log("Enable Keyboard Input");
     window.addEventListener('keydown', (e) => {
       if(this.gameState.paused == true ) return;
       if(this.gameState.gameOver) return;
       e = e || window.event;
       if (e.keyCode == 38) {
         this.moveUp();
-        this.$emit('moveUp');
       }
       else if (e.keyCode == 40) {
         this.moveDown();
-        this.$emit('moveDown');
       }
       else if (e.keyCode == 37) {
         this.moveLeft();
-        this.$emit('moveLeft');
       }
       else if (e.keyCode == 39) {
         this.moveRight();
-        this.$emit('moveRight');
       }
     });
   }
-  mounted(){
-    this.initializeGame();
+  enableRemoteInput(){
+    console.log("Enable Remote Input");
+    apiService.socket.on(GameMutationTypes.REMOTE_GAME_START, this.initializeGame);
+    apiService.socket.on(GameMutationTypes.REMOTE_MOVE, (move: IGameMove) => {
+      console.log("REMOTE_MOVE", move);
+      switch(move.direction){
+        case Direction.UP:
+          this.moveUp(move.newCell);
+          break;
+        case Direction.DOWN:
+          this.moveDown(move.newCell);
+          break;
+        case Direction.LEFT:
+          this.moveLeft(move.newCell);
+          break;
+        case Direction.RIGHT:
+          this.moveRight(move.newCell);
+          break;
+      }
+    });
+    apiService.socket.on(GameMutationTypes.REMOTE_GAME_OVER, (score: number) => {
+      console.log("[Remote] Game Over!");
+      this.$emit('gameOver', { score: score, cells: this.cells });
+    });
   }
   getRandom(min,max){
     return Math.floor(Math.random() * max) + min;
@@ -98,6 +133,13 @@ export default class Game extends Vue{
   }
   get theme(){
     return this.$vuetify.theme.dark ? 'dark' : 'light';
+  }
+
+  get GridState(): IGameGridState{
+    return {
+      cells: this.cells.map(c => c.CellValue),
+      nextNumber: this.gameState.nextNumber,
+    };
   }
 
   getScore(){
@@ -116,6 +158,7 @@ export default class Game extends Vue{
     return Math.pow(3,Math.log2(value / 3) + 1);
   }
   gameOverCheck(){
+    if(this.gameState.isRemote) return;
     if(this.gameOverCheckTimeout) clearTimeout(this.gameOverCheckTimeout);
     this.gameOverCheckTimeout = setTimeout(() => {
       console.log("Check Game Over");
@@ -172,7 +215,7 @@ export default class Game extends Vue{
       else return a;
     }, 0);
   }
-  emitNextNumber(){
+  getNextNumber(){
     let nextNumber = 1;
     let ones = (100 - (this.valueCount(1) * 20));
     let twos = (100 - (this.valueCount(2) * 20));
@@ -191,9 +234,7 @@ export default class Game extends Vue{
     }else{
       nextNumber = 3;
     }
-    console.log("Selected", nextNumber);
-    
-    this.$emit('nextNumber', nextNumber);
+    // console.log("Selected", nextNumber);
     return nextNumber;
   }
   at(coords: ICoords): ICell | undefined{
@@ -209,13 +250,12 @@ export default class Game extends Vue{
     }, getRandom(1,3));
   }
   createCell(coords: ICoords, value: number){
-    // console.log("Create Cell", coords, value);
+    console.log("Create Cell", coords, value);
     let c = <ICell> new Cell();
     c.row = coords.r;
     c.col = coords.c;
     c.value = value;
-    c.grid = this;
-    // console.log("Created Cell", c);
+    console.log("Created Cell", c);
     return c;
   }
   spawnCellInGrid(cell: ICell){
@@ -225,17 +265,17 @@ export default class Game extends Vue{
     this.$refs.grid.appendChild(cell.$el);
     return true;
   }
-  initializeGame(numberOfCells: number = 9){
+  initializeGame(){
     // console.log("[Grid.ts] initialize Game gridRef: " + gridRef);
     this.cells.map((cell: ICell) => cell.destroy());
     this.cells = [];
-    for(let i = 0; i < numberOfCells; i++){
-      let cell = this.createRandomCell();
+    for(let cellValue of this.gameState.initialState.cells){
+      let cell = this.createCell(cellValue, cellValue.value);
       this.spawnCellInGrid(cell);
     }
-    this.emitNextNumber();
-    this.$emit('gameStart', { cells: this.cells });
-    // console.log("Grid Initialized", this.cells);
+    let nextNumber = this.getNextNumber();
+    const initialGridState: IGameGridState = { cells: this.cells.map(c => c.CellValue), nextNumber };
+    this.$emit('gameStart', initialGridState);
   }
   clear(coords: ICoords){
     let cellIndex = this.indexAt(coords);
@@ -269,7 +309,7 @@ export default class Game extends Vue{
     return this.at(new_coords);
   }
   // Methods to scan the grid from corner to corner and exec the move method on each cell
-  topToBottom(cellAt: (c: ICoords) => ICell){
+  shiftCellsUp(cellAt: (c: ICoords) => ICell){
     // iterate top left to bottom right
     for(let r of INDEXES){
       for(let c of INDEXES){
@@ -277,7 +317,7 @@ export default class Game extends Vue{
       }
     }
   }
-  bottomToTop(cellAt: (c: ICoords) => ICell){
+  shiftCellsDown(cellAt: (c: ICoords) => ICell){
     // iterate top left to bottom right
     for(let r of R_INDEXES){
       for(let c of R_INDEXES){
@@ -285,7 +325,7 @@ export default class Game extends Vue{
       }
     }
   }
-  leftToRight(cellAt: (c: ICoords) => ICell){
+  shiftCellsLeft(cellAt: (c: ICoords) => ICell){
     // iterate bottom left to top right
     for(let r of R_INDEXES){
       for(let c of INDEXES){
@@ -293,7 +333,7 @@ export default class Game extends Vue{
       }
     }
   }
-  rightToLeft(cellAt: (c: ICoords) => ICell){
+  shiftCellsRight(cellAt: (c: ICoords) => ICell){
     // iterate top left to bottom right
     for(let r of INDEXES){
       for(let c of R_INDEXES){
@@ -347,74 +387,88 @@ export default class Game extends Vue{
       // console.log(`No Valid Move ${direction}`);
     }
   }
-  moveUp(){
+  moveUp(nextCell?: ICellValue){
     // console.log("moveUp");
-    this.topToBottom(this.above);
-    this.addNumberUp();
+    this.shiftCellsUp(this.above);
+    this.addNumberUp(nextCell);
     this.gameOverCheck();
   }
-  moveDown(){
+  moveDown(nextCell?: ICellValue){
     // console.log("moveDown");
-    this.bottomToTop(this.below);
-    this.addNumberDown();
+    this.shiftCellsDown(this.below);
+    this.addNumberDown(nextCell);
     this.gameOverCheck();
   }
-  moveLeft(){
+  moveLeft(nextCell?: ICellValue){
     // console.log("moveLeft");
-    this.leftToRight(this.left);
-    this.addNumberLeft();
+    this.shiftCellsLeft(this.left);
+    this.addNumberLeft(nextCell);
     this.gameOverCheck();
   }
-  moveRight(){
+  moveRight(nextCell?: ICellValue){
     // console.log("moveRight");
-    this.rightToLeft(this.right);
-    this.addNumberRight();
+    this.shiftCellsRight(this.right);
+    this.addNumberRight(nextCell);
     this.gameOverCheck();
   }
-  addNumberUp(){
-    let options = [];
+  addNumberUp(nextCell?: ICellValue){
+    let emptyCells = [];
     let r = 3;
+    // Add pre-determined cell
+    if(nextCell){
+      return this.spawnCellInGrid(this.createCell(nextCell, nextCell.value));
+    }
+    // Determine Cell to add
     for(let c of INDEXES){
       if(this.valueAt({r,c}) !== 0) continue;
       let coords = { r, c, value: this.valueAt({r: r-1,c})};
-      options.push(coords);
+      emptyCells.push(coords);
     }
-    this.addNumberToSide(options);
+    this.addNumberToSide(emptyCells, Direction.UP);
   }
-  addNumberDown(){
-    let options = [];
+  addNumberDown(nextCell?: ICellValue){
+    let emptyCells = [];
     let r = 0;
+    if(nextCell){
+      return this.spawnCellInGrid(this.createCell(nextCell, nextCell.value));
+    }
     for(let c of INDEXES){
       if(this.valueAt({r,c}) !== 0) continue;
       let coords = { r, c, value: this.valueAt({r:r+1,c})};
-      options.push(coords);
+      emptyCells.push(coords);
     }
-    this.addNumberToSide(options);
+    this.addNumberToSide(emptyCells, Direction.DOWN);
   }
-  addNumberLeft(){
+  addNumberLeft(nextCell?: ICellValue){
     // console.log("addNumberLeft");
-    let options = [];
+    let emptyCells = [];
     let c = 3;
+    if(nextCell){
+      return this.spawnCellInGrid(this.createCell(nextCell, nextCell.value));
+    }
     for(let r of INDEXES){
       if(this.valueAt({r,c}) !== 0) continue;
       let coords = { r, c, value: this.valueAt({r,c:c-1})};
-      options.push(coords);
+      emptyCells.push(coords);
     }
-    this.addNumberToSide(options);
+    this.addNumberToSide(emptyCells, Direction.LEFT);
   }
-  addNumberRight(){
+  addNumberRight(nextCell?: ICellValue){
     let emptyCells: ICellValue[] = [];
     let nextRow: ICellValue[] = [];
     let c = 0;
+    if(nextCell){
+      return this.spawnCellInGrid(this.createCell(nextCell, nextCell.value));
+    }
     for(let r of INDEXES){
       if(this.valueAt({r,c}) !== 0) continue;
       let coords = { r, c, value: this.valueAt({r,c:c+1})};
       emptyCells.push(coords);
     }
-    this.addNumberToSide(emptyCells);
+    this.addNumberToSide(emptyCells, Direction.RIGHT);
   }
-  addNumberToSide(emptyCells: ICellValue[]){
-    console.log("addNumberToSide", emptyCells);
+  addNumberToSide(emptyCells: ICellValue[], direction: Direction){
+    // console.log("addNumberToSide", emptyCells);
     if(emptyCells.length > 0){
       let targetIndex;
       
@@ -434,8 +488,21 @@ export default class Game extends Vue{
       }
       let targetCoords = emptyCells[targetIndex];
       let cell = this.createCell(targetCoords, this.gameState.nextNumber);
-      this.spawnCellInGrid(cell);
-      this.emitNextNumber();
+      let cellAdded = this.spawnCellInGrid(cell);
+      let nextNumber = this.getNextNumber();
+      if(cellAdded){
+        const gameMove: IGameMove = {
+          nextNumber,
+          newCell: {
+            c: cell.col,
+            r: cell.row,
+            value: cell.value,
+          },
+          direction,
+          timestamp: new Date(),
+        };
+        this.$emit('onMove', gameMove);
+      }
     }
   }
   getClass(value: number){

@@ -14,6 +14,7 @@
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { ICell } from '../../model/views';
 import { IS_DARK, COLORS } from "../../model/constants";
+import { ICellValue } from "../../model/interfaces";
 
 @Component
 export default class Cell extends Vue implements ICell{
@@ -35,6 +36,13 @@ export default class Cell extends Vue implements ICell{
   }
   get Value(){
     return this.value;
+  }
+  get CellValue(): ICellValue{
+    return {
+      c: this.col,
+      r: this.row,
+      value: this.value,
+    };
   }
   getRow(){
     switch (this.Row) {

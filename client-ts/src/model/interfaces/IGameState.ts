@@ -1,11 +1,11 @@
-import { ICellValue } from '@/model/interfaces';
-
+import { IGameMove, IGameGridState } from '@/model/interfaces';
 export interface IGameState{
   paused: boolean,
   gameOver: boolean,
   keyboardEnabled: boolean,
-  remoteGameId: string | null,
+  isRemote: boolean,
   nextNumber: number,
   score: number,
-  lastCellState: ICellValue[] | null,
+  history: IGameMove[],
+  initialState: IGameGridState,
 }

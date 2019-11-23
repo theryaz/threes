@@ -1,7 +1,8 @@
 import store from '../store';
 import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators';
+import apiService from '../../services/api.service';
 import { ICell } from '../../model/views';
-import { IPlayerInfo, IGameState } from '../../model/interfaces';
+import { IPlayerInfo, IGameState, IGameMove, IGameGridState } from '../../model/interfaces';
 
 import * as GameMutationTypes from './game.types';
 
@@ -30,23 +31,39 @@ export default class GameModule extends VuexModule{
 	};
 
 	localGameState: IGameState = {
-		paused: false,
+		paused: true,
 		gameOver: false,
 		score: 0,
 		keyboardEnabled: true,
-		remoteGameId: null,
+		isRemote: false,
 		nextNumber: 1,
-		lastCellState: null,
+		history: [],
+		initialState:{
+			cells: [
+				{c:1,r:1,value:1},
+				{c:2,r:2,value:2},
+				{c:3,r:3,value:3},
+			],
+			nextNumber: 1,
+		}
 	};
 
 	remoteGameState: IGameState = {
-		paused: false,
+		paused: true,
 		gameOver: false,
 		score: 0,
 		keyboardEnabled: false,
-		remoteGameId: null,
-		nextNumber: 2,
-		lastCellState: null
+		isRemote: true,
+		nextNumber: 1,
+		history: [],
+		initialState: {
+			cells: [
+				{c:1,r:1,value:1},
+				{c:2,r:2,value:2},
+				{c:3,r:3,value:3},
+			],
+			nextNumber: 1,
+		},
 	}
 
 
@@ -64,32 +81,25 @@ export default class GameModule extends VuexModule{
 		this.remotePlayer.color = noUser.color;
 	}
 
-	
 
-	@Action({commit: GameMutationTypes.START_GAME}) onStartGame(){ return; }
-	@Mutation [GameMutationTypes.START_GAME](){
-		// Testing
-		// this.remoteGame.grid.initializeGame(this.remoteGame.grid.ref, 9);
-	}
-
-	@Action({commit: GameMutationTypes.APPLY_REMOTE_STATE}) applyRemoteState(cellState: ICell[]){
-		return cellState;
-	}
-	@Mutation [GameMutationTypes.APPLY_REMOTE_STATE](cellState: ICell[]){
-		// this.remoteGame.grid.applyCellState(cellState);
-	}
-	
-	@Action onRemoteGameEnd(payload){ return payload; }
-	@Mutation [GameMutationTypes.REMOTE_GAME_END](){
-		
-	}
 	
 	
-	@Action({ commit: GameMutationTypes.REMOTE_NEXT_NUMBER }) onRemoteNextNumber(){  }
-	@Mutation [GameMutationTypes.REMOTE_NEXT_NUMBER]({ nextNumber }: { nextNumber: number }){
-		this.remoteGameState.nextNumber = nextNumber;
+	@Action({ commit: GameMutationTypes.REMOTE_GAME_START }) onRemoteGameStart(initialGridState: IGameGridState){
+		return initialGridState;
 	}
-	@Action({ commit: GameMutationTypes.REMOTE_GAME_OVER }) onRemoteGameOver(){  }
+	@Mutation [GameMutationTypes.REMOTE_GAME_START](initialGridState: IGameGridState){
+		this.remoteGameState.paused = false;
+	}
+	@Action({ commit: GameMutationTypes.REMOTE_MOVE }) onRemoteMove(move: IGameMove){
+		return move;
+	}
+	@Mutation [GameMutationTypes.REMOTE_MOVE](move: IGameMove){
+		this.remoteGameState.nextNumber = move.nextNumber;
+		this.remoteGameState.history.push(move);
+	}
+	@Action({ commit: GameMutationTypes.REMOTE_GAME_OVER }) onRemoteGameOver(score: number){
+		return score;
+	}
 	@Mutation [GameMutationTypes.REMOTE_GAME_OVER](){
 		this.remoteGameState.gameOver = true;
 	}
@@ -97,31 +107,36 @@ export default class GameModule extends VuexModule{
 	@Mutation [GameMutationTypes.REMOTE_GAME_PAUSE](){
 		this.remoteGameState.paused = true;	
 	}
-	@Action({ commit: GameMutationTypes.REMOTE_MOVE_UP }) onRemoteMoveUp(){  }
-	@Mutation [GameMutationTypes.REMOTE_MOVE_UP](){
-		// this.remoteGame.ref.moveUp();
-	}
-	@Action({ commit: GameMutationTypes.REMOTE_MOVE_DOWN }) onRemoteMoveDown(){  }
-	@Mutation [GameMutationTypes.REMOTE_MOVE_DOWN](){
-		// this.remoteGame.ref.moveDown();
-	}
-	@Action({ commit: GameMutationTypes.REMOTE_MOVE_LEFT }) onRemoteMoveLeft(){  }
-	@Mutation [GameMutationTypes.REMOTE_MOVE_LEFT](){
-		// this.remoteGame.ref.moveLeft();
-	}
-	@Action({ commit: GameMutationTypes.REMOTE_MOVE_RIGHT }) onRemoteMoveRight(){  }
-	@Mutation [GameMutationTypes.REMOTE_MOVE_RIGHT](){
-		// this.remoteGame.ref.moveRight();
-	}
 	
-	@Action({ commit: GameMutationTypes.NEXT_NUMBER }) onNextNumber(nextNumber: number){ return nextNumber;  }
-	@Mutation [GameMutationTypes.NEXT_NUMBER](nextNumber: number){
-		this.localGameState.nextNumber = nextNumber;
+
+	@Action({commit: GameMutationTypes.GAME_START}) onGameStart(initialGridState: IGameGridState){
+		apiService.socket.emit('onGameStart', initialGridState);
+		return initialGridState;
 	}
-	@Action({ commit: GameMutationTypes.GAME_OVER }) onGameOver(score: number){ return score;  }
+	@Mutation [GameMutationTypes.GAME_START](initialGridState: IGameGridState){
+		this.localGameState.paused = false;
+		this.localGameState.gameOver = false;
+		this.localGameState.history = [];
+	}
+	@Action({ commit: GameMutationTypes.MOVE }) onMove(move: IGameMove){
+		apiService.socket.emit('onMove', move);
+		return move;
+	}
+	@Mutation [GameMutationTypes.MOVE](move: IGameMove){
+		this.localGameState.nextNumber = move.nextNumber;
+		this.localGameState.history.push(move);
+	}
+	@Action({ commit: GameMutationTypes.GAME_OVER }) onGameOver(score: number){
+		apiService.socket.emit('onLocalGameOver');
+		return score;
+	}
 	@Mutation [GameMutationTypes.GAME_OVER](score: number){
 		this.localGameState.gameOver = true;
 		this.localGameState.score = score;
+	}
+	@Action({ commit: GameMutationTypes.GAME_PAUSE }) onGamePause(){ }
+	@Mutation [GameMutationTypes.GAME_PAUSE](){
+		this.remoteGameState.paused = true;	
 	}
 
 }
