@@ -30,11 +30,6 @@ class ApiService{
 		this.socket.on(GameMutationTypes.APPLY_REMOTE_STATE, gameStore.applyRemoteState);
 		this.socket.on(GameMutationTypes.REMOTE_GAME_END, gameStore.onRemoteGameEnd);
 		this.socket.on(GameMutationTypes.REMOTE_GAME_PAUSE, gameStore.onRemoteGamePause);
-
-		this.socket.on(GameMutationTypes.REMOTE_MOVE_UP, gameStore.onRemoteMoveUp);
-		this.socket.on(GameMutationTypes.REMOTE_MOVE_DOWN, gameStore.onRemoteMoveDown);
-		this.socket.on(GameMutationTypes.REMOTE_MOVE_LEFT, gameStore.onRemoteMoveLeft);
-		this.socket.on(GameMutationTypes.REMOTE_MOVE_RIGHT, gameStore.onRemoteMoveRight);
 	}
 
 

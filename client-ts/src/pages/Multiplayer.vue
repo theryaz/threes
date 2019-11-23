@@ -3,7 +3,9 @@
     <v-row>
       <v-col cols="6">
         <Game 
-          :paused="isPaused"
+          :game-state="gameStore.localGameState"
+          v-on:nextNumber="onNextNumber"
+          v-on:gameOver="onLocalGameOver"
           v-on:moveUp="onLocalMoveUp"
           v-on:moveDown="onLocalMoveDown"
           v-on:moveLeft="onLocalMoveLeft"
@@ -13,13 +15,13 @@
         </Game>
       </v-col>
       <v-col cols="6">
-        <!-- <RemoteGame :grid="gameStore.remoteGame.grid">
+        <Game :game-state="gameStore.remoteGameState">
           <PlayerCard
             :username="gameStore.remotePlayer.username"
             :color="gameStore.remotePlayer.color"
             :avatarIcon="gameStore.remotePlayer.avatarIcon"
           />
-        </RemoteGame> -->
+        </Game>
       </v-col>
     </v-row>
     
@@ -46,6 +48,7 @@ import LoginDialog from '../components/LoginDialog.vue';
 import UserModule from '../store/user/user.store';
 const userStore = getModule(UserModule);
 import GameModule from '../store/game/game.store';
+import * as GameMutationTypes from '../store/game/game.types';
 import apiService from '../services/api.service';
 const gameStore = getModule(GameModule);
 
@@ -104,6 +107,14 @@ export default class Multiplayer extends Vue{
     this.showRegisterDialog = true;
   }
 
+  onNextNumber(nextNumber: number){
+    apiService.socket.emit('onNextNumber', nextNumber);
+    gameStore.onNextNumber(nextNumber);
+  }
+  onLocalGameOver(score: number){
+    apiService.socket.emit('onLocalGameOver');
+    gameStore.onGameOver(score);
+  }
   onLocalMoveUp(){
     apiService.socket.emit('onMoveUp');
   }

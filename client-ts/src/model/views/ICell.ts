@@ -7,4 +7,5 @@ export interface ICell extends Cell{
   destroy(): void,
   isAt(coords: ICoords): boolean,
   coords(): ICoords,
+  grid: HTMLDivElement,
 }

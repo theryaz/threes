@@ -1,6 +1,6 @@
-export const DIRECTION = {
-  UP: 'moveUp',
-  DOWN: 'moveDown',
-  LEFT: 'moveLeft',
-  RIGHT: 'moveRight',
+export enum Direction{
+  UP='moveUp',
+  DOWN='moveDown',
+  LEFT='moveLeft',
+  RIGHT='moveRight',
 };

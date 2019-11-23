@@ -1,26 +1,5 @@
 <template>
   <div class="game-component" :style="componentStyle">
-     <v-dialog v-model="gameOver" max-width="290">
-      <v-card>
-        <v-card-title class="headline">
-          <div class="new-high-score" v-if="score == highScore">
-            Wow! New high score!
-          </div>
-          <div v-else class="new-high-score">
-            Game over
-          </div>
-        </v-card-title>
-        <v-card-text>
-          Score: <strong>{{ score }}</strong>
-          <br />
-          High Score: {{ highScore }}
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="primary darken-1" text @click="initializeGame()">Play Again</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
     <div id="title">
       <table>
         <tr>
@@ -31,7 +10,7 @@
           </td>
           <td>
             <div id="preview" class="cell">
-              <Cell :value="nextNumber" />
+              <Cell :value="gameState.nextNumber" />
             </div>
           </td>
         </tr>
@@ -42,9 +21,10 @@
   </div>
 </template>
 <script lang="ts">
-import { ICoords } from '../../model/interfaces';
+import { Vuetify, VuetifyObject } from 'vuetify';
+import { ICoords, IGameState, ICellValue } from '../../model/interfaces';
 import { ICell } from '../../model/views';
-import { DIRECTION, INDEXES, R_INDEXES } from './model/constants';
+import { Direction, INDEXES, R_INDEXES } from './model/constants';
 
 import Cell from './Cell.vue';
 import { Component, Vue, Prop } from "vue-property-decorator";
@@ -69,28 +49,23 @@ function getRandom(min: number, max: number){
   }
 })
 export default class Game extends Vue{
-  @Prop({type: Boolean, default: false}) private paused: boolean;
-  @Prop({type: Boolean, default: false}) private isRemote: boolean;
-  @Prop({type: Boolean, default: false}) private isMultiplayer: boolean;
-
-  gameOverCheckTimeout: number | null  = null;
-  highScore: number  = 0;
-  score: number  = 0;
-  gameOver: boolean  = false;
-  cells: ICell[]  = [];
-  nextNumber: any  = getRandom(1,3);
-
-  $refs!:{
-    grid: any,
+  $refs:{
+    grid: HTMLDivElement,
   };
-  $vuetify!: any;
+  $vuetify: VuetifyObject;
+
+  @Prop({type: Object}) private gameState: IGameState;
+  
+  gameOverCheckTimeout: NodeJS.Timeout | null  = null;
+  cells: ICell[]  = [];
+  nextNumber: number;
 
   beforeMount(){
     // console.log("Game.vue Grid");
-    if(this.isRemote) return;
+    if(!this.gameState.keyboardEnabled) return;
     window.addEventListener('keydown', (e) => {
-      if(this.paused == true ) return;
-      if(this.gameOver) return;
+      if(this.gameState.paused == true ) return;
+      if(this.gameState.gameOver) return;
       e = e || window.event;
       if (e.keyCode == 38) {
         this.moveUp();
@@ -111,11 +86,10 @@ export default class Game extends Vue{
     });
   }
   mounted(){
-    // console.log("Refs", this.$refs);
     this.initializeGame();
   }
   getRandom(min,max){
-      return Math.floor(Math.random() * max) + min;
+    return Math.floor(Math.random() * max) + min;
   }
   get componentStyle(){
     return {
@@ -127,41 +101,27 @@ export default class Game extends Vue{
   }
 
   getScore(){
-    let score = this.score = this.cells
-    .map((cell: ICell) => cell.value)
-    .reduce((a,b) => {
-      if(b < 3){
-        return a;
-      }else{
-        return a + this.scoreValue(b);
-      }
-    });
-    this.setHighScore(score);
+    return this.cells
+      .map((cell: ICell) => cell.value)
+      .reduce((a,b) => {
+        if(b < 3){
+          return a;
+        }else{
+          return a + this.scoreValue(b);
+        }
+      });
   }
   scoreValue(value: number){
     // 3^(log₂(x/3)+1)
-    let score = Math.pow(3,Math.log2(value / 3) + 1);
-    // console.log(`Calculated ${value} as worth ${score} points`);
-    return score;
-  }
-  setHighScore(score: number){
-    let highScore = +localStorage.getItem('highScore');
-    if(!highScore) highScore = 100;
-    if(score > highScore){
-      this.highScore = score;
-      localStorage.setItem('highScore', score);
-    }else{
-      this.highScore = highScore;
-      localStorage.setItem('highScore', highScore);
-    }
+    return Math.pow(3,Math.log2(value / 3) + 1);
   }
   gameOverCheck(){
     if(this.gameOverCheckTimeout) clearTimeout(this.gameOverCheckTimeout);
     this.gameOverCheckTimeout = setTimeout(() => {
-      // console.log("Check Game Over");
+      console.log("Check Game Over");
       let gameOver = false;
       if(this.cells.length < 16){
-        // console.log("The grid isn't even full.");
+        console.log("The grid isn't even full.");
         return;
       }
 
@@ -199,9 +159,8 @@ export default class Game extends Vue{
         }
       }
       if(allCellsStuck){
-        // console.log("Game Over!");
-        this.getScore();
-        this.gameOver = allCellsStuck;
+        console.log("Game Over!");
+        this.$emit('gameOver', { score: this.getScore(), cells: this.cells });
       }
     }, 1000);
   }
@@ -213,9 +172,8 @@ export default class Game extends Vue{
       else return a;
     }, 0);
   }
-  setNextNumber(){
-    let nextNumber = this.nextNumber;
-
+  emitNextNumber(){
+    let nextNumber = 1;
     let ones = (100 - (this.valueCount(1) * 20));
     let twos = (100 - (this.valueCount(2) * 20));
     let seed = getRandom(0, 100);
@@ -224,17 +182,18 @@ export default class Game extends Vue{
     // console.log(`${twos}% twos`);
     // console.log(`${seed} rolled`);
     if(seed < ones && seed < twos){
-      if(ones > twos) this.nextNumber = 1;
-      else this.nextNumber = 2;
+      if(ones > twos) nextNumber = 1;
+      else nextNumber = 2;
     }else if (seed < twos) {
-      this.nextNumber = 2;
+      nextNumber = 2;
     }else if (seed < ones){
-      this.nextNumber = 1;
+      nextNumber = 1;
     }else{
-      this.nextNumber = 3;
+      nextNumber = 3;
     }
-    // console.log("Selected",this.nextNumber);
-    // this.nextNumber = getRandom(1,3);
+    console.log("Selected", nextNumber);
+    
+    this.$emit('nextNumber', nextNumber);
     return nextNumber;
   }
   at(coords: ICoords): ICell | undefined{
@@ -268,14 +227,14 @@ export default class Game extends Vue{
   }
   initializeGame(numberOfCells: number = 9){
     // console.log("[Grid.ts] initialize Game gridRef: " + gridRef);
-    this.score = 0;
     this.cells.map((cell: ICell) => cell.destroy());
     this.cells = [];
-    this.gameOver = false;
     for(let i = 0; i < numberOfCells; i++){
       let cell = this.createRandomCell();
       this.spawnCellInGrid(cell);
     }
+    this.emitNextNumber();
+    this.$emit('gameStart', { cells: this.cells });
     // console.log("Grid Initialized", this.cells);
   }
   clear(coords: ICoords){
@@ -314,7 +273,7 @@ export default class Game extends Vue{
     // iterate top left to bottom right
     for(let r of INDEXES){
       for(let c of INDEXES){
-        this.moveDirection(cellAt, {r,c}, DIRECTION.UP);
+        this.moveDirection(cellAt, {r,c}, Direction.UP);
       }
     }
   }
@@ -322,7 +281,7 @@ export default class Game extends Vue{
     // iterate top left to bottom right
     for(let r of R_INDEXES){
       for(let c of R_INDEXES){
-        this.moveDirection(cellAt, {r,c}, DIRECTION.DOWN);
+        this.moveDirection(cellAt, {r,c}, Direction.DOWN);
       }
     }
   }
@@ -330,7 +289,7 @@ export default class Game extends Vue{
     // iterate bottom left to top right
     for(let r of R_INDEXES){
       for(let c of INDEXES){
-        this.moveDirection(cellAt, {r,c}, DIRECTION.LEFT);
+        this.moveDirection(cellAt, {r,c}, Direction.LEFT);
       }
     }
   }
@@ -338,7 +297,7 @@ export default class Game extends Vue{
     // iterate top left to bottom right
     for(let r of INDEXES){
       for(let c of R_INDEXES){
-        this.moveDirection(cellAt, {r,c}, DIRECTION.RIGHT);
+        this.moveDirection(cellAt, {r,c}, Direction.RIGHT);
       }
     }
   }
@@ -416,54 +375,67 @@ export default class Game extends Vue{
     let options = [];
     let r = 3;
     for(let c of INDEXES){
-      let coords = {r,c};
-      if(this.valueAt(coords) == 0){
-        options.push(coords);
-      }
+      if(this.valueAt({r,c}) !== 0) continue;
+      let coords = { r, c, value: this.valueAt({r: r-1,c})};
+      options.push(coords);
     }
-    this.addNumberTo(options);
+    this.addNumberToSide(options);
   }
   addNumberDown(){
     let options = [];
     let r = 0;
     for(let c of INDEXES){
-      let coords = {r,c};
-      if(this.valueAt(coords) == 0){
-        options.push(coords);
-      }
+      if(this.valueAt({r,c}) !== 0) continue;
+      let coords = { r, c, value: this.valueAt({r:r+1,c})};
+      options.push(coords);
     }
-    this.addNumberTo(options);
+    this.addNumberToSide(options);
   }
   addNumberLeft(){
     // console.log("addNumberLeft");
     let options = [];
     let c = 3;
     for(let r of INDEXES){
-      let coords = {r,c};
-      if(this.valueAt(coords) == 0){
-        options.push(coords);
-      }
+      if(this.valueAt({r,c}) !== 0) continue;
+      let coords = { r, c, value: this.valueAt({r,c:c-1})};
+      options.push(coords);
     }
-    this.addNumberTo(options);
+    this.addNumberToSide(options);
   }
   addNumberRight(){
-    let options = [];
+    let emptyCells: ICellValue[] = [];
+    let nextRow: ICellValue[] = [];
     let c = 0;
     for(let r of INDEXES){
-      let coords = {r,c};
-      if(this.valueAt(coords) == 0){
-        options.push(coords);
-      }
+      if(this.valueAt({r,c}) !== 0) continue;
+      let coords = { r, c, value: this.valueAt({r,c:c+1})};
+      emptyCells.push(coords);
     }
-    this.addNumberTo(options);
+    this.addNumberToSide(emptyCells);
   }
-  addNumberTo(options){
-    // console.log("addNumberTo",options);
-    if(options.length > 0){
-      let targetCoords = options[getRandom(0,options.length)];
-      let cell = this.createCell(targetCoords, this.setNextNumber());
+  addNumberToSide(emptyCells: ICellValue[]){
+    console.log("addNumberToSide", emptyCells);
+    if(emptyCells.length > 0){
+      let targetIndex;
+      
+      switch(this.gameState.nextNumber){
+        case 1:
+          targetIndex = emptyCells.findIndex(c => c.value === 2);
+          break;
+        case 2:
+          targetIndex = emptyCells.findIndex(c => c.value === 1);
+          break;
+        default:
+          targetIndex = emptyCells.findIndex(c => c.value === this.gameState.nextNumber);
+          break;
+      }
+      if(targetIndex === -1){
+        targetIndex = getRandom(0,emptyCells.length);
+      }
+      let targetCoords = emptyCells[targetIndex];
+      let cell = this.createCell(targetCoords, this.gameState.nextNumber);
       this.spawnCellInGrid(cell);
-      // console.log("Number Add to",targetCoords);
+      this.emitNextNumber();
     }
   }
   getClass(value: number){
