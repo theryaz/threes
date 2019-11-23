@@ -117,6 +117,7 @@ export default class Game extends Vue{
           this.moveRight(move.newCell);
           break;
       }
+      this.$emit('onMove', move);
     });
     apiService.socket.on(GameMutationTypes.REMOTE_GAME_OVER, (score: number) => {
       console.log("[Remote] Game Over!");
@@ -416,7 +417,7 @@ export default class Game extends Vue{
     let r = 3;
     // Add pre-determined cell
     if(nextCell){
-      return this.spawnCellInGrid(this.createCell(nextCell, nextCell.value));
+      return this.remoteAddNumber(nextCell);
     }
     // Determine Cell to add
     for(let c of INDEXES){
@@ -430,7 +431,7 @@ export default class Game extends Vue{
     let emptyCells = [];
     let r = 0;
     if(nextCell){
-      return this.spawnCellInGrid(this.createCell(nextCell, nextCell.value));
+      return this.remoteAddNumber(nextCell);
     }
     for(let c of INDEXES){
       if(this.valueAt({r,c}) !== 0) continue;
@@ -444,7 +445,7 @@ export default class Game extends Vue{
     let emptyCells = [];
     let c = 3;
     if(nextCell){
-      return this.spawnCellInGrid(this.createCell(nextCell, nextCell.value));
+      return this.remoteAddNumber(nextCell);
     }
     for(let r of INDEXES){
       if(this.valueAt({r,c}) !== 0) continue;
@@ -458,7 +459,7 @@ export default class Game extends Vue{
     let nextRow: ICellValue[] = [];
     let c = 0;
     if(nextCell){
-      return this.spawnCellInGrid(this.createCell(nextCell, nextCell.value));
+      return this.remoteAddNumber(nextCell);
     }
     for(let r of INDEXES){
       if(this.valueAt({r,c}) !== 0) continue;
@@ -466,6 +467,10 @@ export default class Game extends Vue{
       emptyCells.push(coords);
     }
     this.addNumberToSide(emptyCells, Direction.RIGHT);
+  }
+  remoteAddNumber(newCell: ICellValue){
+    let cell = this.createCell(newCell, newCell.value);
+    this.spawnCellInGrid(cell);
   }
   addNumberToSide(emptyCells: ICellValue[], direction: Direction){
     // console.log("addNumberToSide", emptyCells);

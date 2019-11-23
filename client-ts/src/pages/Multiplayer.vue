@@ -12,7 +12,11 @@
         </Game>
       </v-col>
       <v-col cols="6">
-        <Game :game-state="gameStore.remoteGameState">
+        <Game
+          :game-state="gameStore.remoteGameState"
+          v-on:gameStart="onRemoteGameStart"
+          v-on:gameOver="onRemoteGameOver"
+          v-on:onMove="onRemoteMove">
           <PlayerCard
             :username="gameStore.remotePlayer.username"
             :color="gameStore.remotePlayer.color"
@@ -119,15 +123,15 @@ export default class Multiplayer extends Vue{
 
   onRemoteGameStart(initialGridState: IGameGridState){
     console.log("onRemoteGameStart", initialGridState);
-    // gameStore.onRemoteGameStart(initialGridState);
+    gameStore.onRemoteGameStart(initialGridState);
   }
   onRemoteMove(move: IGameMove){
     console.log("onRemoteMove", move);
-    // gameStore.onRemoteMove(move);
+    gameStore.onRemoteMove(move);
   }
   onRemoteGameOver(score: number){
     console.log("onRemoteGameOver", score);
-    // gameStore.onRemoteGameOver(score);
+    gameStore.onRemoteGameOver(score);
   }
 }
 </script>
