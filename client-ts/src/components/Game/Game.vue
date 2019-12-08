@@ -67,21 +67,23 @@ export default class Game extends Vue{
     this.setupInputs(); 
   }
   mounted(){
-    this.initializeGame();
+    if(this.gameState.isRemote){
+      apiService.socket.on(GameMutationTypes.GAME_START, this.initializeGame);
+    }else if(this.gameState.autoStart){
+      this.initializeGame();
+    }
   }
   setupInputs(){
     if(this.gameState.keyboardEnabled){
       this.enableKeyboardInput();
-    }else if(this.gameState.isRemote){
-      this.enableRemoteInput();
     }else{
-      console.error("No Input type enabled for game");
+      this.enableRemoteInput();
     }
   }
   enableKeyboardInput(){
     console.log("Enable Keyboard Input");
     window.addEventListener('keydown', (e) => {
-      if(this.gameState.paused == true ) return;
+      if(this.gameState.paused === true ) return;
       if(this.gameState.gameOver) return;
       e = e || window.event;
       if (e.keyCode == 38) {
@@ -270,7 +272,7 @@ export default class Game extends Vue{
     // console.log("[Grid.ts] initialize Game gridRef: " + gridRef);
     this.cells.map((cell: ICell) => cell.destroy());
     this.cells = [];
-    for(let cellValue of this.gameState.initialState.cells){
+    for(let cellValue of this.gameState.initialGridState.cells){
       let cell = this.createCell(cellValue, cellValue.value);
       this.spawnCellInGrid(cell);
     }

@@ -2,6 +2,7 @@ import store from '../store';
 import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators';
 
 import * as SocketMutationTypes from './socket.types';
+import apiService from '@/services/api.service';
 
 
 @Module({
@@ -16,6 +17,8 @@ export default class SocketModule extends VuexModule{
 
   @Action onConnected(){
     console.log("onConnected");
+    const jwt = this.context.rootState.userStore.jwt;
+    apiService.socket.emit('jwt', jwt);
     this.context.commit(SocketMutationTypes.CONNECTED);
   }
 	@Mutation [SocketMutationTypes.CONNECTED](){

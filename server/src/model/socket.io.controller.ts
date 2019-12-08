@@ -5,6 +5,8 @@ import { CONFIG } from '../model/constants';
 import * as GameMutationTypes from '../../../client-ts/src/store/game/game.types';
 import { ICell } from '../../../client-ts/src/model/views';
 import { IPlayerInfo, ICoords, IGameGridState, IGameMove, IGameState } from '../../../client-ts/src/model/interfaces';
+import { Player } from './classes/Player';
+import { Game } from './classes/Game';
 
 function getRandom(min: number, max: number){
   return Math.floor(Math.random() * max) + min;
@@ -13,18 +15,22 @@ function getRandom(min: number, max: number){
 export class SocketIOController{
 	
 	private connectedClients: number = 0;
-	private clientSockets: {[id: string]: SocketIO.Socket} = {};
+	private connectedPlayers: {[id: string]: Player} = {};
+	private gameList: Game[] = [];
+
+	private autoPairInterval;
 
 	constructor(private io: SocketIO.Server){
 		this.setupCleanupDeadConnections();
+		// this.startAutoPairPlayersInterval();
 	}
 	private addClient(socket: SocketIO.Socket){
-		this.clientSockets[socket.client.id] = socket;
+		this.connectedPlayers[socket.client.id] = new Player(socket);
 		this.connectedClients++;
 		logger.debug(`${this.connectedClients} clients connected`);
 	}
-	private removeClient(socket: SocketIO.Socket){
-		delete this.clientSockets[socket.client.id];
+	private removeClient(socketId: string){
+		delete this.connectedPlayers[socketId];
 		this.connectedClients--;
 		logger.debug(`${this.connectedClients} clients connected`);
 	}
@@ -35,10 +41,10 @@ export class SocketIOController{
 	}
 	private cleanupDeadConnections(){
 		// logger.debug("Cleanup Dead connections...");
-		for(let socket of Object.values(this.clientSockets)){
-			if(socket.disconnected === true){
-				logger.debug("Removed Dead connection: " + socket.client.id);
-				this.removeClient(socket);
+		for(let player of Object.values(this.connectedPlayers)){
+			if(player.isDisconnected === true){
+				logger.debug("Removed Dead connection: " + player.socketId);
+				this.removeClient(player.socketId);
 			}
 		}
 	}
@@ -52,30 +58,23 @@ export class SocketIOController{
 			this.addClient(socket);
 			socket.on('disconnect', () =>{
 				clientLogger.info("Disconnected");
-				this.removeClient(socket);
+				this.removeClient(socket.client.id);
 			});
 
-			// Setup Client Game Event Handlers
-			socket.on('onGameStart', (initialGridState: IGameGridState) => {
-				clientLogger.silly("onGameStart", initialGridState);
-				socket.emit(GameMutationTypes.REMOTE_GAME_START, initialGridState);
+			socket.on('jwt', () => {
+				sleep(2);
+				this.autoPairPlayers();
 			});
-			socket.on('onMove', (move: IGameMove) => {
-				clientLogger.silly("onMove: " + move.direction);
-				socket.emit(GameMutationTypes.REMOTE_MOVE, move);
+			socket.on('SET_TEMP_USERNAME', () => {
+				sleep(2);
+				this.autoPairPlayers();
 			});
-			socket.on('onLocalGameOver', (score: number) => {
-				clientLogger.silly("onLocalGameOver", score);
-				socket.emit(GameMutationTypes.REMOTE_GAME_OVER, score);
-			});
-
-			this.testGameInit(socket);
 		});
 	}
-	public async testGameInit(socket: SocketIO.Socket){
-		logger.info("testGameInit");
+	public async testJoinPlayer(socket: SocketIO.Socket){
+		logger.info("testJoinPlayer");
 		await sleep(5);
-		logger.info("testGameInit: " + GameMutationTypes.SET_REMOTE_PLAYER_INFO);
+		logger.info("testJoinPlayer: " + GameMutationTypes.SET_REMOTE_PLAYER_INFO);
 		socket.emit(GameMutationTypes.SET_REMOTE_PLAYER_INFO, <IPlayerInfo>{
 			username: "The Server",
 			avatarIcon: "fa-robot",
@@ -83,18 +82,29 @@ export class SocketIOController{
 		});
 	}
 
-	// Temp Cell Functions
-	createRandomCell(){
-    return this.createCell({
-      r: getRandom(0,3),
-      c: getRandom(0,3),
-    }, getRandom(1,3));
-  }
-  createCell(coords: ICoords, value: number): Partial<ICell>{
-		return {
-			row: coords.r,
-			col: coords.c,
-			value: value,
-		};
-  }
+	startAutoPairPlayersInterval(){
+		this.autoPairInterval = setInterval(() => {
+			this.autoPairPlayers();
+		}, 10 * 1000);
+	}
+	autoPairPlayersNow(){
+		if(this.autoPairInterval) clearInterval(this.autoPairInterval);
+		this.autoPairPlayers();
+		this.startAutoPairPlayersInterval();
+	}
+	autoPairPlayers(){
+		logger.debug(`Auto join players to games (${this.connectedClients} clients connected)`);
+		if(this.connectedClients > 1){
+			let pair: Player[] = [];
+			for(let player of Object.values(this.connectedPlayers)){
+				if(!player.Username){
+					continue;
+				}
+				if(!player.isInGame) pair.push(player);
+				if(pair.length == 2){
+					this.gameList.push(new Game(this.io, pair));
+				}
+			}
+		}
+	}
 };

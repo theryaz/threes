@@ -1,5 +1,6 @@
 import { IGameMove, IGameGridState } from '@/model/interfaces';
 export interface IGameState{
+  autoStart: boolean,
   paused: boolean,
   gameOver: boolean,
   keyboardEnabled: boolean,
@@ -7,5 +8,5 @@ export interface IGameState{
   nextNumber: number,
   score: number,
   history: IGameMove[],
-  initialState: IGameGridState,
+  initialGridState: IGameGridState,
 }

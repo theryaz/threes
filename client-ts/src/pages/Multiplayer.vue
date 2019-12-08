@@ -8,7 +8,11 @@
           v-on:gameOver="onLocalGameOver"
           v-on:onMove="onLocalMove"
         >
-          <PlayerCard :username="userStore.username" />
+          <PlayerCard
+            :username="userStore.username"
+            :color="userStore.color"
+            :avatarIcon="userStore.avatarIcon"
+            />
         </Game>
       </v-col>
       <v-col cols="6">
@@ -90,7 +94,12 @@ export default class Multiplayer extends Vue{
     this.showRegisterDialog = false;
   }
   onRegister(formData){
-    console.log("[Multiplayer.vue] onRegister");
+    console.log("[Multiplayer.vue] onRegister", formData);
+    userStore.register({
+      username: formData.username,
+      email: formData.email,
+      password: formData.password1,
+    });
   }
   onHasAccount(formData){
     console.log("[Multiplayer.vue] onHasAccount");

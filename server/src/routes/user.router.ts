@@ -22,6 +22,7 @@ export class UserRouter{
 			.post(sanitizeBody,
 			asyncWrap(async (req, res) => {
 				const { username, email, password, avatarIcon } = req.body;
+				logger.debug('Registering user', req.body);
 				const jwt = await User.registerUser({ username, email, password, role: Role.User, avatarIcon });
 				res.json({
 					jwt
@@ -41,6 +42,7 @@ export class UserRouter{
 					avatarUrl: user.avatarUrl,
 					avatarIcon: user.avatarIcon,
 					role: user.role,
+					color: user.color,
 					jwt,
 				});
 			}));

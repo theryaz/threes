@@ -11,9 +11,15 @@ interface LoginPayload{
 	role: string,
 	avatarUrl: string | null,
 	avatarIcon: string,
+	color: string,
 }
 
 interface LoginParams{
+	email: string,
+	password: string,
+}
+interface RegisterParams{
+	username: string,
 	email: string,
 	password: string,
 }
@@ -65,6 +71,7 @@ export default class UserModule extends VuexModule{
 				avatarIcon: response.body.avatarIcon,
 				avatarUrl: response.body.avatarUrl,
 				role: response.body.role,
+				color: response.body.color,
 			};
 			this.context.commit(UserMutationTypes.LOGIN_SUCCESS, payload);
 		}catch(error){
@@ -90,6 +97,7 @@ export default class UserModule extends VuexModule{
 		this.loading = false;
 		this.jwt = payload.jwt;
 		this.username = payload.username;
+		this.color = payload.color;
 		this.avatarIcon = payload.avatarIcon;
 		this.avatarUrl = payload.avatarUrl;
 		this.role = payload.role;
@@ -99,10 +107,10 @@ export default class UserModule extends VuexModule{
 		this.loading = false;
   }
   
-  @Action({rawError: true, commit: UserMutationTypes.REGISTER_SUCCESS}) async register({ email, password }: LoginParams){
+  @Action({rawError: true, commit: UserMutationTypes.REGISTER_SUCCESS}) async register({ username, email, password }: RegisterParams){
 		this.context.commit(UserMutationTypes.REGISTER);
 		try{
-			let response = await apiService.post('/v1/register', { email, password });
+			let response = await apiService.post('/v1/user/register', { username, email, password });
 			return {
 				jwt: response.body.jwt,
 				role: response.body.role,
@@ -127,6 +135,7 @@ export default class UserModule extends VuexModule{
 
 	@Action setTempUsername(username: string){
 		this.context.commit(UserMutationTypes.SET_TEMP_USERNAME, username);
+		apiService.socket.emit(UserMutationTypes.SET_TEMP_USERNAME, username);
 	}
 	@Mutation [UserMutationTypes.SET_TEMP_USERNAME](username: string){
 		this.username = username;

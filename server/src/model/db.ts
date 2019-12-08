@@ -20,3 +20,4 @@ db.once('open', function() {
 });
 
 export { User, UserModel } from './user.model';
+export { Game, GameModel } from './game.model';

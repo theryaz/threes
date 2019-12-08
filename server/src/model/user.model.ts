@@ -1,11 +1,12 @@
+import uuid from 'uuid/v4';
 import { prop, getModelForClass } from '@typegoose/typegoose';
 import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
-const { ObjectId } = Schema.Types;
 
 import { logger, sha512, randomString, createJwt } from '../shared';
 import { JWT_EXPIRY_SECONDS } from './constants';
 import { Role } from './enums';
+import { ObjectId } from 'bson';
 
 interface RegisterUserParams{
   username: string,
@@ -17,12 +18,15 @@ interface RegisterUserParams{
 }
 
 export class User{
+  public _id: ObjectId;
+  @prop({ default: uuid }) public uuid: string;
   @prop() public username: string;
   @prop({ index: true, unique: true}) public email: string;
   @prop({ default: Role.User }) public role: Role;
 
   @prop({ default: null }) public avatarUrl: string | null;
   @prop({ default: 'fa-user' }) public avatarIcon: string;
+  @prop({ default: 'red' }) public color: string;
 
   @prop() private password: string;
   @prop({ default: () => randomString(16) }) private salt: string;
@@ -30,9 +34,11 @@ export class User{
   public createJwt(maxAgeOverride?: number){
     return createJwt({
       data:{
+        uuid: this.uuid,
         username: this.username,
         email: this.email,
         role: this.role,
+        _id: this._id.toHexString(),
       },
       maxAge: maxAgeOverride || JWT_EXPIRY_SECONDS,
     });
@@ -51,9 +57,11 @@ export class User{
     await user.save();
     return createJwt({
       data:{
+        uuid: user.uuid,
         username,
         email,
-        role: role
+        role: role,
+        _id: user._id,
       },
       maxAge: JWT_EXPIRY_SECONDS
     });
