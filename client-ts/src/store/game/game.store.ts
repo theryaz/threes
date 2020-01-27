@@ -6,6 +6,7 @@ import { IPlayerInfo, IGameState, IGameMove, IGameGridState, ICellValue } from '
 import Game from '../../components/Game/Game.vue';
 
 import * as GameMutationTypes from './game.types';
+import { PlayerStatus, GameStatus } from '@/model/enums';
 
 const noUser: IPlayerInfo = {
 	username: "Waiting for Player",
@@ -51,6 +52,7 @@ export default class GameModule extends VuexModule{
 	};
 
 	singleGameState: IGameState = {
+		status: GameStatus.InProgress,
 		autoStart: true,
 		paused: false,
 		gameOver: false,
@@ -62,8 +64,18 @@ export default class GameModule extends VuexModule{
 		initialGridState: this.randomGridState(3),
 	};
 
+	multiplayerGameStatus: PlayerStatus = PlayerStatus.InLobby;
+	hostGameLoading: boolean = false;
+	hostGameError: string | null = null;
+	gameShortId: string | null = null;
+	
+	joinGameLoading: boolean = false;
+	joinGameError: string | null = null;
+
+	// Online Multiplayer States
 	localGameState: IGameState = {
-		autoStart: true,
+		status: GameStatus.WaitingToStart,
+		autoStart: false,
 		paused: true,
 		gameOver: false,
 		score: 0,
@@ -82,6 +94,7 @@ export default class GameModule extends VuexModule{
 	};
 
 	remoteGameState: IGameState = {
+		status: GameStatus.WaitingToStart,
 		autoStart: true,
 		paused: true,
 		gameOver: false,
@@ -97,9 +110,99 @@ export default class GameModule extends VuexModule{
 				{c:3,r:3,value:3},
 			],
 			nextNumber: 1,
-		},
+		}
 	}
 
+	// Local Multiplayer States.
+	leftGameState: IGameState = {
+		status: GameStatus.InProgress,
+		autoStart: true,
+		paused: true,
+		gameOver: false,
+		score: 0,
+		keyboardEnabled: true,
+		isRemote: false,
+		nextNumber: 1,
+		history: [],
+		initialGridState:{
+			cells: [
+				{c:1,r:1,value:1},
+				{c:2,r:2,value:2},
+				{c:3,r:3,value:3},
+			],
+			nextNumber: 1,
+		}
+	};
+	rightGameState: IGameState = {
+		status: GameStatus.InProgress,
+		autoStart: true,
+		paused: true,
+		gameOver: false,
+		score: 0,
+		keyboardEnabled: true,
+		isRemote: false,
+		nextNumber: 1,
+		history: [],
+		initialGridState:{
+			cells: [
+				{c:1,r:1,value:1},
+				{c:2,r:2,value:2},
+				{c:3,r:3,value:3},
+			],
+			nextNumber: 1,
+		}
+	};
+
+
+	@Action({}) async hostGame(){
+		this.context.commit(GameMutationTypes.HOST_GAME);
+		try{
+			const response = await apiService.post('/v1/game/create', {});
+			this.context.commit(GameMutationTypes.HOST_GAME_SUCCESS, {
+				gameShortId: response.body.gameShortId,
+			}); 
+		}catch(e){
+			this.context.commit(GameMutationTypes.HOST_GAME_FAILURE);
+		}
+	}
+	@Mutation [GameMutationTypes.HOST_GAME](){
+    this.hostGameLoading = true;
+    this.hostGameError = null;
+	}
+	@Mutation [GameMutationTypes.HOST_GAME_SUCCESS]({ gameShortId }: { gameShortId: string }){ // TODO
+		this.hostGameLoading = false;
+		this.gameShortId = gameShortId;
+		this.multiplayerGameStatus = PlayerStatus.HostedGame;
+		this.localGameState.status = GameStatus.WaitingToStart;
+		this.remoteGameState.status = GameStatus.WaitingToStart;
+	}
+	@Mutation [GameMutationTypes.HOST_GAME_FAILURE](errorMessage: string){
+		this.hostGameLoading = false;
+		this.hostGameError = errorMessage;
+	}
+
+	@Action({rawError: true}) async joinGame(gameShortId: string){
+		this.context.commit(GameMutationTypes.JOIN_GAME);
+		try{
+			await apiService.post(`/v1/game/join/${gameShortId}`, {});
+			this.context.commit(GameMutationTypes.JOIN_GAME_SUCCESS); 
+		}catch(e){
+			console.error("Failed to Join Game", e);
+			this.context.commit(GameMutationTypes.JOIN_GAME_FAILURE);
+		}
+	}
+	@Mutation [GameMutationTypes.JOIN_GAME](){
+    this.joinGameLoading = true;
+    this.joinGameError = null;
+	}
+	@Mutation [GameMutationTypes.JOIN_GAME_SUCCESS](){
+		this.joinGameLoading = false;
+		this.multiplayerGameStatus = PlayerStatus.JoinedGame;
+	}
+	@Mutation [GameMutationTypes.JOIN_GAME_FAILURE](errorMessage: string){
+		this.joinGameLoading = false;
+		this.joinGameError = errorMessage;
+	}
 
 	@Action({commit: GameMutationTypes.SET_REMOTE_PLAYER_INFO}) onSetRemotePlayerInfo(playerInfo: IPlayerInfo){ return playerInfo; }
 	@Mutation [GameMutationTypes.SET_REMOTE_PLAYER_INFO](playerInfo: IPlayerInfo){
@@ -115,15 +218,13 @@ export default class GameModule extends VuexModule{
 		this.remotePlayer.color = noUser.color;
 	}
 
-
-	
-	
 	@Action({ commit: GameMutationTypes.REMOTE_GAME_START }) onRemoteGameStart(initialGridState: IGameGridState){
 		return initialGridState;
 	}
 	@Mutation [GameMutationTypes.REMOTE_GAME_START](initialGridState: IGameGridState){
 		this.remoteGameState.paused = false;
 		this.localGameState.gameOver = false;
+		this.remoteGameState.status = GameStatus.InProgress;
 		this.remoteGameState.initialGridState = initialGridState;
 		this.localGameState.history = [];
 	}
@@ -134,11 +235,12 @@ export default class GameModule extends VuexModule{
 		this.remoteGameState.nextNumber = move.nextNumber;
 		this.remoteGameState.history.push(move);
 	}
-	@Action({ commit: GameMutationTypes.REMOTE_GAME_OVER }) onRemoteGameOver(score: number){
-		return score;
+	@Action({ commit: GameMutationTypes.REMOTE_GAME_OVER }) onRemoteGameOver({ score }: {score: number, cells: ICellValue[]}){
+		return { score };
 	}
 	@Mutation [GameMutationTypes.REMOTE_GAME_OVER](){
 		this.remoteGameState.gameOver = true;
+		this.remoteGameState.status = GameStatus.GameOver;
 	}
 	@Action({ commit: GameMutationTypes.REMOTE_GAME_PAUSE }) onRemoteGamePause(){ }
 	@Mutation [GameMutationTypes.REMOTE_GAME_PAUSE](){
@@ -165,11 +267,11 @@ export default class GameModule extends VuexModule{
 		this.localGameState.nextNumber = move.nextNumber;
 		this.localGameState.history.push(move);
 	}
-	@Action({ commit: GameMutationTypes.GAME_OVER }) onGameOver(score: number){
+	@Action({ commit: GameMutationTypes.GAME_OVER }) onGameOver({ score }: {score: number, cells: ICellValue[]}){
 		apiService.socket.emit('onLocalGameOver');
-		return score;
+		return { score };
 	}
-	@Mutation [GameMutationTypes.GAME_OVER](score: number){
+	@Mutation [GameMutationTypes.GAME_OVER]({ score }: {score: number, cells: ICellValue[]}){
 		this.localGameState.gameOver = true;
 		this.localGameState.score = score;
 	}
@@ -195,16 +297,75 @@ export default class GameModule extends VuexModule{
 		this.singleGameState.nextNumber = move.nextNumber;
 		this.singleGameState.history.push(move);
 	}
-	@Action({ commit: GameMutationTypes.SINGLE_GAME_OVER }) onSingleGameOver(score: number){
-		return score;
+	@Action({ commit: GameMutationTypes.SINGLE_GAME_OVER }) onSingleGameOver({ score }: {score: number, cells: ICellValue[]}){
+		return { score };
 	}
-	@Mutation [GameMutationTypes.SINGLE_GAME_OVER](score: number){
+	@Mutation [GameMutationTypes.SINGLE_GAME_OVER]({ score }: {score: number, cells: ICellValue[]}){
 		this.singleGameState.gameOver = true;
 		this.singleGameState.score = score;
 	}
 	@Action({ commit: GameMutationTypes.SINGLE_GAME_PAUSE }) onSingleGamePause(){ }
 	@Mutation [GameMutationTypes.SINGLE_GAME_PAUSE](){
-		this.remoteGameState.paused = true;	
+		this.singleGameState.paused = true;	
+	}
+
+
+	@Action({commit: GameMutationTypes.LEFT_GAME_START}) onLeftGameStart(initialGridState: IGameGridState){
+		return initialGridState;
+	}
+	@Mutation [GameMutationTypes.LEFT_GAME_START](initialGridState: IGameGridState){
+		this.leftGameState.paused = false;
+		this.leftGameState.keyboardEnabled = true;
+		this.leftGameState.gameOver = false;
+		this.leftGameState.initialGridState = initialGridState;
+		this.leftGameState.history = [];
+	}
+	@Action({ commit: GameMutationTypes.LEFT_MOVE }) onLeftMove(move: IGameMove){
+		return move;
+	}
+	@Mutation [GameMutationTypes.LEFT_MOVE](move: IGameMove){
+		this.leftGameState.nextNumber = move.nextNumber;
+		this.leftGameState.history.push(move);
+	}
+	@Action({ commit: GameMutationTypes.LEFT_GAME_OVER }) onLeftGameOver({ score }: {score: number, cells: ICellValue[]}){
+		return { score };
+	}
+	@Mutation [GameMutationTypes.LEFT_GAME_OVER]({ score }: {score: number, cells: ICellValue[]}){
+		this.leftGameState.gameOver = true;
+		this.leftGameState.score = score;
+	}
+	@Action({ commit: GameMutationTypes.LEFT_GAME_PAUSE }) onLeftGamePause(){ }
+	@Mutation [GameMutationTypes.LEFT_GAME_PAUSE](){
+		this.leftGameState.paused = true;	
+	}
+
+	@Action({commit: GameMutationTypes.RIGHT_GAME_START}) onRightGameStart(initialGridState: IGameGridState){
+		return initialGridState;
+	}
+	@Mutation [GameMutationTypes.RIGHT_GAME_START](initialGridState: IGameGridState){
+		this.rightGameState.paused = false;
+		this.rightGameState.keyboardEnabled = true;
+		this.rightGameState.gameOver = false;
+		this.rightGameState.initialGridState = initialGridState;
+		this.rightGameState.history = [];
+	}
+	@Action({ commit: GameMutationTypes.RIGHT_MOVE }) onRightMove(move: IGameMove){
+		return move;
+	}
+	@Mutation [GameMutationTypes.RIGHT_MOVE](move: IGameMove){
+		this.rightGameState.nextNumber = move.nextNumber;
+		this.rightGameState.history.push(move);
+	}
+	@Action({ commit: GameMutationTypes.RIGHT_GAME_OVER }) onRightGameOver({ score }: {score: number, cells: ICellValue[]}){
+		return { score };
+	}
+	@Mutation [GameMutationTypes.RIGHT_GAME_OVER]({ score }: {score: number, cells: ICellValue[]}){
+		this.rightGameState.gameOver = true;
+		this.rightGameState.score = score;
+	}
+	@Action({ commit: GameMutationTypes.RIGHT_GAME_PAUSE }) onRightGamePause(){ }
+	@Mutation [GameMutationTypes.RIGHT_GAME_PAUSE](){
+		this.rightGameState.paused = true;	
 	}
 
 }

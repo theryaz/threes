@@ -4,7 +4,7 @@ import { Socket } from 'socket.io';
 
 import { Document } from 'mongoose';
 import { User, UserModel } from '../db';
-import { verifyJwt, createLogger, sleep } from '../../shared';
+import { verifyJwt, createLogger, sleep, randomString } from '../../shared';
 
 import { Player } from './Player';
 
@@ -19,7 +19,12 @@ export class Game{
   get RoomId(){
     return `Game/${this.uuid}`;
   }
+
+  get ShortId(){
+    return this.shortId;
+  }
   
+  private shortId: string;
   private logger: winston.Logger;
   private uuid: string;
   
@@ -31,6 +36,7 @@ export class Game{
   private players: Player[] = [];
 
   constructor(private io: SocketIO.Server, initialPlayers: Player[]){
+    this.shortId = randomString(6).toUpperCase();
     this.uuid = uuid();
     this.logger = createLogger(`Game.ts ${this.uuid}`);
     this.logger.debug("Game Created");

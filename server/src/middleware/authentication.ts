@@ -14,7 +14,7 @@ export async function authentication(req: Request, res: Response, next: NextFunc
 
   try{
     const decodedToken = await verifyJwt(token)
-    logger.info("Decoded Token:", {decodedToken});
+    logger.silly("Decoded Token:", {decodedToken});
     res.locals.jwtData = decodedToken.data;
     next();
   }catch(error){

@@ -21,6 +21,8 @@ import { logRoute } from './middleware';
 import { errorHandler } from './errors';
 
 import userRouter from './routes/user.router';
+import gameRouter from './routes/game.router';
+import playerRouter from './routes/player.router';
 import { SocketIOController } from './model/socket.io.controller';
 
 export class App{
@@ -57,12 +59,14 @@ export class App{
 			});
 		});
 		this.app.use("/v1/user", userRouter.router);
-		this.app.use('/graphql',
-				graphqlHTTP({
-					schema: graphqlSchema,
-					graphiql: true,
-				})
-		);
+		this.app.use("/v1/player", playerRouter.router);
+		this.app.use("/v1/game", gameRouter.router);
+		// this.app.use('/graphql',
+		// 		graphqlHTTP({
+		// 			schema: graphqlSchema,
+		// 			graphiql: true,
+		// 		})
+		// );
 	}
 	private postMiddleware(): void{
 		this.app.use(errorHandler);
@@ -72,5 +76,6 @@ export class App{
 		this.socketIOController.initializeSocketIOHandlers();
 	}
 }
-
-export default new App().httpServer;
+const AppServer = new App();
+export const socketIOController = AppServer.socketIOController;
+export default AppServer.httpServer;

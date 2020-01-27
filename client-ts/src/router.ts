@@ -1,7 +1,10 @@
 import Vue from "vue";
 import Router from "vue-router";
 import Home from "./pages/Home.vue";
-import Multiplayer from "./pages/Multiplayer.vue";
+import LocalMultiplayer from "./pages/LocalMultiplayer.vue";
+import MultiplayerRoot from "./pages/Multiplayer/MultiplayerRoot.vue";
+import MultiplayerHome from "./pages/Multiplayer/MultiplayerHome.vue";
+import MultiplayerGame from "./pages/Multiplayer/MultiplayerGame.vue";
 
 Vue.use(Router);
 
@@ -15,9 +18,26 @@ export default new Router({
       component: Home
     },
     {
+      path: "/local-multiplayer",
+      name: "local-multiplayer",
+      component: LocalMultiplayer
+    },
+    {
       path: "/multiplayer",
-      name: "multiplayer",
-      component: Multiplayer
+      name: "MultiplayerRoot",
+      component: MultiplayerRoot,
+      children:[
+        {
+          path: '/multiplayer',
+          name: "MultiplayerHome",
+          component: MultiplayerHome,
+        },
+        {
+          path: '/multiplayer/game',
+          name: "MultiplayerGame",
+          component: MultiplayerGame,
+        }
+      ]
     }
   ]
 });

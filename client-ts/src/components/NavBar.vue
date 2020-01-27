@@ -10,9 +10,14 @@
       <v-icon>fa-gamepad</v-icon>
     </v-btn>
     
-    <v-btn to="/multiplayer" value="online" height="100%">
-      <span>Multiplayer</span>
+    <v-btn to="/local-multiplayer" value="local" height="100%">
+      <span>Local</span>
       <v-icon>fa-user-friends</v-icon>
+    </v-btn>
+
+    <v-btn to="/multiplayer" value="online" height="100%">
+      <span>Online</span>
+      <v-icon>fa-users</v-icon>
     </v-btn>
 
     <v-menu

@@ -9,21 +9,20 @@
             </slot>
           </td>
           <td>
-            <div id="preview" class="cell">
+            <div class="cell preview">
               <Cell :value="gameState.nextNumber" />
             </div>
           </td>
         </tr>
       </table>
     </div>
-    <div id="playing-grid" ref="grid">
-    </div>
+    <div class="playing-grid" ref="grid"></div>
   </div>
 </template>
 <script lang="ts">
 import { Vuetify, VuetifyObject } from 'vuetify';
 import apiService from '../../services/api.service';
-import { ICoords, IGameState, ICellValue, IGameMove, IGameGridState } from '../../model/interfaces';
+import { ICoords, IGameState, ICellValue, IGameMove, IGameGridState, IKeyboardControls } from '../../model/interfaces';
 import { ICell } from '../../model/views';
 import { Direction, INDEXES, R_INDEXES } from './model/constants';
 import * as GameMutationTypes from '../../store/game/game.types';
@@ -56,6 +55,15 @@ export default class Game extends Vue{
   };
   $vuetify: VuetifyObject;
 
+  @Prop({ type: Object, default: () => ({
+    // Arrow Key Defaults
+    moveUp: 38,
+    moveDown: 40,
+    moveLeft: 37,
+    moveRight: 39,
+  })}) private keyboardControls: IKeyboardControls;
+  private keydownListenerFn: (this: Window, ev: KeyboardEvent) => any;
+
   @Prop({type: Object}) private gameState: IGameState;
   
   gameOverCheckTimeout: NodeJS.Timeout | null  = null;
@@ -73,6 +81,9 @@ export default class Game extends Vue{
       this.initializeGame();
     }
   }
+  beforeDestroy(){
+    this.teardownEventListeners();
+  }
   setupInputs(){
     if(this.gameState.keyboardEnabled){
       this.enableKeyboardInput();
@@ -80,25 +91,25 @@ export default class Game extends Vue{
       this.enableRemoteInput();
     }
   }
-  enableKeyboardInput(){
-    console.log("Enable Keyboard Input");
-    window.addEventListener('keydown', (e) => {
+  enableKeyboardInput(keys: IKeyboardControls = this.keyboardControls){
+    this.keydownListenerFn = (e) => {
       if(this.gameState.paused === true ) return;
       if(this.gameState.gameOver) return;
       e = e || window.event;
-      if (e.keyCode == 38) {
+      if (e.keyCode == keys.moveUp) {
         this.moveUp();
       }
-      else if (e.keyCode == 40) {
+      else if (e.keyCode == keys.moveDown) {
         this.moveDown();
       }
-      else if (e.keyCode == 37) {
+      else if (e.keyCode == keys.moveLeft) {
         this.moveLeft();
       }
-      else if (e.keyCode == 39) {
+      else if (e.keyCode == keys.moveRight) {
         this.moveRight();
       }
-    });
+    };
+    window.addEventListener('keydown', this.keydownListenerFn);
   }
   enableRemoteInput(){
     console.log("Enable Remote Input");
@@ -125,6 +136,12 @@ export default class Game extends Vue{
       console.log("[Remote] Game Over!");
       this.$emit('gameOver', { score: score, cells: this.cells });
     });
+  }
+  teardownEventListeners(){
+    window.removeEventListener('keydown', this.keydownListenerFn);
+    apiService.socket.removeListener(GameMutationTypes.REMOTE_GAME_START);
+    apiService.socket.removeListener(GameMutationTypes.REMOTE_MOVE);
+    apiService.socket.removeListener(GameMutationTypes.REMOTE_GAME_OVER);
   }
   getRandom(min,max){
     return Math.floor(Math.random() * max) + min;
@@ -253,12 +270,11 @@ export default class Game extends Vue{
     }, getRandom(1,3));
   }
   createCell(coords: ICoords, value: number){
-    console.log("Create Cell", coords, value);
+    // console.log("Create Cell", coords, value);
     let c = <ICell> new Cell();
     c.row = coords.r;
     c.col = coords.c;
     c.value = value;
-    console.log("Created Cell", c);
     return c;
   }
   spawnCellInGrid(cell: ICell){
@@ -538,14 +554,14 @@ export default class Game extends Vue{
     }
     font-size: 1.25rem;
     font-weight: bold;
-    #preview{
+    .preview{
       display: inline-block;
       position: static;
       transform: scale(0.7);
     }
   }
 
-  #playing-grid{
+  .playing-grid{
     position: relative;
     width: ($width * 4);
     height: ($height * 4);

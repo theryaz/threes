@@ -13,16 +13,18 @@ import apiService from '@/services/api.service';
 })
 export default class SocketModule extends VuexModule{
   isConnected: boolean = false;
+  socketId: string | null = null;
   socketError: string | null = null;
 
   @Action onConnected(){
     console.log("onConnected");
     const jwt = this.context.rootState.userStore.jwt;
     apiService.socket.emit('jwt', jwt);
-    this.context.commit(SocketMutationTypes.CONNECTED);
+    this.context.commit(SocketMutationTypes.CONNECTED, { socketId: apiService.socket.id});
   }
-	@Mutation [SocketMutationTypes.CONNECTED](){
+	@Mutation [SocketMutationTypes.CONNECTED]({ socketId }: { socketId: string }){
     this.isConnected = true;
+    this.socketId = socketId;
   }
   
   @Action onDisconnected(){

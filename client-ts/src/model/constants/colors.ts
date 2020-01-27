@@ -31,6 +31,7 @@ export const COLORS = {
     }
   },
   dark:{
+    background: "#FFF",
     FONT_COLOR: FONT_COLOR_INVERT,
     FONT_COLOR_INVERT: FONT_COLOR,
     gameBackground: '#333333',

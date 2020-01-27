@@ -3,43 +3,52 @@
     <v-row>
       <v-col cols="6">
         <Game 
-          :game-state="gameStore.localGameState"
-          v-on:gameStart="onLocalGameStart"
-          v-on:gameOver="onLocalGameOver"
-          v-on:onMove="onLocalMove"
+          :keyboardControls="wasdKeys"
+          :game-state="gameStore.leftGameState"
+          v-on:gameStart="onLeftGameStart"
+          v-on:gameOver="onLeftGameOver"
+          v-on:onMove="onLeftMove"
         >
           <PlayerCard
-            :username="userStore.username"
-            :color="userStore.color"
-            :avatarIcon="userStore.avatarIcon"
+            :username="'Ryan'"
+            :color="''"
+            :avatarIcon="'fa-kiwi-bird'"
             />
+          <div v-if="gameStore.leftGameState.gameOver" class="mt-2">
+            Score: {{ gameStore.leftGameState.score }}
+          </div>
         </Game>
       </v-col>
       <v-col cols="6">
-        <Game
-          :game-state="gameStore.remoteGameState"
-          v-on:gameStart="onRemoteGameStart"
-          v-on:gameOver="onRemoteGameOver"
-          v-on:onMove="onRemoteMove">
+        <Game 
+          :keyboardControls="arrowKeys"
+          :game-state="gameStore.rightGameState"
+          v-on:gameStart="onRightGameStart"
+          v-on:gameOver="onRightGameOver"
+          v-on:onMove="onRightMove"
+        >
           <PlayerCard
-            :username="gameStore.remotePlayer.username"
-            :color="gameStore.remotePlayer.color"
-            :avatarIcon="gameStore.remotePlayer.avatarIcon"
-          />
+            :username="'Krista'"
+            :color="''"
+            :avatarIcon="'fa-pegasus'"
+            />
+          <div v-if="gameStore.rightGameState.gameOver" class="mt-2">
+            Score: {{ gameStore.rightGameState.score }}
+          </div>
         </Game>
       </v-col>
     </v-row>
     
-    <RegisterDialog
+    <!-- <RegisterDialog
     :show="showRegisterDialog"
     v-on:onRegister="onRegister"
     v-on:onContinue="onContinue"
-    v-on:onHasAccount="onHasAccount"/>
+    v-on:onHasAccount="onHasAccount"/> -->
     
-    <LoginDialog
+    <!-- <LoginDialog
     :show="showLoginDialog"
     v-on:onGoRegister="onGoRegister"
-    v-on:onLogin="onLogin"/>
+    v-on:onLogin="onLogin"/> -->
   </v-container>
 </template>
 <script lang="ts">
@@ -65,9 +74,26 @@ const gameStore = getModule(GameModule);
     ...mapState(['gameStore']),
   }
 })
-export default class Multiplayer extends Vue{
+export default class LocalMultiplayer extends Vue{
   private showRegisterDialog: boolean = false;
   private showLoginDialog: boolean = false;
+
+  get arrowKeys(){
+    return {
+      moveUp: 38,
+      moveDown: 40,
+      moveLeft: 37,
+      moveRight: 39,
+    };
+  }
+  get wasdKeys(){
+    return {
+      moveUp: 87,
+      moveDown: 83,
+      moveLeft: 65,
+      moveRight: 68,
+    };
+  }
 
   // private localGrid: Grid = new Grid();
 
@@ -77,7 +103,7 @@ export default class Multiplayer extends Vue{
     }
   }
   mounted(){
-    console.log("[Multiplayer.vue] Auto Join game");
+    
   }
 
   get isPaused(){
@@ -89,12 +115,12 @@ export default class Multiplayer extends Vue{
 
   // Continue without registering
   onContinue({ username }){
-    console.log("[Multiplayer.vue] onContinue");
+    // console.log("[Multiplayer.vue] onContinue");
     userStore.setTempUsername(username);
     this.showRegisterDialog = false;
   }
   onRegister(formData){
-    console.log("[Multiplayer.vue] onRegister", formData);
+    // console.log("[Multiplayer.vue] onRegister", formData);
     userStore.register({
       username: formData.username,
       email: formData.email,
@@ -102,45 +128,46 @@ export default class Multiplayer extends Vue{
     });
   }
   onHasAccount(formData){
-    console.log("[Multiplayer.vue] onHasAccount");
+    // console.log("[Multiplayer.vue] onHasAccount");
     this.showRegisterDialog = false;
     this.showLoginDialog = true;
   }
   onLogin({ email, password }){
-    console.log("[Multiplayer.vue] onLogin");
+    // console.log("[Multiplayer.vue] onLogin");
     userStore.login({ email, password }).then(result => {
       this.showLoginDialog = false;
     });
   }
   onGoRegister(formData){
-    console.log("[Multiplayer.vue] onGoRegister");
+    // console.log("[Multiplayer.vue] onGoRegister");
     this.showLoginDialog = false;
     this.showRegisterDialog = true;
   }
 
-  onLocalGameStart(initialGridState: IGameGridState){
-    console.log("onLocalGameStart", initialGridState);
-    gameStore.onGameStart(initialGridState);
+  onLeftGameStart(initialGridState: IGameGridState){
+    console.log("onLeftGameStart", initialGridState);
+    gameStore.onLeftGameStart(initialGridState);
   }
-  onLocalMove(move: IGameMove){
-    console.log("onLocalMove", move);
-    gameStore.onMove(move);
+  onLeftMove(move: IGameMove){
+    // console.log("onLeftMove", move);
+    gameStore.onLeftMove(move);
   }
-  onLocalGameOver(score: number){
-    gameStore.onGameOver(score);
+  onLeftGameOver(score: number){
+    console.log("onLeftGameOver", score);
+    gameStore.onLeftGameOver(score);
   }
 
-  onRemoteGameStart(initialGridState: IGameGridState){
-    console.log("onRemoteGameStart", initialGridState);
-    gameStore.onRemoteGameStart(initialGridState);
+  onRightGameStart(initialGridState: IGameGridState){
+    console.log("onRightGameStart", initialGridState);
+    gameStore.onRightGameStart(initialGridState);
   }
-  onRemoteMove(move: IGameMove){
-    console.log("onRemoteMove", move);
-    gameStore.onRemoteMove(move);
+  onRightMove(move: IGameMove){
+    // console.log("onRightMove", move);
+    gameStore.onRightMove(move);
   }
-  onRemoteGameOver(score: number){
-    console.log("onRemoteGameOver", score);
-    gameStore.onRemoteGameOver(score);
+  onRightGameOver(score: number){
+    console.log("onRightGameOver", score);
+    gameStore.onRightGameOver(score);
   }
 }
 </script>

@@ -6,21 +6,19 @@ services:
       - .:/app
     working_dir: /app/client-ts
     ports:
-      - "127.3.3.3:80:8080"
-
-      # - "192.168.132.196:8080:8080"
+      - 80:8080 # LAN Support
+      # - 127.3.3.3:80:8080
     command: npm start
   server:
     image: node:11.15.0
     environment:
       - MONGO_URL=mongodb://mongo/threeswithfriends
       - JWT_SECRET=changeme
-      - LOG_LEVEL=silly
+      - LOG_LEVEL=debug
       - NODE_ENV=local
     ports:
-      # - 192.168.132.196:4280:4280
-      
-      - 127.3.3.4:80:4280
+      - 4280:4280 # LAN Support
+      # - 127.3.3.4:80:4280
     working_dir: /app/server
     volumes:
       - .:/app

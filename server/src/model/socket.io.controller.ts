@@ -3,6 +3,7 @@ const logger = createLogger("socket.io.controller.ts");
 import { CONFIG } from '../model/constants';
 
 import * as GameMutationTypes from '../../../client-ts/src/store/game/game.types';
+import * as MultiplayerMutationTypes from '../../../client-ts/src/store/multiplayer/multiplayer.types';
 import { ICell } from '../../../client-ts/src/model/views';
 import { IPlayerInfo, ICoords, IGameGridState, IGameMove, IGameState } from '../../../client-ts/src/model/interfaces';
 import { Player } from './classes/Player';
@@ -12,21 +13,23 @@ function getRandom(min: number, max: number){
   return Math.floor(Math.random() * max) + min;
 }
 
+export const connectedPlayers: {[id: string]: Player} = {};
+export const gameList: Game[] = [];
+
 export class SocketIOController{
 	
 	private connectedClients: number = 0;
-	private connectedPlayers: {[id: string]: Player} = {};
-	private gameList: Game[] = [];
+	private connectedPlayers: {[id: string]: Player} = connectedPlayers;
+	private gameList: Game[] = gameList;
 
-	private autoPairInterval;
-
-	constructor(private io: SocketIO.Server){
+	constructor(public io: SocketIO.Server){
 		this.setupCleanupDeadConnections();
-		// this.startAutoPairPlayersInterval();
+		// this.startDebugLogInterval();
 	}
 	private addClient(socket: SocketIO.Socket){
 		this.connectedPlayers[socket.client.id] = new Player(socket);
 		this.connectedClients++;
+		this.io.emit(MultiplayerMutationTypes.ADD_USER, this.connectedPlayers[socket.client.id]);
 		logger.debug(`${this.connectedClients} clients connected`);
 	}
 	private removeClient(socketId: string){
@@ -48,6 +51,17 @@ export class SocketIOController{
 			}
 		}
 	}
+	private startDebugLogInterval(){
+		logger.debug("startDebugLogInterval");
+		const logSocketState = () => {
+			console.log(`Server has ${this.connectedClients} connections`);
+			console.log(Object.keys(this.connectedPlayers).map(key => 
+				`${this.connectedPlayers[key].Username} IsReady: ${this.connectedPlayers[key].IsReady}`
+			).join('\n'));
+		};
+		logSocketState();
+		setInterval(logSocketState, 8000);
+	}
 
 
   public initializeSocketIOHandlers(){
@@ -60,51 +74,17 @@ export class SocketIOController{
 				clientLogger.info("Disconnected");
 				this.removeClient(socket.client.id);
 			});
-
-			socket.on('jwt', () => {
-				sleep(2);
-				this.autoPairPlayers();
-			});
-			socket.on('SET_TEMP_USERNAME', () => {
-				sleep(2);
-				this.autoPairPlayers();
-			});
 		});
 	}
-	public async testJoinPlayer(socket: SocketIO.Socket){
-		logger.info("testJoinPlayer");
-		await sleep(5);
-		logger.info("testJoinPlayer: " + GameMutationTypes.SET_REMOTE_PLAYER_INFO);
-		socket.emit(GameMutationTypes.SET_REMOTE_PLAYER_INFO, <IPlayerInfo>{
-			username: "The Server",
-			avatarIcon: "fa-robot",
-			color: "blue",
-		});
-	}
+	// public async testJoinPlayer(socket: SocketIO.Socket){
+	// 	logger.info("testJoinPlayer");
+	// 	await sleep(5);
+	// 	logger.info("testJoinPlayer: " + GameMutationTypes.SET_REMOTE_PLAYER_INFO);
+	// 	socket.emit(GameMutationTypes.SET_REMOTE_PLAYER_INFO, <IPlayerInfo>{
+	// 		username: "The Server",
+	// 		avatarIcon: "fa-robot",
+	// 		color: "blue",
+	// 	});
+	// }
 
-	startAutoPairPlayersInterval(){
-		this.autoPairInterval = setInterval(() => {
-			this.autoPairPlayers();
-		}, 10 * 1000);
-	}
-	autoPairPlayersNow(){
-		if(this.autoPairInterval) clearInterval(this.autoPairInterval);
-		this.autoPairPlayers();
-		this.startAutoPairPlayersInterval();
-	}
-	autoPairPlayers(){
-		logger.debug(`Auto join players to games (${this.connectedClients} clients connected)`);
-		if(this.connectedClients > 1){
-			let pair: Player[] = [];
-			for(let player of Object.values(this.connectedPlayers)){
-				if(!player.Username){
-					continue;
-				}
-				if(!player.isInGame) pair.push(player);
-				if(pair.length == 2){
-					this.gameList.push(new Game(this.io, pair));
-				}
-			}
-		}
-	}
 };

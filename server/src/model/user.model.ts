@@ -65,7 +65,20 @@ export class User{
       },
       maxAge: JWT_EXPIRY_SECONDS
     });
-  } 
+  }
+
+  public getPublicFields(){
+    return {
+      _id: this._id,
+      uuid: this.uuid,
+      username: this.username,
+      email: this.email,
+      role: this.role,
+      avatarUrl: this.avatarUrl,
+      avatarIcon: this.avatarIcon,
+      color: this.color,
+    };
+  }
 };
 
 export const UserModel = getModelForClass(User); // UserModel is a regular Mongoose Model with correct types

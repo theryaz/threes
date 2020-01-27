@@ -33,6 +33,7 @@ class ApiService{
 	get(uri: string, headers={}){
 		headers = {
 			...headers,
+			['x-client-id']: this.socket.id,
 			Authorization: this.getAuthHeader(),
 		};
 		return Http.get(`${this.baseUrl}${uri}`, { headers });
@@ -40,6 +41,7 @@ class ApiService{
 	post(uri: string, payload: {[field:string]: any}, headers={}){
 		headers = {
 			...headers,
+			['x-client-id']: this.socket.id,
 			Authorization: this.getAuthHeader(),
 		};
 		return Http.post(`${this.baseUrl}${uri}`, payload, { headers });
@@ -47,6 +49,7 @@ class ApiService{
 	put(uri: string, payload: {[field:string]: any}, headers={}){
 		headers = {
 			...headers,
+			['x-client-id']: this.socket.id,
 			Authorization: this.getAuthHeader(),
 		};
 		return Http.put(`${this.baseUrl}${uri}`, payload, { headers });
@@ -54,6 +57,7 @@ class ApiService{
 	delete(uri: string, headers={}){
 		headers = {
 			...headers,
+			['x-client-id']: this.socket.id,
 			Authorization: this.getAuthHeader(),
 		};
 		return Http.delete(`${this.baseUrl}${uri}`, { headers });
@@ -61,6 +65,7 @@ class ApiService{
 	download(uri: string, headers={}, method='get'){
 		headers = {
 			...headers,
+			['x-client-id']: this.socket.id,
 			Authorization: this.getAuthHeader(),
 		};
 		return Http[method](`${this.baseUrl}${uri}`, { headers, responseTye: 'arraybuffer' });

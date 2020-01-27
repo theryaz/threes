@@ -43,6 +43,7 @@ export default class UserModule extends VuexModule{
 	username: string | null = null;
 	avatarUrl: string | null = null;
 	avatarIcon: string | null = null;
+	color: string | null = null;
 
 	get isLoggedIn(): boolean{
 		return this.jwt !== null;

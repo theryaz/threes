@@ -64,6 +64,7 @@ export class Player{
   
   constructor(public socket: SocketIO.Socket){
     socket.on('jwt', (jwt) => {
+      logger.debug("Loaded Player JWT");
       this.onJwt(jwt).catch(e => {
         logger.error("JWT is invalid");
       });
@@ -89,5 +90,12 @@ export class Player{
   onJoinGame(){
 
   }
-
+  // Prevent Circular structure error
+  toJSON(){
+    return {
+      ...this,
+      socket: this.socketId,
+      user: this.user ? this.user.getPublicFields() : {},
+    }
+  }
 }
