@@ -138,7 +138,7 @@ export default class MultiplayerHome extends Vue{
   private autoJoin: boolean = false;
 
   beforeMount(){
-    if(userStore.isLoggedIn === false){
+    if(userStore.isLoggedIn === false && !userStore.username){
       this.showRegisterDialog = true;
     }
   }

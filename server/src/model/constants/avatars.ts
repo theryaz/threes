@@ -13,7 +13,7 @@ const icons = [
   'fa-user-cowboy',
   'fa-user-crown',
   'fa-user-graduate',
-  'fa-user-hard',
+  'fa-user-hard-hat',
   'fa-user-md',
   'fa-user-ninja',
   'fa-user-visor',

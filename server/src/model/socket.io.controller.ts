@@ -74,6 +74,7 @@ export class SocketIOController{
 			socket.on('disconnect', () =>{
 				clientLogger.info("Disconnected");
 				this.removeClient(socket.client.id);
+				this.io.emit(MultiplayerMutationTypes.GET_USERS);
 			});
 			socket.on(UserMutationTypes.SET_TEMP_USERNAME, (username: string) =>{
 				connectedPlayers[socket.client.id].onSetUsername(username);
