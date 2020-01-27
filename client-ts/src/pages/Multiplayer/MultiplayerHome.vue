@@ -10,8 +10,8 @@
     v-on:onGoRegister="onGoRegister"
     v-on:onLogin="onLogin"/>
 
-  <v-row>
-    <v-col class="text-right">
+  <v-row dense>
+    <!-- <v-col>
       <v-spacer>
       </v-spacer>
       <v-switch
@@ -35,8 +35,47 @@
           </v-chip>
         </template>
       </v-switch>
+    </v-col> -->
+    <v-col sm="12" md="6">
+      <v-form v-model="joinFormValid" @submit="joinGame">
+        <v-text-field
+          solo
+          flat
+          required
+          label="Game Id"
+          :rules="gameIdRules"
+          v-model="joinForm.gameShortId"
+        >
+          <template v-slot:append>
+            <v-btn
+              tile
+              text
+              class="ma-0"
+              color="blue"
+              type="submit"
+              :disabled="!joinFormValid"
+            > Join Game </v-btn>
+          </template>
+        </v-text-field>
+
+        <v-snackbar
+          v-model="joinFormSnackbar"
+          top
+          color="error"
+          :timeout="5000"
+        >
+          {{ gameStore.joinGameError }}
+          <v-btn
+            dark
+            text
+            @click="joinFormSnackbar = false"
+          >
+            Close
+          </v-btn>
+        </v-snackbar>
+      </v-form>
     </v-col>
-    <v-col class="text-right">
+    <v-col sm="12" md="6" class="text-right">
       <v-btn
         class="ma-0"
         color="primary"
@@ -44,30 +83,8 @@
       @click="hostGame"> Host Game </v-btn>
     </v-col>
   </v-row>
-  <v-row>
-    <v-col class="text-right">
-      <v-text-field
-        solo
-        flat
-        required
-        label="Game Id"
-        :rules="gameIdRules"
-        v-model="joinGameId"
-      >
-        <template v-slot:append>
-          <v-btn
-            tile
-            text
-            class="ma-0"
-            color="blue"
-            @click="joinGame"
-          > Join Game </v-btn>
-        </template>1
-      </v-text-field>
-    </v-col>
-  </v-row>
 
-  <v-row>
+  <v-row dense>
     <v-col cols="12">
       <PlayerList :limit="5" :playerList="playerList" />
     </v-col>
@@ -85,6 +102,7 @@ import LoginDialog from '../../components/LoginDialog.vue';
 import PlayerList from '../../components/PlayerList.vue';
 
 import UserModule from '../../store/user/user.store';
+import * as UserMutationTypes from '../../store/user/user.types';
 const userStore = getModule(UserModule);
 
 import GameModule from '../../store/game/game.store';
@@ -107,7 +125,11 @@ import { IGameMove, IGameGridState } from '../../model/interfaces';
   }
 })
 export default class MultiplayerHome extends Vue{
-  private joinGameId: string = "";
+  private joinFormSnackbar: boolean = false;
+  private joinFormValid: boolean = false;
+  private joinForm = {
+    gameShortId: "",
+  };
   private showRegisterDialog: boolean = false;
   private showLoginDialog: boolean = false;
 
@@ -121,28 +143,41 @@ export default class MultiplayerHome extends Vue{
     }
   }
   mounted(){
+    this.getUsers();
+    apiService.socket.on(MultiplayerMutationTypes.GET_USERS, this.getUsers);
+    apiService.socket.on(UserMutationTypes.SET_TEMP_AVATAR, userStore.setTempAvatar);
+  }
+  beforeUnmount(){
+    apiService.socket.removeListener(MultiplayerMutationTypes.GET_USERS);
+    apiService.socket.removeListener(UserMutationTypes.SET_TEMP_AVATAR);
+  }
+  getUsers(){
     multiplayerStore.getUsers();
   }
 
   get gameIdRules(){
     return [
-      v => !!v || 'required',
+      v => v.length <= 6 || 'Maximum 6 characters',
+      v => !!v || '',
     ];
   }
 
   hostGame(){
     gameStore.hostGame().then(() => {
-      console.log("Game Hosted!");
+      // console.log("Game Hosted!");
       this.$router.push('/multiplayer/game');
     });
   }
-  joinGame(){
-    if(this.joinGameId){
-      gameStore.joinGame(this.joinGameId).then(() => {
-        console.log("Joined Game!");
+  joinGame($event){
+    $event.preventDefault();
+    gameStore.joinGame(this.joinForm.gameShortId).then((success) => {
+      if(success){
+        // console.log("Joined Game!");
         this.$router.push('/multiplayer/game');
-      });
-    }
+      }else{
+        this.joinFormSnackbar = true;
+      }
+    });
   }
 
   // Continue without registering

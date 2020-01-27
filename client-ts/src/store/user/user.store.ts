@@ -3,6 +3,7 @@ import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators';
 
 import * as UserMutationTypes from './user.types';
 import apiService from '../../services/api.service';
+import { IPlayerInfo } from '@/model/interfaces';
 
 
 interface LoginPayload{
@@ -140,5 +141,12 @@ export default class UserModule extends VuexModule{
 	}
 	@Mutation [UserMutationTypes.SET_TEMP_USERNAME](username: string){
 		this.username = username;
+	}
+	@Action setTempAvatar(playerInfo: IPlayerInfo){
+		this.context.commit(UserMutationTypes.SET_TEMP_AVATAR, playerInfo);
+	}
+	@Mutation [UserMutationTypes.SET_TEMP_AVATAR]({ avatarIcon, color }: IPlayerInfo){
+		this.avatarIcon = avatarIcon;
+		this.color = color;
 	}
 }

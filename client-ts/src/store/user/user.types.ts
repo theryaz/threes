@@ -1,4 +1,5 @@
 export const SET_TEMP_USERNAME = 'SET_TEMP_USERNAME';
+export const SET_TEMP_AVATAR = 'SET_TEMP_AVATAR';
 
 export const REGISTER = 'REGISTER';
 export const REGISTER_SUCCESS = 'REGISTER_SUCCESS';

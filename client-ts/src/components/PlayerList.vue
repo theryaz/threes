@@ -8,10 +8,10 @@
     >
       <PlayerCard
         :color="player.user.color"
+        :player="player"
+        :username="player.username"
         :avatarUrl="player.user.avatarUrl"
         :avatarIcon="player.user.avatarIcon"
-        :username="player.user.username"
-        :player="player"
       />
     </v-card>
   </v-container>

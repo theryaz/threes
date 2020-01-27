@@ -3,6 +3,7 @@ const logger = createLogger("socket.io.controller.ts");
 import { CONFIG } from '../model/constants';
 
 import * as GameMutationTypes from '../../../client-ts/src/store/game/game.types';
+import * as UserMutationTypes from '../../../client-ts/src/store/user/user.types';
 import * as MultiplayerMutationTypes from '../../../client-ts/src/store/multiplayer/multiplayer.types';
 import { ICell } from '../../../client-ts/src/model/views';
 import { IPlayerInfo, ICoords, IGameGridState, IGameMove, IGameState } from '../../../client-ts/src/model/interfaces';
@@ -74,17 +75,11 @@ export class SocketIOController{
 				clientLogger.info("Disconnected");
 				this.removeClient(socket.client.id);
 			});
+			socket.on(UserMutationTypes.SET_TEMP_USERNAME, (username: string) =>{
+				connectedPlayers[socket.client.id].onSetUsername(username);
+				this.io.emit(MultiplayerMutationTypes.GET_USERS);
+			});
 		});
 	}
-	// public async testJoinPlayer(socket: SocketIO.Socket){
-	// 	logger.info("testJoinPlayer");
-	// 	await sleep(5);
-	// 	logger.info("testJoinPlayer: " + GameMutationTypes.SET_REMOTE_PLAYER_INFO);
-	// 	socket.emit(GameMutationTypes.SET_REMOTE_PLAYER_INFO, <IPlayerInfo>{
-	// 		username: "The Server",
-	// 		avatarIcon: "fa-robot",
-	// 		color: "blue",
-	// 	});
-	// }
 
 };

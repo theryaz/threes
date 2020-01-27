@@ -3,7 +3,7 @@ import { socketIOController } from '../app';
 import { gameList, connectedPlayers } from '../model/socket.io.controller';
 
 import * as express from 'express';
-import { sanitizeParams, sanitizeBody, authentication } from '../middleware'
+import { sanitizeParams, sanitizeBody, authentication, loadClientId } from '../middleware'
 
 import { logger } from '../shared';
 import { asyncWrap } from '../shared/async-wrap';
@@ -29,7 +29,7 @@ export class GameRouter{
         res.json({ games: gameList });
       }));
     this.router.route("/create")
-      .post(sanitizeBody, authentication,
+      .post(sanitizeBody, loadClientId,
       asyncWrap(async (req, res) => {
         const clientId = res.locals.clientId;
         if(!clientId) throw new BadRequestError("Socket.io Connection Id is required (x-client-id header)");
@@ -40,7 +40,7 @@ export class GameRouter{
         res.json({ gameShortId: game.ShortId });
       }));
     this.router.route("/join/:gameShortId")
-      .post(sanitizeBody, authentication,
+      .post(sanitizeBody, loadClientId,
       asyncWrap(async (req, res) => {
         const clientId = res.locals.clientId;
         if(!clientId) throw new BadRequestError("Socket.io Connection Id is required (x-client-id header)");

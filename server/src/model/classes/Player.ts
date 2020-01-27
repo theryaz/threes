@@ -2,6 +2,7 @@ import uuid from 'uuid/v4';
 import { Socket } from 'socket.io';
 
 import { Document } from 'mongoose';
+import { Avatars } from '../constants';
 import { User, UserModel } from '../db';
 import { verifyJwt, createLogger } from '../../shared';
 
@@ -40,21 +41,15 @@ export class Player{
   }
   get PlayerInfo(): IPlayerInfo{
     logger.silly(`PlayerInfo: ${this.username}`);
-    if(this.user){
-      return {
-        avatarIcon: this.user.avatarIcon,
-        avatarUrl: this.user.avatarUrl,
-        color: 'blue',
-        username: this.username,
-      };
-    }else{
-      return {
-        avatarIcon: 'fa-dog',
-        avatarUrl: null,
-        color: 'blue',
-        username: this.username,
-      };
+    if(!this.user){
+      this.setRandomAvatar();
     }
+    return {
+      avatarIcon: (<User>this.user).avatarIcon,
+      avatarUrl: (<User>this.user).avatarUrl,
+      color: (<User>this.user).color,
+      username: this.username,
+    };
   }
   get socketId(){ return this.socket.client.id }
   get isDisconnected(){ return this.socket.disconnected }
@@ -86,16 +81,24 @@ export class Player{
   onSetUsername(username: string){
     this.username = username;
     logger.debug("Player set temp username: " + username);
+    this.socket.emit(UserMutationTypes.SET_TEMP_AVATAR, this.PlayerInfo);
   }
-  onJoinGame(){
-
+  setRandomAvatar(){
+    if(!this.user){
+      this.user = new UserModel();
+    }
+    this.user.avatarIcon = Avatars.randomIcon();
+    this.user.color = Avatars.randomColor();
+  }
+  onJoinGame(payload: any){
+    logger.debug("onJoinGame", payload);
   }
   // Prevent Circular structure error
   toJSON(){
     return {
       ...this,
       socket: this.socketId,
-      user: this.user ? this.user.getPublicFields() : {},
+      user: this.user ? this.user.getPublicFields() : this.PlayerInfo,
     }
   }
 }

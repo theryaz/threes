@@ -174,7 +174,15 @@ export default class GameModule extends VuexModule{
 		this.gameShortId = gameShortId;
 		this.multiplayerGameStatus = PlayerStatus.HostedGame;
 		this.localGameState.status = GameStatus.WaitingToStart;
+		this.localGameState.initialGridState = {
+			cells: [],
+			nextNumber: 1,
+		};
 		this.remoteGameState.status = GameStatus.WaitingToStart;
+		this.remoteGameState.initialGridState = {
+			cells: [],
+			nextNumber: 1,
+		};
 	}
 	@Mutation [GameMutationTypes.HOST_GAME_FAILURE](errorMessage: string){
 		this.hostGameLoading = false;
@@ -186,9 +194,11 @@ export default class GameModule extends VuexModule{
 		try{
 			await apiService.post(`/v1/game/join/${gameShortId}`, {});
 			this.context.commit(GameMutationTypes.JOIN_GAME_SUCCESS); 
+			return true;
 		}catch(e){
 			console.error("Failed to Join Game", e);
-			this.context.commit(GameMutationTypes.JOIN_GAME_FAILURE);
+			this.context.commit(GameMutationTypes.JOIN_GAME_FAILURE, e.body.result.message);
+			return false;
 		}
 	}
 	@Mutation [GameMutationTypes.JOIN_GAME](){
@@ -198,6 +208,14 @@ export default class GameModule extends VuexModule{
 	@Mutation [GameMutationTypes.JOIN_GAME_SUCCESS](){
 		this.joinGameLoading = false;
 		this.multiplayerGameStatus = PlayerStatus.JoinedGame;
+		this.localGameState.initialGridState = {
+			cells: [],
+			nextNumber: 1,
+		};
+		this.remoteGameState.initialGridState = {
+			cells: [],
+			nextNumber: 1,
+		};
 	}
 	@Mutation [GameMutationTypes.JOIN_GAME_FAILURE](errorMessage: string){
 		this.joinGameLoading = false;

@@ -10,7 +10,7 @@
           v-on:onMove="onLeftMove"
         >
           <PlayerCard
-            :username="'Ryan'"
+            :username="'WASD'"
             :color="''"
             :avatarIcon="'fa-kiwi-bird'"
             />
@@ -28,7 +28,7 @@
           v-on:onMove="onRightMove"
         >
           <PlayerCard
-            :username="'Krista'"
+            :username="'Arrows'"
             :color="''"
             :avatarIcon="'fa-pegasus'"
             />
@@ -111,37 +111,6 @@ export default class LocalMultiplayer extends Vue{
   }
   get userStore(){
     return userStore;
-  }
-
-  // Continue without registering
-  onContinue({ username }){
-    // console.log("[Multiplayer.vue] onContinue");
-    userStore.setTempUsername(username);
-    this.showRegisterDialog = false;
-  }
-  onRegister(formData){
-    // console.log("[Multiplayer.vue] onRegister", formData);
-    userStore.register({
-      username: formData.username,
-      email: formData.email,
-      password: formData.password1,
-    });
-  }
-  onHasAccount(formData){
-    // console.log("[Multiplayer.vue] onHasAccount");
-    this.showRegisterDialog = false;
-    this.showLoginDialog = true;
-  }
-  onLogin({ email, password }){
-    // console.log("[Multiplayer.vue] onLogin");
-    userStore.login({ email, password }).then(result => {
-      this.showLoginDialog = false;
-    });
-  }
-  onGoRegister(formData){
-    // console.log("[Multiplayer.vue] onGoRegister");
-    this.showLoginDialog = false;
-    this.showRegisterDialog = true;
   }
 
   onLeftGameStart(initialGridState: IGameGridState){
