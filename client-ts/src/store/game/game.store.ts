@@ -2,7 +2,7 @@ import store from '../store';
 import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators';
 import apiService from '../../services/api.service';
 import { ICell } from '../../model/views';
-import { IPlayerInfo, IGameState, IGameMove, IGameGridState, ICellValue } from '../../model/interfaces';
+import { IPlayerInfo, IGameState, IGameMove, IGameGridState, IGameOverPayload, ICellValue } from '../../model/interfaces';
 import Game from '../../components/Game/Game.vue';
 
 import * as GameMutationTypes from './game.types';
@@ -253,7 +253,7 @@ export default class GameModule extends VuexModule{
 		this.remoteGameState.nextNumber = move.nextNumber;
 		this.remoteGameState.history.push(move);
 	}
-	@Action({ commit: GameMutationTypes.REMOTE_GAME_OVER }) onRemoteGameOver({ score }: {score: number, cells: ICellValue[]}){
+	@Action({ commit: GameMutationTypes.REMOTE_GAME_OVER }) onRemoteGameOver({ score }: IGameOverPayload){
 		return { score };
 	}
 	@Mutation [GameMutationTypes.REMOTE_GAME_OVER](){
@@ -285,11 +285,11 @@ export default class GameModule extends VuexModule{
 		this.localGameState.nextNumber = move.nextNumber;
 		this.localGameState.history.push(move);
 	}
-	@Action({ commit: GameMutationTypes.GAME_OVER }) onGameOver({ score }: {score: number, cells: ICellValue[]}){
+	@Action({ commit: GameMutationTypes.GAME_OVER }) onGameOver({ score }: IGameOverPayload){
 		apiService.socket.emit('onLocalGameOver');
 		return { score };
 	}
-	@Mutation [GameMutationTypes.GAME_OVER]({ score }: {score: number, cells: ICellValue[]}){
+	@Mutation [GameMutationTypes.GAME_OVER]({ score }: IGameOverPayload){
 		this.localGameState.gameOver = true;
 		this.localGameState.score = score;
 	}
@@ -315,10 +315,10 @@ export default class GameModule extends VuexModule{
 		this.singleGameState.nextNumber = move.nextNumber;
 		this.singleGameState.history.push(move);
 	}
-	@Action({ commit: GameMutationTypes.SINGLE_GAME_OVER }) onSingleGameOver({ score }: {score: number, cells: ICellValue[]}){
+	@Action({ commit: GameMutationTypes.SINGLE_GAME_OVER }) onSingleGameOver({ score }: IGameOverPayload){
 		return { score };
 	}
-	@Mutation [GameMutationTypes.SINGLE_GAME_OVER]({ score }: {score: number, cells: ICellValue[]}){
+	@Mutation [GameMutationTypes.SINGLE_GAME_OVER]({ score }: IGameOverPayload){
 		this.singleGameState.gameOver = true;
 		this.singleGameState.score = score;
 	}
@@ -345,10 +345,10 @@ export default class GameModule extends VuexModule{
 		this.leftGameState.nextNumber = move.nextNumber;
 		this.leftGameState.history.push(move);
 	}
-	@Action({ commit: GameMutationTypes.LEFT_GAME_OVER }) onLeftGameOver({ score }: {score: number, cells: ICellValue[]}){
+	@Action({ commit: GameMutationTypes.LEFT_GAME_OVER }) onLeftGameOver({ score }: IGameOverPayload){
 		return { score };
 	}
-	@Mutation [GameMutationTypes.LEFT_GAME_OVER]({ score }: {score: number, cells: ICellValue[]}){
+	@Mutation [GameMutationTypes.LEFT_GAME_OVER]({ score }: IGameOverPayload){
 		this.leftGameState.gameOver = true;
 		this.leftGameState.score = score;
 	}
@@ -374,10 +374,10 @@ export default class GameModule extends VuexModule{
 		this.rightGameState.nextNumber = move.nextNumber;
 		this.rightGameState.history.push(move);
 	}
-	@Action({ commit: GameMutationTypes.RIGHT_GAME_OVER }) onRightGameOver({ score }: {score: number, cells: ICellValue[]}){
+	@Action({ commit: GameMutationTypes.RIGHT_GAME_OVER }) onRightGameOver({ score }: IGameOverPayload){
 		return { score };
 	}
-	@Mutation [GameMutationTypes.RIGHT_GAME_OVER]({ score }: {score: number, cells: ICellValue[]}){
+	@Mutation [GameMutationTypes.RIGHT_GAME_OVER]({ score }: IGameOverPayload){
 		this.rightGameState.gameOver = true;
 		this.rightGameState.score = score;
 	}

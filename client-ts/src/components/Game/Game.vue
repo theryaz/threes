@@ -20,7 +20,7 @@
   </div>
 </template>
 <script lang="ts">
-import { Vuetify, VuetifyObject } from 'vuetify';
+import { Vuetify } from 'vuetify';
 import apiService from '../../services/api.service';
 import { ICoords, IGameState, ICellValue, IGameMove, IGameGridState, IKeyboardControls } from '../../model/interfaces';
 import { ICell } from '../../model/views';
@@ -53,7 +53,6 @@ export default class Game extends Vue{
   $refs:{
     grid: HTMLDivElement,
   };
-  $vuetify: VuetifyObject;
 
   @Prop({ type: Object, default: () => ({
     // Arrow Key Defaults
@@ -66,7 +65,7 @@ export default class Game extends Vue{
 
   @Prop({type: Object}) private gameState: IGameState;
   
-  gameOverCheckTimeout: NodeJS.Timeout | null  = null;
+  gameOverCheckTimeout: any | null  = null;
   cells: ICell[]  = [];
   nextNumber: number;
 
@@ -92,7 +91,7 @@ export default class Game extends Vue{
     }
   }
   enableKeyboardInput(keys: IKeyboardControls = this.keyboardControls){
-    this.keydownListenerFn = (e) => {
+    this.keydownListenerFn = (e: any) => {
       if(this.gameState.paused === true ) return;
       if(this.gameState.gameOver) return;
       e = e || window.event;
@@ -312,19 +311,19 @@ export default class Game extends Vue{
     else return cell.value;
   }
   above(coords: ICoords): ICell{
-    let new_coords = {r: coords.r - 1, c: coords.c};
+    const new_coords: any = {r: coords.r - 1, c: coords.c};
     return this.at(new_coords);
   }
   below(coords: ICoords): ICell{
-    let new_coords = {r: coords.r + 1, c: coords.c};
+    const new_coords: any = {r: coords.r + 1, c: coords.c};
     return this.at(new_coords);
   }
   left(coords: ICoords): ICell{
-    let new_coords = {r: coords.r, c: coords.c - 1};
+    const new_coords: any = {r: coords.r, c: coords.c - 1};
     return this.at(new_coords);
   }
   right(coords: ICoords): ICell{
-    let new_coords = {r: coords.r, c: coords.c + 1};
+    const new_coords: any = {r: coords.r, c: coords.c + 1};
     return this.at(new_coords);
   }
   // Methods to scan the grid from corner to corner and exec the move method on each cell

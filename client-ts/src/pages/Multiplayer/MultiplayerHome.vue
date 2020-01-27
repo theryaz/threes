@@ -186,7 +186,7 @@ export default class MultiplayerHome extends Vue{
     userStore.setTempUsername(username);
     this.showRegisterDialog = false;
   }
-  onRegister(formData){
+  onRegister(formData: any){
     console.log("[Multiplayer.vue] onRegister", formData);
     userStore.register({
       username: formData.username,
@@ -194,7 +194,7 @@ export default class MultiplayerHome extends Vue{
       password: formData.password1,
     });
   }
-  onHasAccount(formData){
+  onHasAccount(formData: any){
     console.log("[Multiplayer.vue] onHasAccount");
     this.showRegisterDialog = false;
     this.showLoginDialog = true;
@@ -205,7 +205,7 @@ export default class MultiplayerHome extends Vue{
       this.showLoginDialog = false;
     });
   }
-  onGoRegister(formData){
+  onGoRegister(formData: any){
     console.log("[Multiplayer.vue] onGoRegister");
     this.showLoginDialog = false;
     this.showRegisterDialog = true;

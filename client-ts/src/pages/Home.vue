@@ -27,7 +27,7 @@ const userStore = getModule(UserModule);
 import GameModule from '../store/game/game.store';
 import * as GameMutationTypes from '../store/game/game.types';
 import apiService from '../services/api.service';
-import { IGameMove, IGameGridState } from '../model/interfaces';
+import { IGameMove, IGameGridState, IGameOverPayload } from '../model/interfaces';
 const gameStore = getModule(GameModule);
 
 @Component({
@@ -46,8 +46,8 @@ export default class Home extends Vue{
     // console.log("onSingleMove", move);
     gameStore.onSingleMove(move);
   }
-  onGameOver(score: number){
-    gameStore.onSingleGameOver(score);
+  onGameOver({ score, cells }: IGameOverPayload){
+    gameStore.onSingleGameOver({ score, cells });
   }
 }
 </script>

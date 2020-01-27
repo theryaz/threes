@@ -64,7 +64,7 @@ const userStore = getModule(UserModule);
 import GameModule from '../store/game/game.store';
 import * as GameMutationTypes from '../store/game/game.types';
 import apiService from '../services/api.service';
-import { IGameMove, IGameGridState } from '../model/interfaces';
+import { IGameMove, IGameGridState, IGameOverPayload } from '../model/interfaces';
 const gameStore = getModule(GameModule);
 
 @Component({
@@ -121,9 +121,9 @@ export default class LocalMultiplayer extends Vue{
     // console.log("onLeftMove", move);
     gameStore.onLeftMove(move);
   }
-  onLeftGameOver(score: number){
+  onLeftGameOver({ score, cells }: IGameOverPayload){
     console.log("onLeftGameOver", score);
-    gameStore.onLeftGameOver(score);
+    gameStore.onLeftGameOver({ score, cells });
   }
 
   onRightGameStart(initialGridState: IGameGridState){
@@ -134,9 +134,9 @@ export default class LocalMultiplayer extends Vue{
     // console.log("onRightMove", move);
     gameStore.onRightMove(move);
   }
-  onRightGameOver(score: number){
+  onRightGameOver({ score, cells }: IGameOverPayload){
     console.log("onRightGameOver", score);
-    gameStore.onRightGameOver(score);
+    gameStore.onRightGameOver({ score, cells });
   }
 }
 </script>

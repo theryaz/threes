@@ -1,6 +1,6 @@
 {
-  "name": "client-ts",
-  "short_name": "client-ts",
+  "name": "Threes With Friends",
+  "short_name": "threeswithfriends",
   "icons": [
     {
       "src": "./img/icons/android-chrome-192x192.png",

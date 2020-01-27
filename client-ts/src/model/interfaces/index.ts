@@ -6,3 +6,4 @@ export * from './IGameMove';
 export * from './IGameGridState';
 export * from './IKeyboardControls';
 export * from './IPlayer';
+export * from './IGameOverPayload';
