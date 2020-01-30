@@ -5,7 +5,6 @@ import { CONFIG } from '../model/constants';
 import * as GameMutationTypes from '../../../client-ts/src/store/game/game.types';
 import * as UserMutationTypes from '../../../client-ts/src/store/user/user.types';
 import * as MultiplayerMutationTypes from '../../../client-ts/src/store/multiplayer/multiplayer.types';
-import { ICell } from '../../../client-ts/src/model/views';
 import { IPlayerInfo, ICoords, IGameGridState, IGameMove, IGameState } from '../../../client-ts/src/model/interfaces';
 import { Player } from './classes/Player';
 import { Game } from './classes/Game';

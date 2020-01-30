@@ -1,4 +1,4 @@
-import { ICellValue } from '@/model/interfaces';
+import { ICellValue } from '../../model/interfaces';
 
 export interface IGameGridState{
   nextNumber: number,

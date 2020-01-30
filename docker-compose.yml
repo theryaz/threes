@@ -1,7 +1,7 @@
 version: "3"
 services:
   client:
-    image: node:11.15.0
+    image: node:13.6.0
     volumes:
       - .:/app
     working_dir: /app/client-ts
@@ -10,7 +10,7 @@ services:
       # - 127.3.3.3:80:8080
     command: npm start
   server:
-    image: node:11.15.0
+    image: node:13.6.0
     environment:
       - MONGO_URL=mongodb://mongo/threeswithfriends
       - JWT_SECRET=changeme

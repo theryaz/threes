@@ -1,5 +1,5 @@
-import { ICellValue } from 'src/model/interfaces';
-import { Direction } from 'src/components/Game/model/constants';
+import { ICellValue } from '../../model/interfaces';
+import { Direction } from '../../components/Game/model/constants';
 
 /**
  * Information needed to replicate this move in another game.
