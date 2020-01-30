@@ -65,7 +65,7 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
-      - aws-cli/setup:
+      - aws-cli/setup
       - run:
           name: Deploy API to Rancher
           command: |
