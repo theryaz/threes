@@ -6,7 +6,7 @@ version: 2.1
 orbs:
   aws-cli: circleci/aws-cli@0.1.19
 jobs:
-  build:
+  build-deploy-stage:
     docker:
       # specify the version you desire here
       - image: node:13.6.0
@@ -98,10 +98,7 @@ workflows:
   version: 2
   staging:
     jobs:
-      - build
-      - deploy-stage:
-          requires:
-            - build
+      - build-deploy-stage:
           filters:
             branches:
               only: development
