@@ -60,11 +60,20 @@ jobs:
             cd server
             npm run build
 
+      - save_cache:
+          paths:
+            - client-ts/dist
+            - server/dist
+          key: build-dists
+
   deploy-stage:
     executor: aws-cli/default
     working_directory: ~/repo
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - build-dists
       - aws-cli/setup
       - run:
           name: Deploy API to Rancher
