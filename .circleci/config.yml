@@ -52,5 +52,5 @@ jobs:
             npm run build:staging
       - run:
           command: |
-            cd server
+            cd ../server
             npm run build
