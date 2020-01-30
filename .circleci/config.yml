@@ -28,6 +28,7 @@ jobs:
             - server-node-
 
       - run:
+          name: Install Node Modules
           command: |
             cd client-ts
             npm install
@@ -47,10 +48,12 @@ jobs:
       #  Build
 
       - run:
+          name: Compile Vue Client
           command: |
             cd client-ts
             npm run build:staging
       - run:
+          name: Compile Server
           command: |
-            cd ../server
+            cd server
             npm run build
