@@ -20,9 +20,12 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - node-modules-{{ checksum "package.json" }}
-            # fallback to using the latest cache if no exact match is found
-            - node-modules-
+            - client-node-{{ checksum "client-ts/package.json" }}
+            - client-node-
+      - restore_cache:
+          keys:
+            - server-node-{{ checksum "server/package.json" }}
+            - server-node-
 
       - run:
           command: |
@@ -35,8 +38,11 @@ jobs:
       - save_cache:
           paths:
             - client-ts/node_modules
+          key: client-node-{{ checksum "client-ts/package.json" }}
+      - save_cache:
+          paths:
             - server/node_modules
-          key: node-modules-{{ checksum "package.json" }}
+          key: server-node-{{ checksum "server/package.json" }}
 
       #  Build
 
@@ -48,4 +54,3 @@ jobs:
           command: |
             cd server
             npm run build
-      
