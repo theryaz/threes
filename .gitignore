@@ -20,5 +20,5 @@ yarn-error.log*
 *.sln
 *.sw?
 
-db
+mongo_data
 server/dist

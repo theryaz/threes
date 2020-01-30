@@ -26,6 +26,6 @@ services:
   mongo:
     image: mongo:4.0.9
     volumes:
-      - ./db:/data/db
+      - ./mongo_data:/data/db
     logging:
       driver: syslog
