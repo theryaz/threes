@@ -11,13 +11,10 @@
     "lint": "vue-cli-service lint",
     "test:e2e": "vue-cli-service test:e2e",
     "test:unit": "vue-cli-service test:unit",
-    
     "deploy:production": "vue-cli-service build && npm run s3sync:production",
     "s3sync:production": "aws s3 sync --delete --acl public-read dist s3://play.threeswithfriends.com && aws cloudfront create-invalidation --distribution-id E3P2WX3OJLCJD3 --paths /index.html",
-    
     "deploy:staging": "npm run build:staging && npm run s3sync:staging",
     "s3sync:staging": "aws s3 sync --delete --acl public-read dist s3://play.staging.threeswithfriends.com && aws cloudfront create-invalidation --distribution-id EGF98SYFEN0UJ --paths /index.html",
-    
     "npm-install": "docker run --rm -it -v $(pwd):/app -w /app node:13.6.0 npm install"
   },
   "dependencies": {
