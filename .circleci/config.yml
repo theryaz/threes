@@ -59,6 +59,12 @@ jobs:
           command: |
             cd server
             npm run build
+      - run:
+          name: Install AWS CLI
+          command: |
+            apt-get update -y
+            apt-get install -y python python-pip
+            pip install awscli
 
       # - save_cache:
       #     paths:
@@ -86,10 +92,6 @@ jobs:
       - run:
           name: Deploy to S3
           command: |
-            apt-get update -y
-            apt-get install -y python python-pip
-            pip install awscli
-
             cd client-ts
             npm run s3sync:staging
 
