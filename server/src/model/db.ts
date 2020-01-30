@@ -11,7 +11,7 @@ try{
 }
 
 logger.info('Connecting to MongoDB: ' + MONGO_URL);
-mongoose.connect(MONGO_URL, {useNewUrlParser: true});
+mongoose.connect(MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true});
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB Connection error:'));
