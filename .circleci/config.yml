@@ -68,14 +68,14 @@ jobs:
           name: Deploy to S3
           command: aws s3 sync --delete --acl public-read dist s3://play.staging.threeswithfriends.com && aws cloudfront create-invalidation --distribution-id EGF98SYFEN0UJ --paths /index.html
   
-workflows:
-  version: 2
-  build-deploy:
-    jobs:
-      - build
-      - deploy-stage:
-          requires:
-            - build
-          filters:
-            branches:
-              only: development
+# workflows:
+#   version: 2
+#   staging:
+#     jobs:
+#       - build
+#       - deploy-stage:
+#           requires:
+#             - build
+#           filters:
+#             branches:
+#               only: development
