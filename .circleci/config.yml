@@ -71,7 +71,7 @@ jobs:
       #       - client-ts/dist
       #       - server/dist
       #     key: build-dists
-
+      - setup_remote_docker
       - run:
           name: Deploy API to Rancher
           command: |
