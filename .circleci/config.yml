@@ -20,6 +20,7 @@ jobs:
 
     steps:
       - checkout
+      - setup_remote_docker
       - restore_cache:
           keys:
             - client-node-{{ checksum "client-ts/package.json" }}
@@ -59,6 +60,7 @@ jobs:
           command: |
             cd server
             npm run build
+
       - run:
           name: Install AWS CLI
           command: |
@@ -71,7 +73,7 @@ jobs:
       #       - client-ts/dist
       #       - server/dist
       #     key: build-dists
-      - setup_remote_docker
+
       - run:
           name: Deploy API to Rancher
           command: |
