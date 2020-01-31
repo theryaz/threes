@@ -5,6 +5,7 @@
       v-for="player in PlayerList"
       :key="player.socket"
       class="mt-2 pl-2 pr-2"
+      @click="() => emitGameId(player)"
     >
       <PlayerCard
         :color="player.user.color"
@@ -36,6 +37,12 @@ export default class PlayerList extends Vue{
       return this.playerList;
     }
     return this.playerList.slice(0, this.limit);
+  }
+
+  emitGameId(player: IPlayer){
+    if(player.gameShortId){
+      this.$emit('gameShortId', player.gameShortId);
+    }
   }
 }
 </script>

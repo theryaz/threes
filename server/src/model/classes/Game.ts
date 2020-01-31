@@ -47,6 +47,13 @@ export class Game{
   get AllPlayersReady(){
     return this.players.reduce((isReady,b) => isReady && b.IsReady, true);
   }
+
+  get Players(){
+    return this.players;
+  }
+  hasPlayer(player: Player){
+    return this.players.find(p => p.socketId === player.socketId);
+  }
   
   addPlayer(player: Player){
     player.isInGame = true;
@@ -79,11 +86,6 @@ export class Game{
       this.listenForGameOver();
     }
   }
-  // private addPlayersToGameRoom(){
-  //   this.players.forEach((player: Player) => {
-  //     player.socket.join(this.RoomId);
-  //   });
-  // }
   private sendPlayerInfo(){
     this.players.forEach((player: Player, index: number) => {
       this.players.forEach((otherPlayer: Player, otherIndex: number) => {

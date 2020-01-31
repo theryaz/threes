@@ -16,7 +16,7 @@ const gameStore = getModule(GameModule);
 class ApiService{
 	public socket: SocketIOClient.Socket = io.connect(API_URL);
 	constructor(private baseUrl: string){
-		console.log("ApiService Initialized baseUrl: ", this.baseUrl);
+		// console.log("ApiService Initialized baseUrl: ", this.baseUrl);
 		this.setupSocketIO();
 	}
 

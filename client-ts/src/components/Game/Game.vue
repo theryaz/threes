@@ -17,6 +17,23 @@
       </table>
     </div>
     <div class="playing-grid" ref="grid"></div>
+    <v-flex class="mt-1">
+      <v-chip class="mx-1" label transition="slide-x-transition">
+        <v-avatar tile left>
+          <v-icon>fa-abacus</v-icon>
+        </v-avatar>
+        {{ CurrentScore }}
+      </v-chip>
+
+      <v-expand-x-transition>
+        <v-chip class="mx-1" label color="crimson" v-show="this.gameState.gameOver">
+          <v-avatar tile left>
+            <v-icon>fa-lock-alt</v-icon>
+          </v-avatar>
+          Game Over
+        </v-chip>
+      </v-expand-x-transition>
+    </v-flex>
   </div>
 </template>
 <script lang="ts">
@@ -111,10 +128,10 @@ export default class Game extends Vue{
     window.addEventListener('keydown', this.keydownListenerFn);
   }
   enableRemoteInput(){
-    console.log("Enable Remote Input");
+    // console.log("Enable Remote Input");
     apiService.socket.on(GameMutationTypes.REMOTE_GAME_START, this.initializeGame);
     apiService.socket.on(GameMutationTypes.REMOTE_MOVE, (move: IGameMove) => {
-      console.log("REMOTE_MOVE", move);
+      // console.log("REMOTE_MOVE", move);
       switch(move.direction){
         case Direction.UP:
           this.moveUp(move.newCell);
@@ -132,7 +149,7 @@ export default class Game extends Vue{
       this.$emit('onMove', move);
     });
     apiService.socket.on(GameMutationTypes.REMOTE_GAME_OVER, (score: number) => {
-      console.log("[Remote] Game Over!");
+      // console.log("[Remote] Game Over!");
       this.$emit('gameOver', { score: score, cells: this.cells });
     });
   }
@@ -161,6 +178,14 @@ export default class Game extends Vue{
     };
   }
 
+  get CurrentScore(){
+    if(this.cells.length > 0){
+      return this.getScore();
+    }else{
+      return 0;
+    }
+  }
+
   getScore(){
     return this.cells
       .map((cell: ICell) => cell.value)
@@ -180,10 +205,10 @@ export default class Game extends Vue{
     if(this.gameState.isRemote) return;
     if(this.gameOverCheckTimeout) clearTimeout(this.gameOverCheckTimeout);
     this.gameOverCheckTimeout = setTimeout(() => {
-      console.log("Check Game Over");
+      // console.log("Check Game Over");
       let gameOver = false;
       if(this.cells.length < 16){
-        console.log("The grid isn't even full.");
+        // console.log("The grid isn't even full.");
         return;
       }
 
@@ -221,7 +246,7 @@ export default class Game extends Vue{
         }
       }
       if(allCellsStuck){
-        console.log("Game Over!");
+        // console.log("Game Over!");
         this.$emit('gameOver', { score: this.getScore(), cells: this.cells });
       }
     }, 1000);

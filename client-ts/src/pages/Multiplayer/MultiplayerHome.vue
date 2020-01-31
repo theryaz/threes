@@ -86,7 +86,7 @@
 
   <v-row dense>
     <v-col cols="12">
-      <PlayerList :limit="5" :playerList="playerList" />
+      <PlayerList :limit="5" :playerList="playerList" v-on:gameShortId="setGameShortId" />
     </v-col>
   </v-row>
 
@@ -167,6 +167,9 @@ export default class MultiplayerHome extends Vue{
       // console.log("Game Hosted!");
       this.$router.push('/multiplayer/game');
     });
+  }
+  setGameShortId(gameShortId: string){
+    this.joinForm.gameShortId = gameShortId;
   }
   joinGame($event){
     $event.preventDefault();

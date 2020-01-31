@@ -24,6 +24,7 @@ export class Player{
   private username: string | null;
   private role: string | null;
   private _id: string | null;
+  public gameShortId: string | null;
   
   public user: (Document & User) | null;
   

@@ -29,7 +29,7 @@
         </Game>
       </v-col>
     </v-row>
-    <v-row>
+    <v-row v-if="isWaiting">
       <v-col offset="3" cols="6">
         <v-card>
           <v-card-title>
@@ -67,7 +67,7 @@ import * as MultiplayerMutationTypes from '../../store/multiplayer/multiplayer.t
 const multiplayerStore = getModule(MultiplayerModule);
 
 import apiService from '../../services/api.service';
-import { PlayerStatus } from '../../model/enums';
+import { PlayerStatus, GameStatus } from '../../model/enums';
 import { IGameMove, IGameGridState, ICellValue } from '../../model/interfaces';
 
 @Component({
@@ -83,6 +83,10 @@ export default class MultiplayerGame extends Vue{
   private showLoginDialog: boolean = false;
 
   // private localGrid: Grid = new Grid();
+
+  get isWaiting(){
+    return gameStore.localGameState.status === GameStatus.WaitingToStart;
+  }
 
   get joinUrl(){
     // TODO configure this properly

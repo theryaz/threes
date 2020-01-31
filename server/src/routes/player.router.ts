@@ -1,5 +1,5 @@
 // TODO Use real Datastore
-import { connectedPlayers } from '../model/socket.io.controller';
+import { connectedPlayers, gameList } from '../model/socket.io.controller';
 
 import * as express from 'express';
 import { sanitizeParams, sanitizeBody, authentication } from '../middleware'
@@ -26,7 +26,13 @@ export class PlayerRouter{
         const players: Player[] = [];
         const connectedIds = Object.keys(connectedPlayers);
         for(const connectedId of connectedIds){
-					players.push(connectedPlayers[connectedId]);
+					const player = connectedPlayers[connectedId];
+					const game = gameList.find(g => g.hasPlayer(player));
+					if(game !== undefined){
+						if(game.Players.length > 1) continue; // Don't show players playing games
+						player.gameShortId = game.ShortId;
+					}
+					players.push(player);
 				}
 				res.json({ players });
 			}));

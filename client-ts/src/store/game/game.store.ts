@@ -242,6 +242,7 @@ export default class GameModule extends VuexModule{
 	@Mutation [GameMutationTypes.REMOTE_GAME_START](initialGridState: IGameGridState){
 		this.remoteGameState.paused = false;
 		this.localGameState.gameOver = false;
+		this.localGameState.status = GameStatus.InProgress;
 		this.remoteGameState.status = GameStatus.InProgress;
 		this.remoteGameState.initialGridState = initialGridState;
 		this.localGameState.history = [];

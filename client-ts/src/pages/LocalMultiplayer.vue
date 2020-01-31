@@ -14,9 +14,6 @@
             :color="''"
             :avatarIcon="'fa-kiwi-bird'"
             />
-          <div v-if="gameStore.leftGameState.gameOver" class="mt-2">
-            Score: {{ gameStore.leftGameState.score }}
-          </div>
         </Game>
       </v-col>
       <v-col cols="6">
@@ -32,23 +29,9 @@
             :color="''"
             :avatarIcon="'fa-pegasus'"
             />
-          <div v-if="gameStore.rightGameState.gameOver" class="mt-2">
-            Score: {{ gameStore.rightGameState.score }}
-          </div>
         </Game>
       </v-col>
     </v-row>
-    
-    <!-- <RegisterDialog
-    :show="showRegisterDialog"
-    v-on:onRegister="onRegister"
-    v-on:onContinue="onContinue"
-    v-on:onHasAccount="onHasAccount"/> -->
-    
-    <!-- <LoginDialog
-    :show="showLoginDialog"
-    v-on:onGoRegister="onGoRegister"
-    v-on:onLogin="onLogin"/> -->
   </v-container>
 </template>
 <script lang="ts">

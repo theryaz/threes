@@ -17,7 +17,7 @@ export default class SocketModule extends VuexModule{
   socketError: string | null = null;
 
   @Action onConnected(){
-    console.log("onConnected");
+    // console.log("onConnected");
     const jwt = this.context.rootState.userStore.jwt;
     apiService.socket.emit('jwt', jwt);
     this.context.commit(SocketMutationTypes.CONNECTED, { socketId: apiService.socket.id});

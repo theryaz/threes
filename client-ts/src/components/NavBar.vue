@@ -20,7 +20,12 @@
       <v-icon>fa-users</v-icon>
     </v-btn>
 
-    <v-menu
+    <!-- <v-btn height="100%">
+      <span>Login</span>
+      <v-icon>fa-sign-in</v-icon>
+    </v-btn> -->
+
+    <!-- <v-menu
       top
       :offset-y="true"
       origin="center bottom"
@@ -42,7 +47,7 @@
           </v-list-item-title>
         </v-list-item>
       </v-list>
-    </v-menu>
+    </v-menu> -->
 
   </v-bottom-navigation>
 </template>

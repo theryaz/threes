@@ -5,6 +5,8 @@ import * as UserMutationTypes from './user.types';
 import apiService from '../../services/api.service';
 import { IPlayerInfo } from '@/model/interfaces';
 
+import { COLORS } from '../../model/constants'
+
 
 interface LoginPayload{
 	jwt: string,
@@ -43,8 +45,8 @@ export default class UserModule extends VuexModule{
 	
 	username: string | null = null;
 	avatarUrl: string | null = null;
-	avatarIcon: string | null = null;
-	color: string | null = null;
+	avatarIcon: string | null = "fa-user";
+	color: string | null = COLORS.primary;
 
 	get isLoggedIn(): boolean{
 		return this.jwt !== null;
@@ -57,9 +59,10 @@ export default class UserModule extends VuexModule{
 		this.loading = true;
 		this.jwt = null;
 		this.username = null;
-		this.avatarIcon = null;
+		this.avatarIcon = "fa-user";
 		this.avatarUrl = null;
 		this.role = null;
+		this.color = COLORS.primary;
 		window.localStorage.removeItem("userAuth");
 	}
 	
@@ -85,7 +88,7 @@ export default class UserModule extends VuexModule{
 		console.log("Load Auth");
 		const userAuth = window.localStorage.getItem("userAuth");
 		if(!userAuth){
-			console.log("No user auth exists");
+			this.setTempUsername(this.username);
 			return;
 		}
 		const payload = JSON.parse(userAuth);

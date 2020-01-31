@@ -14,7 +14,7 @@ services:
     environment:
       - MONGO_URL=mongodb://mongo/threeswithfriends
       - JWT_SECRET=changeme
-      - LOG_LEVEL=debug
+      - LOG_LEVEL=silly
       - NODE_ENV=local
     ports:
       - 4280:4280 # LAN Support

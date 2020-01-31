@@ -8,6 +8,7 @@ export interface IPlayer {
   username: string;
   role:     string;
   _id:      string;
+  gameShortId: string | null;
   user:     IUser;
 }
 

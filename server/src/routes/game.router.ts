@@ -3,16 +3,16 @@ import { socketIOController } from '../app';
 import { gameList, connectedPlayers } from '../model/socket.io.controller';
 
 import * as express from 'express';
-import { sanitizeParams, sanitizeBody, authentication, loadClientId } from '../middleware'
+import { sanitizeBody, authentication, loadClientId } from '../middleware'
 
 import { logger } from '../shared';
 import { asyncWrap } from '../shared/async-wrap';
 
-import { NotFoundError, UnauthorizedError, BadRequestError } from '../errors';
-import { Player } from '../model/classes/Player';
+import { NotFoundError, BadRequestError } from '../errors';
 import { Game } from '../model/classes/Game';
-import { JwtData } from '../model/interfaces';
-import { UserModel } from '../model/db';
+
+import * as MultiplayerMutationTypes from '../../../client-ts/src/store/multiplayer/multiplayer.types';
+
 
 
 export class GameRouter{
@@ -37,6 +37,7 @@ export class GameRouter{
         if(!hostPlayer) throw new BadRequestError(`Socket Id "${clientId}" not found`);
         const game = new Game(socketIOController.io, [ hostPlayer ]);
         gameList.push(game);
+        socketIOController.io.emit(MultiplayerMutationTypes.GET_USERS);
         res.json({ gameShortId: game.ShortId });
       }));
     this.router.route("/join/:gameShortId")
