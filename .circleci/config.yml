@@ -4,7 +4,7 @@
 #
 version: 2.1
 orbs:
-  aws-ecr: circleci/aws-ecr@0.0.2
+  aws-ecr: circleci/aws-ecr@6.7.0
 jobs:
   build-client:
     docker:
@@ -107,7 +107,6 @@ jobs:
 
             SERVER_UPDATED=$($RANCHER kubectl --namespace=threes set image deployment/server server=$SERVER_TAG)
             (test -z "$SERVER_UPDATED" && $RANCHER kubectl --namespace=threes rollout restart deployment/server) || echo 0 # Override with 0 exit code.
-
 
 workflows:
   version: 2
