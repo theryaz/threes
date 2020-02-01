@@ -115,10 +115,10 @@ workflows:
   staging:
     jobs:
       - build-client
-      # - build-server
+      - build-server
       - deploy-client:
           requires:
             - build-client
-      # - deploy-server:
-      #     requires:
-      #       - build-server
+      - deploy-server:
+          requires:
+            - build-server
