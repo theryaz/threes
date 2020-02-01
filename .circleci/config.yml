@@ -30,6 +30,32 @@ jobs:
           command: |
             cd client-ts
             npm run build:staging
+      - save_cache:
+          paths:
+            - client-ts/dist
+          key: client-dist
+  deploy-client:
+    docker:
+      - image: node:13.6.0
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - client-dist
+      - run:
+          name: Install AWS CLI
+          command: |
+            apt-get update -y
+            apt-get install -y python python-pip
+            pip install awscli
+      - run:
+          name: Deploy to S3
+          command: |
+            cd client-ts
+            pwd
+            ls
+            npm run s3sync:staging
 
   build-server:
     docker:
@@ -55,24 +81,6 @@ jobs:
           command: |
             cd server
             npm run build
-  deploy-client:
-    docker:
-      - image: node:13.6.0
-    working_directory: ~/repo
-    steps:
-      - checkout
-      - run:
-          name: Install AWS CLI
-          command: |
-            apt-get update -y
-            apt-get install -y python python-pip
-            pip install awscli
-      - run:
-          name: Deploy to S3
-          command: |
-            cd client-ts
-            npm run s3sync:staging
-
   deploy-server:
     docker:
       - image: node:13.6.0
@@ -101,11 +109,11 @@ workflows:
   version: 2
   staging:
     jobs:
-      - build-client
+      # - build-client
       - build-server
       - deploy-client:
           requires:
             - build-client
-      - deploy-server:
-          requires:
-            - build-server
+      # - deploy-server:
+      #     requires:
+      #       - build-server
