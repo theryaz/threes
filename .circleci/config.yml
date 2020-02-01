@@ -93,6 +93,12 @@ jobs:
       - restore_cache:
           key: server-dist
       - run:
+          name: Install AWS CLI
+          command: |
+            apt-get update -y
+            apt-get install -y python python-pip
+            pip install awscli
+      - run:
           name: Deploy API to Rancher
           command: |
             export SERVER_TAG=$AWS_ECR_URL/threes/server
