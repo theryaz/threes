@@ -12,8 +12,8 @@
             <v-row>
               <v-col cols="12">
                 <v-text-field
-                  label="Username"
-                  :rules="usernameRules"
+                  label="Email"
+                  :rules="emailRules"
                   required
                   v-model="loginForm.email"
                 ></v-text-field>
@@ -80,12 +80,12 @@ export default class LoginDialog extends Vue{
       v => /^[a-zA-Z0-9\_]+$/.test(v) || 'Username can only contain letters, numbers and _',
     ];
   }
-  // get emailRules(){
-  //   return [
-  //     v => !!v || 'E-mail is required',
-  //     v => /.+@.+/.test(v) || 'Email is not valid',
-  //   ];
-  // }
+  get emailRules(){
+    return [
+      v => !!v || 'E-mail is required',
+      v => /.+@.+/.test(v) || 'Email is not valid',
+    ];
+  }
   get passwordRules(){
     return [
       v => !!v || 'Password is required',

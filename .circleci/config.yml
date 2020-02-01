@@ -6,30 +6,16 @@ version: 2.1
 orbs:
   aws-cli: circleci/aws-cli@0.1.19
 jobs:
-  build-deploy-stage:
+  build-stage-client:
     docker:
-      # specify the version you desire here
       - image: node:13.6.0
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/mongo:3.4.4
-
     working_directory: ~/repo
-
     steps:
       - checkout
-      - setup_remote_docker
       - restore_cache:
           keys:
             - client-node-{{ checksum "client-ts/package.json" }}
             - client-node-
-      - restore_cache:
-          keys:
-            - server-node-{{ checksum "server/package.json" }}
-            - server-node-
-
       - run:
           name: Install Node Modules
           command: |
@@ -37,43 +23,64 @@ jobs:
             npm install
             cd ../server
             npm install
-
-
       - save_cache:
           paths:
             - client-ts/node_modules
           key: client-node-{{ checksum "client-ts/package.json" }}
-      - save_cache:
-          paths:
-            - server/node_modules
-          key: server-node-{{ checksum "server/package.json" }}
-
-      #  Build
-
       - run:
           name: Compile Vue Client
           command: |
             cd client-ts
             npm run build:staging
+
+  build-stage-server:
+    docker:
+      - image: node:13.6.0
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - server-node-{{ checksum "server/package.json" }}
+            - server-node-
+      - run:
+          name: Install Node Modules
+          command: |
+            cd server
+            npm install
+      - save_cache:
+          paths:
+            - server/node_modules
+          key: server-node-{{ checksum "server/package.json" }}
       - run:
           name: Compile Server
           command: |
             cd server
             npm run build
-
+  deploy-stage-client:
+    docker:
+      - image: node:13.6.0
+    working_directory: ~/repo
+    steps:
+      - checkout
       - run:
           name: Install AWS CLI
           command: |
             apt-get update -y
             apt-get install -y python python-pip
             pip install awscli
+      - run:
+          name: Deploy to S3
+          command: |
+            cd client-ts
+            npm run s3sync:staging
 
-      # - save_cache:
-      #     paths:
-      #       - client-ts/dist
-      #       - server/dist
-      #     key: build-dists
-
+  deploy-stage-server:
+    docker:
+      - image: node:13.6.0
+    working_directory: ~/repo
+    steps:
+      - checkout
       - run:
           name: Deploy API to Rancher
           command: |
@@ -91,18 +98,12 @@ jobs:
             SERVER_UPDATED=$($RANCHER kubectl --namespace=threes set image deployment/server server=$SERVER_TAG)
             (test -z "$SERVER_UPDATED" && $RANCHER kubectl --namespace=threes rollout restart deployment/server) || echo 0 # Override with 0 exit code.
 
-      - run:
-          name: Deploy to S3
-          command: |
-            cd client-ts
-            npm run s3sync:staging
 
-  
 workflows:
   version: 2
   staging:
     jobs:
-      - build-deploy-stage:
-          filters:
-            branches:
-              only: development
+      - build
+      - deploy:
+          requires:
+            - build

@@ -43,7 +43,7 @@ export default class UserModule extends VuexModule{
 	jwt: string | null = null;
 	role: string | null = null; // Allow Admin Role for debugging purposes
 	
-	username: string | null = null;
+	username: string | null = "Player";
 	avatarUrl: string | null = null;
 	avatarIcon: string | null = "fa-user";
 	color: string | null = COLORS.primary;
@@ -58,7 +58,7 @@ export default class UserModule extends VuexModule{
 	@Mutation [UserMutationTypes.LOGOUT](){
 		this.loading = true;
 		this.jwt = null;
-		this.username = null;
+		this.username = "Player";
 		this.avatarIcon = "fa-user";
 		this.avatarUrl = null;
 		this.role = null;

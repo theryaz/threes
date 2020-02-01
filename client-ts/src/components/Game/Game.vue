@@ -191,11 +191,11 @@ export default class Game extends Vue{
       .map((cell: ICell) => cell.value)
       .reduce((a,b) => {
         if(b < 3){
-          return a;
+          return a + b;
         }else{
           return a + this.scoreValue(b);
         }
-      });
+      }, 0);
   }
   scoreValue(value: number){
     // 3^(log₂(x/3)+1)
