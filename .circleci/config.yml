@@ -9,7 +9,7 @@ jobs:
   build-client:
     docker:
       - image: node:13.6.0
-    working_directory: ~/repo/client-ts
+    working_directory: ~/repo
     steps:
       - checkout
       - restore_cache:
@@ -19,6 +19,7 @@ jobs:
       - run:
           name: Install Node Modules
           command: |
+            cd client-ts
             npm install
       - save_cache:
           paths:
@@ -27,12 +28,13 @@ jobs:
       - run:
           name: Compile Vue Client
           command: |
+            cd client-ts
             npm run build:staging
 
   build-server:
     docker:
       - image: node:13.6.0
-    working_directory: ~/repo/server
+    working_directory: ~/repo
     steps:
       - checkout
       - restore_cache:
@@ -42,6 +44,7 @@ jobs:
       - run:
           name: Install Node Modules
           command: |
+            cd server
             npm install
       - save_cache:
           paths:
@@ -50,6 +53,7 @@ jobs:
       - run:
           name: Compile Server
           command: |
+            cd server
             npm run build
   deploy-client:
     docker:
