@@ -6,7 +6,7 @@ version: 2.1
 orbs:
   aws-cli: circleci/aws-cli@0.1.19
 jobs:
-  build-stage-client:
+  build-client:
     docker:
       - image: node:13.6.0
     working_directory: ~/repo
@@ -33,7 +33,7 @@ jobs:
             cd client-ts
             npm run build:staging
 
-  build-stage-server:
+  build-server:
     docker:
       - image: node:13.6.0
     working_directory: ~/repo
@@ -57,7 +57,7 @@ jobs:
           command: |
             cd server
             npm run build
-  deploy-stage-client:
+  deploy-client:
     docker:
       - image: node:13.6.0
     working_directory: ~/repo
@@ -75,7 +75,7 @@ jobs:
             cd client-ts
             npm run s3sync:staging
 
-  deploy-stage-server:
+  deploy-server:
     docker:
       - image: node:13.6.0
     working_directory: ~/repo
@@ -103,7 +103,11 @@ workflows:
   version: 2
   staging:
     jobs:
-      - build
-      - deploy:
+      - build-client
+      - build-server
+      - deploy-client:
           requires:
-            - build
+            - build-client
+      - deploy-server:
+          requires:
+            - build-server
