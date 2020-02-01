@@ -53,8 +53,6 @@ jobs:
           name: Deploy to S3
           command: |
             cd client-ts
-            pwd
-            ls
             npm run s3sync:staging
 
   build-server:
@@ -81,12 +79,19 @@ jobs:
           command: |
             cd server
             npm run build
+      - save_cache:
+          paths:
+            - server/dist
+          key: server-dist
   deploy-server:
     docker:
-      - image: node:13.6.0
+      - image: docker:17.05.0-ce-git
     working_directory: ~/repo
     steps:
       - checkout
+      - setup_remote_docker
+      - restore_cache:
+          key: server-dist
       - run:
           name: Deploy API to Rancher
           command: |
