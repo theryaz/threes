@@ -109,8 +109,8 @@ workflows:
   version: 2
   staging:
     jobs:
-      # - build-client
-      - build-server
+      - build-client
+      # - build-server
       - deploy-client:
           requires:
             - build-client
