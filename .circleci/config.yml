@@ -58,7 +58,7 @@ jobs:
   deploy-client:
     docker:
       - image: node:13.6.0
-    working_directory: ~/repo/client-ts
+    working_directory: ~/repo
     steps:
       - checkout
       - run:
@@ -70,8 +70,7 @@ jobs:
       - run:
           name: Deploy to S3
           command: |
-            pwd
-            ls
+            cd client-ts
             npm run s3sync:staging
 
   deploy-server:
