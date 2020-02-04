@@ -101,10 +101,10 @@ jobs:
           command: |
             cd server
             npm run build
-      - save_cache:
+      - persist_to_workspace:
+          root: ~/
           paths:
-            - server/dist
-          key: server-dist
+            - repo/server/dist
   deploy-server:
     docker:
       - image: docker:17.05.0-ce-git
@@ -112,8 +112,6 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - restore_cache:
-          key: server-dist
       - run:
           name: Deploy API to Rancher
           command: |
