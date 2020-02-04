@@ -121,9 +121,9 @@ jobs:
           at: /server-build
       - run:
           command: |
-            - pwd
-            - ls
-            - ls /server-build
+            pwd
+            ls
+            ls /server-build
   deploy-server:
     docker:
       - image: docker:17.05.0-ce-git
