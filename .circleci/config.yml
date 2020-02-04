@@ -17,9 +17,9 @@ workflows:
       - aws-ecr/build-and-push-image:
           requires:
             - build-server
-          account-url: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
+          account-url: "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
           repo: threes/server
-          region: ${AWS_DEFAULT_REGION}
+          region: $AWS_DEFAULT_REGION
           tag: latest
           path: ./server
           dockerfile: Dockerfile
