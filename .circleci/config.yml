@@ -11,7 +11,9 @@ workflows:
     jobs:
       - build-client
       - build-server
-      - use-server
+      - use-server:
+          requires:
+            - build-server
       - deploy-client:
           requires:
             - build-client
@@ -24,7 +26,7 @@ workflows:
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
           repo: threes/server
           region: AWS_DEFAULT_REGION
-          path: /server-build/server
+          path: ~/repo/server
       # - deploy-server:
       #     requires:
       #       - aws-ecr/build-and-push-image
