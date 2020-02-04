@@ -17,12 +17,13 @@ workflows:
           requires:
             - build-server
           attach-workspace: true
+          workspace-root: /server-build
           account-url: AWS_ECR_ACCOUNT_URL
           aws-access-key-id: AWS_ACCESS_KEY_ID
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
           repo: threes/server
           region: AWS_DEFAULT_REGION
-          path: ./server
+          path: /server-build/server
       # - deploy-server:
       #     requires:
       #       - aws-ecr/build-and-push-image
