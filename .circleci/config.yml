@@ -2,9 +2,9 @@
 #
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 #
-version: 2.1
 orbs:
   aws-ecr: circleci/aws-ecr@6.7.0
+version: 2.1
 workflows:
   version: 2
   staging:
@@ -14,16 +14,18 @@ workflows:
       - deploy-client:
           requires:
             - build-client
-      - aws-ecr/build_and_push_image:
+      - aws-ecr/build-and-push-image:
           requires:
             - build-server
           account-url: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
           repo: threes/server
           region: ${AWS_DEFAULT_REGION}
           tag: latest
+          path: ./server
+          dockerfile: Dockerfile
       # - deploy-server:
       #     requires:
-      #       - aws-ecr/build_and_push_image
+      #       - aws-ecr/build-and-push-image
 
 jobs:
   build-client:
