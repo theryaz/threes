@@ -17,13 +17,12 @@ workflows:
       - aws-ecr/build-and-push-image:
           requires:
             - build-server
-          account-url: AWS_ECR_URL
+          account-url: "192407005904.dkr.ecr.us-east-1.amazonaws.com"
           aws-access-key-id: AWS_ACCESS_KEY_ID
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
           repo: threes/server
           region: AWS_DEFAULT_REGION
           path: ./server
-          dockerfile: Dockerfile
       # - deploy-server:
       #     requires:
       #       - aws-ecr/build-and-push-image
