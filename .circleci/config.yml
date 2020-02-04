@@ -5,6 +5,26 @@
 version: 2.1
 orbs:
   aws-ecr: circleci/aws-ecr@6.7.0
+workflows:
+  version: 2
+  staging:
+    jobs:
+      - build-client
+      - build-server
+      - deploy-client:
+          requires:
+            - build-client
+      - aws-ecr/build_and_push_image:
+          requires:
+            - build-server
+          account-url: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
+          repo: threes/server
+          region: ${AWS_DEFAULT_REGION}
+          tag: latest
+      # - deploy-server:
+      #     requires:
+      #       - aws-ecr/build_and_push_image
+
 jobs:
   build-client:
     docker:
@@ -92,11 +112,6 @@ jobs:
       - setup_remote_docker
       - restore_cache:
           key: server-dist
-      - aws-ecr/build_and_push_image:
-          account-url: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
-          repo: threes/server
-          region: ${AWS_DEFAULT_REGION}
-          tag: latest
       - run:
           name: Deploy API to Rancher
           command: |
@@ -107,16 +122,3 @@ jobs:
 
             SERVER_UPDATED=$($RANCHER kubectl --namespace=threes set image deployment/server server=$SERVER_TAG)
             (test -z "$SERVER_UPDATED" && $RANCHER kubectl --namespace=threes rollout restart deployment/server) || echo 0 # Override with 0 exit code.
-
-workflows:
-  version: 2
-  staging:
-    jobs:
-      - build-client
-      - build-server
-      - deploy-client:
-          requires:
-            - build-client
-      - deploy-server:
-          requires:
-            - build-server
