@@ -122,12 +122,13 @@ jobs:
             - server-node-{{ checksum "server/package.json" }}
             - server-node-
       - attach_workspace:
-          at: /server-build
+          at: .
       - run:
           command: |
             pwd
             ls
-            ls /server-build
+            ls server
+            ls server/dist
   deploy-server:
     docker:
       - image: docker:17.05.0-ce-git
