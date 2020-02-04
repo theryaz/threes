@@ -106,7 +106,7 @@ jobs:
       - persist_to_workspace:
           root: ./
           paths:
-            - /server-build
+            - ./server
   use-server:
     docker:
       - image: node:13.6.0
