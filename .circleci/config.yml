@@ -22,7 +22,6 @@ workflows:
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
           repo: threes/server
           region: AWS_DEFAULT_REGION
-          tag: latest
           path: ./server
           dockerfile: Dockerfile
       # - deploy-server:
