@@ -11,6 +11,7 @@ workflows:
     jobs:
       - build-client
       - build-server
+      - use-server
       - deploy-client:
           requires:
             - build-client
@@ -23,7 +24,7 @@ workflows:
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
           repo: threes/server
           region: AWS_DEFAULT_REGION
-          path: ./server
+          path: /server-build
       # - deploy-server:
       #     requires:
       #       - aws-ecr/build-and-push-image
@@ -105,7 +106,24 @@ jobs:
       - persist_to_workspace:
           root: ./
           paths:
-            - ./
+            - /server-build
+  use-server:
+    docker:
+      - image: node:13.6.0
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - server-node-{{ checksum "server/package.json" }}
+            - server-node-
+      - attach_workspace:
+          at: /server-build
+      - run:
+          command: |
+            - pwd
+            - ls
+            - ls /server-build
   deploy-server:
     docker:
       - image: docker:17.05.0-ce-git
