@@ -41,12 +41,15 @@ import { Component, Vue } from 'vue-property-decorator';
 
 import { mapState } from 'vuex';
 import { getModule } from 'vuex-module-decorators';
+
+import * as UserMutationTypes from '../store/user/user.types';
 import UserModule from '../store/user/user.store';
 const userStore = getModule(UserModule);
 
 import PlayerCard from '../components/PlayerCard.vue';
 import RegisterDialog from '../components/RegisterDialog.vue';
 import { IPlayerInfo } from '../model/interfaces';
+import apiService from '../services/api.service';
 
 @Component({
   components: { PlayerCard, RegisterDialog },
@@ -56,7 +59,7 @@ import { IPlayerInfo } from '../model/interfaces';
 })
 export default class NavBar extends Vue{
   
-  private showRegister: boolean = true;
+  private showRegister: boolean = false;
 
   logout(){
     userStore.logout().then(() => {
@@ -68,6 +71,7 @@ export default class NavBar extends Vue{
     console.log("onSetTempUser", payload);
     userStore.setTempUsername(payload.username);
     userStore.setTempAvatar(payload);
+    apiService.socket.emit(UserMutationTypes.SET_USER_INFO, payload);
   }
 }
 </script>

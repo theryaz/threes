@@ -144,15 +144,19 @@ export default class UserModule extends VuexModule{
 		console.log("Load Temp User", tempUsername, tempAvatar);
 		if(tempUsername){
 			this.setTempUsername(tempUsername);
-		}
+	}
 		if(tempAvatar){
 			this.setTempAvatar(tempAvatar);
 		}
+		apiService.socket.emit(UserMutationTypes.SET_USER_INFO, {
+			username: this.username,
+			color: this.color,
+			avatarIcon: this.avatarIcon,
+		});
   }
 
 	@Action setTempUsername(username: string){
 		this.context.commit(UserMutationTypes.SET_TEMP_USERNAME, username);
-		apiService.socket.emit(UserMutationTypes.SET_TEMP_USERNAME, username);
 	}
 	@Mutation [UserMutationTypes.SET_TEMP_USERNAME](username: string){
 		this.username = username;

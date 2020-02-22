@@ -87,6 +87,7 @@ export class Game{
     }
   }
   private sendPlayerInfo(){
+    console.log("sendPlayerInfo", this.players);
     this.players.forEach((player: Player, index: number) => {
       this.players.forEach((otherPlayer: Player, otherIndex: number) => {
         if(index === otherIndex) return;

@@ -22,6 +22,9 @@ export class Player{
   private uuid: string;
   private email: string | null;
   private username: string | null;
+  private avatarIcon: string | null;
+  private avatarUrl: string | null;
+  private color: string | null;
   private role: string | null;
   private _id: string | null;
   public gameShortId: string | null;
@@ -42,13 +45,10 @@ export class Player{
   }
   get PlayerInfo(): IPlayerInfo{
     logger.silly(`PlayerInfo: ${this.username}`);
-    if(!this.user){
-      this.setRandomAvatar();
-    }
     return {
-      avatarIcon: (<User>this.user).avatarIcon,
-      avatarUrl: (<User>this.user).avatarUrl,
-      color: (<User>this.user).color,
+      avatarIcon: this.avatarIcon,
+      avatarUrl: this.avatarUrl,
+      color: this.color,
       username: this.username,
     };
   }
@@ -65,7 +65,8 @@ export class Player{
         logger.error("JWT is invalid");
       });
     });
-    socket.on(UserMutationTypes.JOIN_GAME, this.onJoinGame);
+    socket.on(UserMutationTypes.JOIN_GAME, (payload) => this.onJoinGame(payload));
+    socket.on(UserMutationTypes.SET_USER_INFO, (payload) => this.onSetUserInfo(payload));
   }
   // Called when the player updates their JWT.
   async onJwt(jwt: string){
@@ -90,6 +91,13 @@ export class Player{
   }
   onJoinGame(payload: any){
     logger.debug("onJoinGame", payload);
+  }
+  onSetUserInfo(payload: IPlayerInfo){
+    logger.debug("onSetUserInfo", payload);
+    this.username = payload.username;
+    this.color = payload.color;
+    this.avatarIcon = payload.avatarIcon;
+    this.avatarUrl = payload.avatarUrl;
   }
   // Prevent Circular structure error
   toJSON(){

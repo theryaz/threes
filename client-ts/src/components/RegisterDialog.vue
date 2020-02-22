@@ -137,7 +137,6 @@ export default class RegisterDialog extends Vue{
   }
 
   onAvatarChange({ color, avatarIcon }){
-    console.log("onAvatarChange", { color, avatarIcon });
     this.signupForm.color = color;
     this.signupForm.avatarIcon = avatarIcon;
   }
@@ -157,15 +156,17 @@ export default class RegisterDialog extends Vue{
         color: this.signupForm.color,
         avatarIcon: this.signupForm.avatarIcon,
       });
+      this.onClose();
     }else{
       this.$emit('onRegister', {
         ...this.signupForm
       });
+      this.onClose();
     }
   }
 
-  onClose(e){
-    this.$emit('onClose', e);
+  onClose(){
+    this.$emit('onClose');
   }
 
 }

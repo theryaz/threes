@@ -1,7 +1,7 @@
 <template>
   <v-menu
     v-model="showPickColor"
-    :close-on-click="false"
+    :close-on-click="true"
     :close-on-content-click="false"
     >
 
@@ -59,8 +59,6 @@ interface Color{
 @Component
 export default class ColorPicker extends Vue{
   @Prop({ default: false, type: Boolean }) dense: boolean;
-  @Prop({ default: false, type: Boolean }) persistent: boolean;
-  @Prop({ default: false, type: Boolean }) show: boolean;
   
   @Prop({ default: () => [] }) colors: Color[];
   @Prop({ default: () => [] }) addColors: Color[];

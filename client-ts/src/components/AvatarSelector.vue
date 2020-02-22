@@ -8,16 +8,10 @@
       <v-spacer />
       <v-card-actions class="text-center">
         
-        <v-btn color="primary">
-          <v-icon v-bind:class="{'mr-2': !dense}">
-            fa-user
-          </v-icon>
-          <template v-if="!dense">
-            Image
-          </template>
-        </v-btn>
+        <AvatarPicker v-on:save="onSelectAvatarIcon" :dense="dense" />
 
         <ColorPicker v-on:save="onSelectColor" :dense="dense" />
+
       </v-card-actions>
     </v-layout>
   </v-card>
@@ -41,7 +35,6 @@ export default class AvatarSelector extends Vue{
   private selectedAvatarIcon = this.avatarIcon;
 
   onSelectColor(selectedColor: string){
-    console.log("onSelectColor", selectedColor);
     this.selectedAvatarColor = selectedColor;
     this.onChange();
   }
