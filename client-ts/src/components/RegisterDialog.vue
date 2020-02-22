@@ -1,17 +1,18 @@
 <template>
-  <v-dialog persistent v-model="show" max-width="400">
+  <v-dialog v-bind="$attrs" v-on:input="onClose">
+    <!-- v-on:click:outside="onClose" :persistent="persistent" :value="show" max-width="400" -->
     <v-form ref="signupForm" v-model="signupFormValid" @submit="onSubmit">
       <v-card>
-        <v-card-title class="text-center">
-          <span class="headline">
-            Set a username to begin!
-          </span>
-        </v-card-title>
         <v-card-text>
           <v-container>
             <v-row>
-              <v-col cols="10" offset="2">
-                <v-switch color="primary" hide-details v-model="isRegistering" label="Create an account"></v-switch>
+              <v-col>
+                <AvatarSelector
+                  v-on:change="onAvatarChange"
+                  :color="userStore.color"
+                  :avatarIcon="userStore.avatarIcon"
+                  :avatarUrl="userStore.avatarUrl"
+                />
               </v-col>
             </v-row>
             <v-row>
@@ -27,14 +28,6 @@
             </v-row>
             <v-expand-transition>
               <v-row v-if="isRegistering">
-                  <v-col cols="12">
-                    <v-text-field
-                      type="email"
-                      label="Email Address"
-                      :rules="emailRules"
-                      v-model="signupForm.email"
-                    ></v-text-field>
-                  </v-col>
                   <v-col cols="12">
                     <v-text-field
                       type="password"
@@ -58,9 +51,10 @@
           </v-container>
         </v-card-text>
         <v-card-actions>
-          <v-btn text color="blue darken-2" @click="onHasAccount">
+          <!-- <v-btn text color="blue darken-2" @click="onHasAccount">
             <small>I have an account.</small>
-          </v-btn>
+          </v-btn> -->
+          <!-- <v-switch class="ml-4" color="primary" v-model="isRegistering" label="Remember me"></v-switch> -->
           <v-spacer></v-spacer>
           <v-btn
             type="submit"
@@ -84,31 +78,34 @@
 import { mapState } from 'vuex';
 import { getModule } from 'vuex-module-decorators';
 import { Component, Vue, Prop} from 'vue-property-decorator';
+
 import PlayerCard from '../components/PlayerCard.vue';
+import AvatarSelector from '../components/AvatarSelector.vue';
 
 import UserModule from '../store/user/user.store';
 const userStore = getModule(UserModule);
 
 @Component({
-  components: { PlayerCard },
+  components: { PlayerCard, AvatarSelector },
+  computed: {
+    ...mapState(['userStore']),
+  },
 })
 export default class RegisterDialog extends Vue{
 
-  @Prop({default: false, type: Boolean}) show: boolean;
-  
   $refs!:{
     signupForm: any,
   };
   private signupFormValid: boolean = false;
   private signupForm = {
-    username: "",
-    email: "",
+    color: userStore.color,
+    avatarIcon: userStore.avatarIcon,
+    username: userStore.username,
     password1: "",
     password2: "",
   };
 
   private isRegistering: boolean = false;
-
 
   get usernameHint(){
     return this.isRegistering ? "" : "Make a temporary username";
@@ -139,6 +136,12 @@ export default class RegisterDialog extends Vue{
     ];
   }
 
+  onAvatarChange({ color, avatarIcon }){
+    console.log("onAvatarChange", { color, avatarIcon });
+    this.signupForm.color = color;
+    this.signupForm.avatarIcon = avatarIcon;
+  }
+
   onHasAccount(){
     this.$emit('onHasAccount',{
       ...this.signupForm
@@ -149,14 +152,20 @@ export default class RegisterDialog extends Vue{
     console.log("[RegisterDialog.vue] onSubmit");
     $event.preventDefault();
     if(this.isRegistering == false){
-      this.$emit('onContinue', {
-        username: this.signupForm.username
+      this.$emit('onSetTempUser', {
+        username: this.signupForm.username,
+        color: this.signupForm.color,
+        avatarIcon: this.signupForm.avatarIcon,
       });
     }else{
       this.$emit('onRegister', {
         ...this.signupForm
       });
     }
+  }
+
+  onClose(e){
+    this.$emit('onClose', e);
   }
 
 }

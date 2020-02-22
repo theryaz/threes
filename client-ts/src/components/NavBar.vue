@@ -20,35 +20,20 @@
       <v-icon>fa-users</v-icon>
     </v-btn>
 
-    <!-- <v-btn height="100%">
-      <span>Login</span>
-      <v-icon>fa-sign-in</v-icon>
-    </v-btn> -->
+    <v-btn @click.stop="showRegister = true" value="online" height="100%">
+      <PlayerCard
+        :username="userStore.username"
+        :color="userStore.color"
+        :avatarIcon="userStore.avatarIcon"
+      />
+    </v-btn>
 
-    <!-- <v-menu
-      top
-      :offset-y="true"
-      origin="center bottom"
-      transition="scale-transition"
-    >
-      <template v-slot:activator="{ on }">
-        <v-btn v-on="on" value="settings" height="100%">
-          <span>Settings</span>
-          <v-icon>fa-cog</v-icon>
-        </v-btn>
-      </template>
-      <v-list>
-        <v-list-item @click="logout">
-           <v-list-item-icon>
-            <v-icon>fa-sign-out</v-icon>
-          </v-list-item-icon>
-          <v-list-item-title>
-            Logout
-          </v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </v-menu> -->
-
+    <RegisterDialog
+      v-model="showRegister"
+      v-on:onClose="showRegister = false"
+      v-on:onSetTempUser="onSetTempUser"
+      max-width="600"
+    />
   </v-bottom-navigation>
 </template>
 <script lang="ts">
@@ -59,12 +44,30 @@ import { getModule } from 'vuex-module-decorators';
 import UserModule from '../store/user/user.store';
 const userStore = getModule(UserModule);
 
-@Component
+import PlayerCard from '../components/PlayerCard.vue';
+import RegisterDialog from '../components/RegisterDialog.vue';
+import { IPlayerInfo } from '../model/interfaces';
+
+@Component({
+  components: { PlayerCard, RegisterDialog },
+  computed:{
+    ...mapState(['userStore']),
+  }
+})
 export default class NavBar extends Vue{
+  
+  private showRegister: boolean = true;
+
   logout(){
     userStore.logout().then(() => {
       this.$router.push('/');
     });
+  }
+
+  onSetTempUser(payload: IPlayerInfo){
+    console.log("onSetTempUser", payload);
+    userStore.setTempUsername(payload.username);
+    userStore.setTempAvatar(payload);
   }
 }
 </script>

@@ -11,7 +11,7 @@ const SHADOW = "#000000";
 
 const CRIMSON = "#B3001B";
 
-export const IS_DARK = true;
+export const IS_DARK = false;
 
 export const COLORS = {
   primary: PRIMARY_GREEN,

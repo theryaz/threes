@@ -1,6 +1,6 @@
 <template>
-  <v-row>
-    <v-col>
+  <v-row dense>
+    <v-col dense>
       <v-avatar :color="color">
         <img v-if="avatarUrl !== null" src="avatarUrl">
         <v-icon v-else color="#FEFEFE">{{ avatarIcon }}</v-icon>

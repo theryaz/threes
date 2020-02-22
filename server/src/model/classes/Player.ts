@@ -65,7 +65,6 @@ export class Player{
         logger.error("JWT is invalid");
       });
     });
-    socket.on(UserMutationTypes.SET_TEMP_USERNAME, (username) => this.onSetUsername(username));
     socket.on(UserMutationTypes.JOIN_GAME, this.onJoinGame);
   }
   // Called when the player updates their JWT.
@@ -81,8 +80,6 @@ export class Player{
   // Called when the player updates their JWT.
   onSetUsername(username: string){
     this.username = username;
-    logger.debug("Player set temp username: " + username);
-    this.socket.emit(UserMutationTypes.SET_TEMP_AVATAR, this.PlayerInfo);
   }
   setRandomAvatar(){
     if(!this.user){

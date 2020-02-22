@@ -75,10 +75,6 @@ export class SocketIOController{
 				this.removeClient(socket.client.id);
 				this.io.emit(MultiplayerMutationTypes.GET_USERS);
 			});
-			socket.on(UserMutationTypes.SET_TEMP_USERNAME, (username: string) =>{
-				connectedPlayers[socket.client.id].onSetUsername(username);
-				this.io.emit(MultiplayerMutationTypes.GET_USERS);
-			});
 		});
 	}
 
