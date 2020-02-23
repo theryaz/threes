@@ -5,7 +5,6 @@
         <v-form v-model="joinFormValid" @submit="joinGame">
           <v-text-field
             solo
-            flat
             required
             label="Game Id"
             :rules="gameIdRules"
@@ -47,6 +46,21 @@
           :loading="gameStore.hostGameLoading"
         @click="hostGame"> Host Game </v-btn>
       </v-col>
+      <v-col sm="12" md="6">
+        <v-btn @click.stop="showRegister = true" height="60" width="100%" text class="text-left">
+          <PlayerCard
+            :username="userStore.username"
+            :color="userStore.color"
+            :avatarIcon="userStore.avatarIcon"
+          />
+        </v-btn>
+        <RegisterDialog
+          v-model="showRegister"
+          v-on:onClose="showRegister = false"
+          v-on:onSetTempUser="onSetTempUser"
+          max-width="600"
+        />
+      </v-col>
     </v-row>
 
     <v-row dense>
@@ -79,7 +93,7 @@ import * as MultiplayerMutationTypes from '../../store/multiplayer/multiplayer.t
 const multiplayerStore = getModule(MultiplayerModule);
 
 import apiService from '../../services/api.service';
-import { IGameMove, IGameGridState } from '../../model/interfaces';
+import { IPlayerInfo, IGameMove, IGameGridState } from '../../model/interfaces';
 
 @Component({
   components: { PlayerCard, RegisterDialog, LoginDialog, PlayerList },
@@ -95,8 +109,7 @@ export default class MultiplayerHome extends Vue{
   private joinForm = {
     gameShortId: "",
   };
-  private showRegisterDialog: boolean = false;
-  private showLoginDialog: boolean = false;
+  private showRegister: boolean = false;
 
   private pollInterval: any = null;
 
@@ -148,7 +161,6 @@ export default class MultiplayerHome extends Vue{
   onContinue({ username }){
     console.log("[Multiplayer.vue] onContinue");
     userStore.setTempUsername(username);
-    this.showRegisterDialog = false;
   }
   onRegister(formData: any){
     console.log("[Multiplayer.vue] onRegister", formData);
@@ -158,25 +170,16 @@ export default class MultiplayerHome extends Vue{
       password: formData.password1,
     });
   }
-  onHasAccount(formData: any){
-    console.log("[Multiplayer.vue] onHasAccount");
-    this.showRegisterDialog = false;
-    this.showLoginDialog = true;
-  }
-  onLogin({ email, password }){
-    console.log("[Multiplayer.vue] onLogin");
-    userStore.login({ email, password }).then(result => {
-      this.showLoginDialog = false;
-    });
-  }
-  onGoRegister(formData: any){
-    console.log("[Multiplayer.vue] onGoRegister");
-    this.showLoginDialog = false;
-    this.showRegisterDialog = true;
-  }
 
   get playerList(){
     return multiplayerStore.players;
+  }
+
+  onSetTempUser(payload: IPlayerInfo){
+    console.log("onSetTempUser", payload);
+    userStore.setTempUsername(payload.username);
+    userStore.setTempAvatar(payload);
+    apiService.socket.emit(UserMutationTypes.SET_USER_INFO, payload);
   }
 
 }

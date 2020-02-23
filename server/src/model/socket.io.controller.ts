@@ -24,7 +24,7 @@ export class SocketIOController{
 
 	constructor(public io: SocketIO.Server){
 		this.setupCleanupDeadConnections();
-		this.startDebugLogInterval();
+		// this.startDebugLogInterval();
 	}
 	private addClient(socket: SocketIO.Socket){
 		this.connectedPlayers[socket.client.id] = new Player(socket);

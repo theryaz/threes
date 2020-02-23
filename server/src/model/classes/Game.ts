@@ -129,10 +129,10 @@ export class Game{
   private linkPlayerGames(){
     this.players.forEach((player: Player, index: number) => {
       player.socket.on('onMove', (move: IGameMove) => {
-        this.logger.silly(`${player.Username}: ${move.direction}`);
+        // this.logger.silly(`${player.Username}: ${move.direction}`);
         this.players.forEach((p, otherIndex: number) => {
           if(index === otherIndex) return;
-          this.logger.silly(`Emit Move to ${p.Username}`);
+          // this.logger.silly(`Emit Move to ${p.Username}`);
           p.socket.emit(GameMutationTypes.REMOTE_MOVE, move);
         });
       });
@@ -140,19 +140,25 @@ export class Game{
   }
   private listenForGameOver(){
     this.players.forEach((player: Player) => {
-      player.socket.on('onGameOver', this.startGameOverCountDown);
+      player.socket.on('onGameOver', () => {
+        this.logger.silly(`listenForGameOver: ${player.Username} emitted game over`);
+        this.players.filter(p => p.socketId !== player.socketId).forEach(p => p.socket.emit(GameMutationTypes.REMOTE_GAME_OVER));
+        this.startGameOverCountDown();
+      });
     });
   }
   async startGameOverCountDown(){
     if(this.gameOver === true) return
     this.gameOver = true;
+    this.logger.silly('startGameOverCountDown');
     let countdown = GAME_OVER_COUNTDOWN_SECONDS;
-    this.players.forEach(p => p.socket.emit(GameMutationTypes.GAME_OVER_COUNTDOWN), countdown);
+    this.players.forEach(p => p.socket.emit(GameMutationTypes.GAME_OVER_COUNTDOWN, countdown));
     while(countdown > 0){
-      sleep(1);
+      await sleep(1000);
       countdown--;
-      this.players.forEach(p => p.socket.emit(GameMutationTypes.GAME_OVER_COUNTDOWN), countdown);
+      this.logger.silly(`startGameOverCountDown ${countdown}`);
+      this.players.forEach(p => p.socket.emit(GameMutationTypes.GAME_OVER_COUNTDOWN, countdown));
     }
-    this.players.forEach(p => p.socket.emit(GameMutationTypes.GAME_OVER));
+    this.logger.silly(`startGameOverCountDown: Game Over!`);
   }
 }

@@ -7,6 +7,7 @@ import { IPlayerInfo } from '@/model/interfaces';
 
 import { COLORS } from '../../model/constants'
 
+import Vuetify from '../../plugins/vuetify';
 
 interface LoginPayload{
 	jwt: string,

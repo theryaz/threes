@@ -19,6 +19,7 @@ import { ICellValue } from "../../model/interfaces";
 @Component
 export default class Cell extends Vue implements ICell{
   public grid: HTMLDivElement;
+  @Prop({ type: Boolean, default: false }) dark: boolean;
   @Prop({ type: Number, default: 0 }) row;
   @Prop({ type: Number, default: 0 }) col;
   @Prop({ type: Number, default: 0 }) value;
@@ -128,7 +129,7 @@ export default class Cell extends Vue implements ICell{
     }
   }
   get theme(){
-    return IS_DARK ? 'dark' : 'light';
+    return this.dark ? 'dark' : 'light';
   }
 }
 </script>

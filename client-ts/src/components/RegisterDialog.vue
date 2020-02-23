@@ -54,20 +54,23 @@
           <!-- <v-btn text color="blue darken-2" @click="onHasAccount">
             <small>I have an account.</small>
           </v-btn> -->
-          <!-- <v-switch class="ml-4" color="primary" v-model="isRegistering" label="Remember me"></v-switch> -->
+          <v-switch inset class="ml-5" color="primary" v-model="isRegistering" label="Remember me"></v-switch>
           <v-spacer></v-spacer>
+          <v-switch inset color="white" v-model="isDark">
+            <template v-slot:label>
+              <v-icon>
+                fa-adjust
+              </v-icon>
+            </template>
+          </v-switch>
           <v-btn
+            class="ml-4 mr-5"
             type="submit"
-            v-if="isRegistering"
             color="primary darken-1"
             :disabled="!signupFormValid"
-          >Register</v-btn>
-          <v-btn
-            type="submit"
-            v-else
-            color="primary darken-1"
-            :disabled="!signupFormValid"
-          >Continue</v-btn>
+          >
+            Save
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-form>
@@ -77,7 +80,7 @@
 <script lang="ts">
 import { mapState } from 'vuex';
 import { getModule } from 'vuex-module-decorators';
-import { Component, Vue, Prop} from 'vue-property-decorator';
+import { Component, Vue, Prop, Watch} from 'vue-property-decorator';
 
 import PlayerCard from '../components/PlayerCard.vue';
 import AvatarSelector from '../components/AvatarSelector.vue';
@@ -106,6 +109,12 @@ export default class RegisterDialog extends Vue{
   };
 
   private isRegistering: boolean = false;
+  
+  private isDark: boolean = this.$vuetify.theme.dark;
+  @Watch('isDark') setDarkMode(newVal){
+    this.$vuetify.theme.dark = newVal;
+    window.localStorage.setItem("useDarkMode", newVal);
+  }
 
   get usernameHint(){
     return this.isRegistering ? "" : "Make a temporary username";

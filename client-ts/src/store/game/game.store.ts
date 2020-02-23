@@ -287,7 +287,7 @@ export default class GameModule extends VuexModule{
 		this.localGameState.history.push(move);
 	}
 	@Action({ commit: GameMutationTypes.GAME_OVER }) onGameOver({ score }: IGameOverPayload){
-		apiService.socket.emit('onLocalGameOver');
+		apiService.socket.emit('onGameOver');
 		return { score };
 	}
 	@Mutation [GameMutationTypes.GAME_OVER]({ score }: IGameOverPayload){
@@ -296,7 +296,7 @@ export default class GameModule extends VuexModule{
 	}
 	@Action({ commit: GameMutationTypes.GAME_PAUSE }) onGamePause(){ }
 	@Mutation [GameMutationTypes.GAME_PAUSE](){
-		this.remoteGameState.paused = true;	
+		this.remoteGameState.paused = true;
 	}
 
 	@Action({commit: GameMutationTypes.SINGLE_GAME_START}) onSingleGameStart(initialGridState: IGameGridState){

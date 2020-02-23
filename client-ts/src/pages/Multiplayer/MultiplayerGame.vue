@@ -97,13 +97,13 @@ export default class MultiplayerGame extends Vue{
     return gameStore.multiplayerGameStatus === PlayerStatus.HostedGame;
   }
   beforeMount(){
-    console.log("gameStore.multiplayerGameStatus", gameStore.multiplayerGameStatus);
+    // console.log("gameStore.multiplayerGameStatus", gameStore.multiplayerGameStatus);
     if(gameStore.multiplayerGameStatus === PlayerStatus.InLobby){
       this.$router.push('/multiplayer');
     }
   }
   mounted(){
-    console.log("Multiplayer Game Mounted")
+    // console.log("Multiplayer Game Mounted")
   }
 
   get userStore(){
@@ -114,27 +114,28 @@ export default class MultiplayerGame extends Vue{
   }
 
   onLocalGameStart(initialGridState: IGameGridState){
-    console.log("onLocalGameStart", initialGridState);
+    // console.log("onLocalGameStart", initialGridState);
     gameStore.onGameStart(initialGridState);
   }
   onLocalMove(move: IGameMove){
-    console.log("onLocalMove", move);
+    // console.log("onLocalMove", move);
     gameStore.onMove(move);
   }
   onLocalGameOver({ score, cells }: {score:number,cells: ICellValue[]}){
+    console.log("onLocalGameOver", { score, cells });
     gameStore.onGameOver({ score, cells });
   }
 
   onRemoteGameStart(initialGridState: IGameGridState){
-    console.log("onRemoteGameStart", initialGridState);
+    // console.log("onRemoteGameStart", initialGridState);
     gameStore.onRemoteGameStart(initialGridState);
   }
   onRemoteMove(move: IGameMove){
-    console.log("onRemoteMove", move);
+    // console.log("onRemoteMove", move);
     gameStore.onRemoteMove(move);
   }
   onRemoteGameOver({ score, cells }: {score:number,cells: ICellValue[]}){
-    console.log("onRemoteGameOver", score);
+    console.log("onRemoteGameOver", { score, cells });
     gameStore.onRemoteGameOver({ score, cells });
   }
 }

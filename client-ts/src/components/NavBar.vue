@@ -20,20 +20,6 @@
       <v-icon>fa-users</v-icon>
     </v-btn>
 
-    <v-btn @click.stop="showRegister = true" value="online" height="100%">
-      <PlayerCard
-        :username="userStore.username"
-        :color="userStore.color"
-        :avatarIcon="userStore.avatarIcon"
-      />
-    </v-btn>
-
-    <RegisterDialog
-      v-model="showRegister"
-      v-on:onClose="showRegister = false"
-      v-on:onSetTempUser="onSetTempUser"
-      max-width="600"
-    />
   </v-bottom-navigation>
 </template>
 <script lang="ts">
@@ -48,7 +34,6 @@ const userStore = getModule(UserModule);
 
 import PlayerCard from '../components/PlayerCard.vue';
 import RegisterDialog from '../components/RegisterDialog.vue';
-import { IPlayerInfo } from '../model/interfaces';
 import apiService from '../services/api.service';
 
 @Component({
@@ -58,20 +43,10 @@ import apiService from '../services/api.service';
   }
 })
 export default class NavBar extends Vue{
-  
-  private showRegister: boolean = false;
-
   logout(){
     userStore.logout().then(() => {
       this.$router.push('/');
     });
-  }
-
-  onSetTempUser(payload: IPlayerInfo){
-    console.log("onSetTempUser", payload);
-    userStore.setTempUsername(payload.username);
-    userStore.setTempAvatar(payload);
-    apiService.socket.emit(UserMutationTypes.SET_USER_INFO, payload);
   }
 }
 </script>
