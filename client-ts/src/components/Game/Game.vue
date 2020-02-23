@@ -20,7 +20,7 @@
     <v-flex class="mt-1">
       <v-chip class="mx-1" label transition="slide-x-transition">
         <v-avatar tile left>
-          <v-icon>fa-abacus</v-icon>
+          <v-icon small>fa-abacus</v-icon>
         </v-avatar>
         {{ CurrentScore }}
       </v-chip>
@@ -28,22 +28,20 @@
       <v-expand-x-transition>
         <v-chip dark class="mx-1" label color="crimson" v-show="this.gameState.gameOver">
           <v-avatar tile left>
-            <v-icon>fa-lock-alt</v-icon>
+            <v-icon small>fa-lock-alt</v-icon>
           </v-avatar>
           Game Over
         </v-chip>
       </v-expand-x-transition>
+      <v-expand-x-transition>
+        <v-chip dark class="mx-1" label :color="CountDownColor" v-show="showCountdown">
+          <v-avatar tile left>
+            <v-icon small>fa-clock</v-icon>
+          </v-avatar>
+          Game over in {{ gameOverCountDown }}!
+        </v-chip>
+      </v-expand-x-transition>
     </v-flex>
-
-    <v-snackbar
-      v-model="showCountdown"
-      top
-      :timeout="0"
-      class="text-center"
-      :color="CountDownColor"
-    >
-      Game over in {{ gameOverCountDown }}!
-    </v-snackbar>
 
   </div>
 </template>
