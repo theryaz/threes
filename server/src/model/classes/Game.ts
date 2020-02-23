@@ -12,7 +12,7 @@ import * as UserMutationTypes from '../../../../client-ts/src/store/user/user.ty
 import * as GameMutationTypes from '../../../../client-ts/src/store/game/game.types';
 import { IPlayerInfo, ICoords, IGameGridState, IGameMove, IGameState } from '../../../../client-ts/src/model/interfaces';
 
-const GAME_OVER_COUNTDOWN_SECONDS = 10;
+const GAME_OVER_COUNTDOWN_SECONDS = 30;
 const START_CHECK_INTERVAL = 1 * 1000;
 export class Game{
 
