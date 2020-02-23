@@ -64,6 +64,27 @@ export default class GameModule extends VuexModule{
 		nextNumber: 1,
 		history: [],
 		initialGridState: this.randomGridState(3),
+		// initialGridState: {
+		// 	cells: [
+		// 		{c:0,r:0,value:1},
+		// 		{c:1,r:0,value:2},
+		// 		{c:2,r:0,value:3},
+		// 		{c:3,r:0,value:6},
+		// 		{c:0,r:1,value:12},
+		// 		{c:1,r:1,value:24},
+		// 		{c:2,r:1,value:48},
+		// 		{c:3,r:1,value:96},
+		// 		{c:0,r:2,value:192},
+		// 		{c:1,r:2,value:384},
+		// 		{c:2,r:2,value:768},
+		// 		{c:3,r:2,value:1536},
+		// 		{c:0,r:3,value:3072},
+		// 		{c:1,r:3,value:6144},
+		// 		{c:2,r:3,value:12288},
+		// 		{c:3,r:3,value:24576},
+		// 	],
+		// 	nextNumber: 1,
+		// }
 	};
 
 	multiplayerGameStatus: PlayerStatus = PlayerStatus.InLobby;

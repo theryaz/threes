@@ -125,12 +125,21 @@ export default class Cell extends Vue implements ICell{
         return {
           'color': COLORS[this.theme].FONT_COLOR,
           'background-color': COLORS[this.theme].cell.background,
+          'box-shadow': this.BoxShadow,
         };
     }
   }
   get theme(){
     return this.dark ? 'dark' : 'light';
   }
+
+  get BoxShadow(){
+    if(this.value >= 192) return `4px 4px 4px 0px ${COLORS.SHADOW}`;
+    if(this.value >= 48) return `2px 2px 4px 0px ${COLORS.SHADOW}`;
+    if(this.value >= 12) return `1px 1px 2px 0px ${COLORS.SHADOW}`;
+    else return `0px 0px 0px 0px ${COLORS.SHADOW}`;
+  }
+
 }
 </script>
 
