@@ -15,7 +15,8 @@
     "s3sync:production": "aws s3 sync --delete --acl public-read dist s3://play.threeswithfriends.com && aws cloudfront create-invalidation --distribution-id E3P2WX3OJLCJD3 --paths /index.html",
     "deploy:staging": "npm run build:staging && npm run s3sync:staging",
     "s3sync:staging": "aws s3 sync --delete --acl public-read dist s3://play.staging.threeswithfriends.com && aws cloudfront create-invalidation --distribution-id EGF98SYFEN0UJ --paths /index.html",
-    "npm-install": "docker run --rm -it -v $(pwd):/app -w /app node:13.6.0 npm install"
+    "npm-install": "docker run --rm -it -v $(pwd):/app -w /app node:13.6.0 npm install",
+    "generate-pwa-assets": "pwa-asset-generator threes-network-v3.png --manifest ../../manifest.json --index ../../index.html --opaque false"
   },
   "dependencies": {
     "core-js": "^2.6.11",
