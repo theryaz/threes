@@ -8,9 +8,17 @@
           v-on:gameOver="onGameOver"
           v-on:onMove="onMove"
         >
-          <div>
-            Moves: {{ gameStore.singleGameState.history.length }}
-          </div>
+          <v-layout>
+            <v-flex>
+              <ControlsPreview />
+            </v-flex>
+            <v-flex v-show="CurrentHint === 0">
+              Next Number:
+            </v-flex>
+            <v-flex v-show="CurrentHint === 1">
+              Use the arrow keys to move!
+            </v-flex>
+          </v-layout>
         </Game>
       </v-col>
     </v-row>
@@ -21,6 +29,7 @@ import { mapState } from 'vuex';
 import { getModule } from 'vuex-module-decorators';
 import { Component, Vue } from 'vue-property-decorator';
 import PlayerCard from '../components/PlayerCard.vue';
+import ControlsPreview from '../components/ControlsPreview.vue';
 
 import UserModule from '../store/user/user.store';
 const userStore = getModule(UserModule);
@@ -31,13 +40,20 @@ import { IGameMove, IGameGridState, IGameOverPayload } from '../model/interfaces
 const gameStore = getModule(GameModule);
 
 @Component({
-  components: { PlayerCard },
+  components: { PlayerCard, ControlsPreview },
   computed:{
     ...mapState(['userStore']),
     ...mapState(['gameStore']),
   }
 })
 export default class Home extends Vue{
+  get CurrentHint(){
+    if(gameStore.singleGameState.history.length < 15){
+      return 1;
+    }
+    return 0;
+  }
+
   onGameStart(initialGridState: IGameGridState){
     // console.log("onSingleGameStart", initialGridState);
     gameStore.onSingleGameStart(initialGridState);

@@ -10,39 +10,47 @@
           </td>
           <td>
             <div class="cell preview">
-              <Cell :value="gameState.nextNumber" />
+              <Cell :dark="this.$vuetify.theme.dark" :value="gameState.nextNumber" />
             </div>
           </td>
         </tr>
       </table>
     </div>
     <div class="playing-grid" ref="grid"></div>
-    <v-flex class="mt-1">
-      <v-chip class="mx-1" label transition="slide-x-transition">
-        <v-avatar tile left>
-          <v-icon small>fa-abacus</v-icon>
-        </v-avatar>
-        {{ CurrentScore }}
-      </v-chip>
-
-      <v-expand-x-transition>
-        <v-chip dark class="mx-1" label color="crimson" v-show="this.gameState.gameOver">
+    <v-layout class="mt-1">
+      <v-flex>
+        <v-chip class="mx-1" label transition="slide-x-transition">
           <v-avatar tile left>
-            <v-icon small>fa-lock-alt</v-icon>
+            <v-icon small>fa-abacus</v-icon>
           </v-avatar>
-          Game Over
+          {{ CurrentScore }}
         </v-chip>
-      </v-expand-x-transition>
-      <v-expand-x-transition>
-        <v-chip dark class="mx-1" label :color="CountDownColor" v-show="showCountdown">
-          <v-avatar tile left>
-            <v-icon small>fa-clock</v-icon>
-          </v-avatar>
-          Game over in {{ gameOverCountDown }}!
-        </v-chip>
-      </v-expand-x-transition>
-    </v-flex>
 
+        <v-expand-x-transition>
+          <v-chip dark class="mx-1" label color="crimson" v-show="this.gameState.gameOver">
+            <v-avatar tile left>
+              <v-icon small>fa-lock-alt</v-icon>
+            </v-avatar>
+            Game Over
+          </v-chip>
+        </v-expand-x-transition>
+        <v-expand-x-transition>
+          <v-chip dark class="mx-1" label :color="CountDownColor" v-show="showCountdown">
+            <v-avatar tile left>
+              <v-icon small>fa-clock</v-icon>
+            </v-avatar>
+            Game over in {{ gameOverCountDown }}!
+          </v-chip>
+        </v-expand-x-transition>
+      </v-flex>
+    </v-layout>
+    <v-layout class="justify-center mt-4" v-if="!gameState.isMultiplayer">
+      <v-expand-x-transition>
+        <v-btn color="primary" text v-show="gameState.gameOver" @click="this.initializeGame">
+          Restart
+        </v-btn>
+      </v-expand-x-transition>
+    </v-layout>
   </div>
 </template>
 <script lang="ts">
@@ -68,9 +76,7 @@ function getRandom(min: number, max: number){
 }
 
 @Component({
-  components:{
-    Cell
-  },
+  components:{ Cell },
   computed:{
     ...mapState(['userStore']),
   }
@@ -101,6 +107,7 @@ export default class Game extends Vue{
   private keydownListenerFn: (this: Window, ev: KeyboardEvent) => any;
 
   @Prop({type: Object}) private gameState: IGameState;
+  @Prop({type: Boolean, default: false}) private showRules: boolean;
   
   gameOverCheckTimeout: any | null  = null;
   cells: ICell[]  = [];
@@ -610,8 +617,11 @@ export default class Game extends Vue{
       width: 100%;
       line-height: 1rem;
     }
-    font-size: 1.25rem;
-    font-weight: bold;
+    div.flex{
+      line-height: 64px;
+    }
+    // font-size: 1.25rem;
+    // font-weight: bold;
     .preview{
       display: inline-block;
       position: static;

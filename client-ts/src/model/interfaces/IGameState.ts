@@ -6,6 +6,8 @@ export interface IGameState{
   paused: boolean,
   gameOver: boolean,
   keyboardEnabled: boolean,
+  isOnline: boolean,
+  isMultiplayer: boolean,
   isRemote: boolean,
   nextNumber: number,
   score: number,
