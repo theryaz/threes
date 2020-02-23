@@ -13,7 +13,7 @@ import * as GameMutationTypes from '../../../../client-ts/src/store/game/game.ty
 import { IPlayerInfo, ICoords, IGameGridState, IGameMove, IGameState } from '../../../../client-ts/src/model/interfaces';
 
 const GAME_OVER_COUNTDOWN_SECONDS = 10;
-const START_CHECK_INTERVAL = 3 * 1000;
+const START_CHECK_INTERVAL = 1 * 1000;
 export class Game{
 
   get RoomId(){
@@ -63,6 +63,12 @@ export class Game{
       this.startGameInterval();
     }
   }
+  removePlayer(player: Player){
+    this.players.splice(this.players.findIndex(p => p.socketId === player.socketId),1);
+    if(this.players.length === 0){
+      this.logger.silly(`All players have left the game ${this.ShortId}`);
+    }
+  }
 
   async startGameInterval(){
     this.readyCheckInterval = setInterval(() => {
@@ -83,6 +89,7 @@ export class Game{
       this.sendPlayerInfo();
       this.emitStartGame();
       this.linkPlayerGames();
+      this.listenForPlayerExit();
       this.listenForGameOver();
     }
   }
@@ -135,6 +142,15 @@ export class Game{
           // this.logger.silly(`Emit Move to ${p.Username}`);
           p.socket.emit(GameMutationTypes.REMOTE_MOVE, move);
         });
+      });
+    });
+  }
+  private listenForPlayerExit(){
+    this.players.forEach((player: Player) => {
+      player.socket.on(GameMutationTypes.ON_EXIT_MULTIPLAYER, () => {
+        this.logger.silly(`listenForPlayerExit: ${player.Username} exited`);
+        this.players.filter(p => p.socketId !== player.socketId).forEach(p => p.socket.emit(GameMutationTypes.REMOTE_PLAYER_EXIT));
+        this.removePlayer(player);
       });
     });
   }

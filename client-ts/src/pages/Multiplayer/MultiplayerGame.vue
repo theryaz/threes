@@ -138,6 +138,10 @@ export default class MultiplayerGame extends Vue{
     console.log("onRemoteGameOver", { score, cells });
     gameStore.onRemoteGameOver({ score, cells });
   }
+
+  beforeDestroy(){
+    gameStore.onExitMultiplayer();
+  }
 }
 </script>
 <style lang="scss">

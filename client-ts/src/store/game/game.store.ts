@@ -387,4 +387,14 @@ export default class GameModule extends VuexModule{
 		this.rightGameState.paused = true;	
 	}
 
+	@Action({ commit: GameMutationTypes.ON_EXIT_MULTIPLAYER }) onExitMultiplayer(){ }
+	@Mutation [GameMutationTypes.ON_EXIT_MULTIPLAYER](){
+		apiService.socket.emit(GameMutationTypes.ON_EXIT_MULTIPLAYER);
+	}
+
+	@Action({ commit: GameMutationTypes.REMOTE_PLAYER_EXIT }) onRemotePlayerExit(){
+		console.log("REMOTE_PLAYER_EXIT");
+	}
+	@Mutation [GameMutationTypes.REMOTE_PLAYER_EXIT](){}
+
 }
