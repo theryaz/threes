@@ -1,17 +1,18 @@
 <template>
-  <v-dialog persistent v-model="show" max-width="400">
+  <v-dialog v-bind="$attrs" v-on:input="onClose">
+    <!-- v-on:click:outside="onClose" :persistent="persistent" :value="show" max-width="400" -->
     <v-form ref="signupForm" v-model="signupFormValid" @submit="onSubmit">
       <v-card>
-        <v-card-title class="text-center">
-          <span class="headline">
-            Set a username to begin!
-          </span>
-        </v-card-title>
         <v-card-text>
           <v-container>
             <v-row>
-              <v-col cols="10" offset="2">
-                <v-switch color="primary" hide-details v-model="isRegistering" label="Create an account"></v-switch>
+              <v-col>
+                <AvatarSelector
+                  v-on:change="onAvatarChange"
+                  :color="userStore.color"
+                  :avatarIcon="userStore.avatarIcon"
+                  :avatarUrl="userStore.avatarUrl"
+                />
               </v-col>
             </v-row>
             <v-row>
@@ -27,14 +28,6 @@
             </v-row>
             <v-expand-transition>
               <v-row v-if="isRegistering">
-                  <v-col cols="12">
-                    <v-text-field
-                      type="email"
-                      label="Email Address"
-                      :rules="emailRules"
-                      v-model="signupForm.email"
-                    ></v-text-field>
-                  </v-col>
                   <v-col cols="12">
                     <v-text-field
                       type="password"
@@ -58,22 +51,26 @@
           </v-container>
         </v-card-text>
         <v-card-actions>
-          <v-btn text color="blue darken-2" @click="onHasAccount">
+          <!-- <v-btn text color="blue darken-2" @click="onHasAccount">
             <small>I have an account.</small>
-          </v-btn>
+          </v-btn> -->
+          <v-switch inset class="ml-5" color="primary" v-model="isRegistering" label="Remember me"></v-switch>
           <v-spacer></v-spacer>
+          <v-switch inset color="white" v-model="isDark">
+            <template v-slot:label>
+              <v-icon>
+                fa-adjust
+              </v-icon>
+            </template>
+          </v-switch>
           <v-btn
+            class="ml-4 mr-5"
             type="submit"
-            v-if="isRegistering"
             color="primary darken-1"
             :disabled="!signupFormValid"
-          >Register</v-btn>
-          <v-btn
-            type="submit"
-            v-else
-            color="primary darken-1"
-            :disabled="!signupFormValid"
-          >Continue</v-btn>
+          >
+            Save
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-form>
@@ -83,32 +80,41 @@
 <script lang="ts">
 import { mapState } from 'vuex';
 import { getModule } from 'vuex-module-decorators';
-import { Component, Vue, Prop} from 'vue-property-decorator';
+import { Component, Vue, Prop, Watch} from 'vue-property-decorator';
+
 import PlayerCard from '../components/PlayerCard.vue';
+import AvatarSelector from '../components/AvatarSelector.vue';
 
 import UserModule from '../store/user/user.store';
 const userStore = getModule(UserModule);
 
 @Component({
-  components: { PlayerCard },
+  components: { PlayerCard, AvatarSelector },
+  computed: {
+    ...mapState(['userStore']),
+  },
 })
 export default class RegisterDialog extends Vue{
 
-  @Prop({default: false, type: Boolean}) show: boolean;
-  
   $refs!:{
     signupForm: any,
   };
   private signupFormValid: boolean = false;
   private signupForm = {
-    username: "",
-    email: "",
+    color: userStore.color,
+    avatarIcon: userStore.avatarIcon,
+    username: userStore.username,
     password1: "",
     password2: "",
   };
 
   private isRegistering: boolean = false;
-
+  
+  private isDark: boolean = this.$vuetify.theme.dark;
+  @Watch('isDark') setDarkMode(newVal){
+    this.$vuetify.theme.dark = newVal;
+    window.localStorage.setItem("useDarkMode", newVal);
+  }
 
   get usernameHint(){
     return this.isRegistering ? "" : "Make a temporary username";
@@ -139,6 +145,11 @@ export default class RegisterDialog extends Vue{
     ];
   }
 
+  onAvatarChange({ color, avatarIcon }){
+    this.signupForm.color = color;
+    this.signupForm.avatarIcon = avatarIcon;
+  }
+
   onHasAccount(){
     this.$emit('onHasAccount',{
       ...this.signupForm
@@ -149,14 +160,22 @@ export default class RegisterDialog extends Vue{
     console.log("[RegisterDialog.vue] onSubmit");
     $event.preventDefault();
     if(this.isRegistering == false){
-      this.$emit('onContinue', {
-        username: this.signupForm.username
+      this.$emit('onSetTempUser', {
+        username: this.signupForm.username,
+        color: this.signupForm.color,
+        avatarIcon: this.signupForm.avatarIcon,
       });
+      this.onClose();
     }else{
       this.$emit('onRegister', {
         ...this.signupForm
       });
+      this.onClose();
     }
+  }
+
+  onClose(){
+    this.$emit('onClose');
   }
 
 }

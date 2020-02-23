@@ -20,20 +20,29 @@
     <v-flex class="mt-1">
       <v-chip class="mx-1" label transition="slide-x-transition">
         <v-avatar tile left>
-          <v-icon>fa-abacus</v-icon>
+          <v-icon small>fa-abacus</v-icon>
         </v-avatar>
         {{ CurrentScore }}
       </v-chip>
 
       <v-expand-x-transition>
-        <v-chip class="mx-1" label color="crimson" v-show="this.gameState.gameOver">
+        <v-chip dark class="mx-1" label color="crimson" v-show="this.gameState.gameOver">
           <v-avatar tile left>
-            <v-icon>fa-lock-alt</v-icon>
+            <v-icon small>fa-lock-alt</v-icon>
           </v-avatar>
           Game Over
         </v-chip>
       </v-expand-x-transition>
+      <v-expand-x-transition>
+        <v-chip dark class="mx-1" label :color="CountDownColor" v-show="showCountdown">
+          <v-avatar tile left>
+            <v-icon small>fa-clock</v-icon>
+          </v-avatar>
+          Game over in {{ gameOverCountDown }}!
+        </v-chip>
+      </v-expand-x-transition>
     </v-flex>
+
   </div>
 </template>
 <script lang="ts">
@@ -67,6 +76,17 @@ function getRandom(min: number, max: number){
   }
 })
 export default class Game extends Vue{
+
+  private showCountdown: boolean = false;
+  private gameOverCountDown: number = 0;
+  get CountDownColor(){
+    if(this.gameOverCountDown > 5){
+      return 'primary';
+    }else{
+      return 'crimson';
+    }
+  }
+
   $refs:{
     grid: HTMLDivElement,
   };
@@ -103,6 +123,7 @@ export default class Game extends Vue{
   setupInputs(){
     if(this.gameState.keyboardEnabled){
       this.enableKeyboardInput();
+      this.listenForGameOverCountdown();
     }else{
       this.enableRemoteInput();
     }
@@ -149,8 +170,19 @@ export default class Game extends Vue{
       this.$emit('onMove', move);
     });
     apiService.socket.on(GameMutationTypes.REMOTE_GAME_OVER, (score: number) => {
-      // console.log("[Remote] Game Over!");
       this.$emit('gameOver', { score: score, cells: this.cells });
+    });
+  }
+  listenForGameOverCountdown(){
+    apiService.socket.on(GameMutationTypes.GAME_OVER_COUNTDOWN, (countdown: number) => {
+      console.log("GAME_OVER_COUNTDOWN", countdown);
+      this.showCountdown = true;
+      this.gameOverCountDown = countdown;
+      if(countdown === 0){
+        console.log("Game Over!", countdown);
+        this.$emit('gameOver', { score: this.getScore(), cells: this.cells });
+        this.showCountdown = false;
+      }
     });
   }
   teardownEventListeners(){
@@ -158,6 +190,7 @@ export default class Game extends Vue{
     apiService.socket.removeListener(GameMutationTypes.REMOTE_GAME_START);
     apiService.socket.removeListener(GameMutationTypes.REMOTE_MOVE);
     apiService.socket.removeListener(GameMutationTypes.REMOTE_GAME_OVER);
+    apiService.socket.removeListener(GameMutationTypes.GAME_OVER_COUNTDOWN);
   }
   getRandom(min,max){
     return Math.floor(Math.random() * max) + min;
@@ -296,6 +329,7 @@ export default class Game extends Vue{
   createCell(coords: ICoords, value: number){
     // console.log("Create Cell", coords, value);
     let c = <ICell> new Cell();
+    c.dark = this.$vuetify.theme.dark;
     c.row = coords.r;
     c.col = coords.c;
     c.value = value;

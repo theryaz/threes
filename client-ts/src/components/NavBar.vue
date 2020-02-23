@@ -20,35 +20,6 @@
       <v-icon>fa-users</v-icon>
     </v-btn>
 
-    <!-- <v-btn height="100%">
-      <span>Login</span>
-      <v-icon>fa-sign-in</v-icon>
-    </v-btn> -->
-
-    <!-- <v-menu
-      top
-      :offset-y="true"
-      origin="center bottom"
-      transition="scale-transition"
-    >
-      <template v-slot:activator="{ on }">
-        <v-btn v-on="on" value="settings" height="100%">
-          <span>Settings</span>
-          <v-icon>fa-cog</v-icon>
-        </v-btn>
-      </template>
-      <v-list>
-        <v-list-item @click="logout">
-           <v-list-item-icon>
-            <v-icon>fa-sign-out</v-icon>
-          </v-list-item-icon>
-          <v-list-item-title>
-            Logout
-          </v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </v-menu> -->
-
   </v-bottom-navigation>
 </template>
 <script lang="ts">
@@ -56,10 +27,21 @@ import { Component, Vue } from 'vue-property-decorator';
 
 import { mapState } from 'vuex';
 import { getModule } from 'vuex-module-decorators';
+
+import * as UserMutationTypes from '../store/user/user.types';
 import UserModule from '../store/user/user.store';
 const userStore = getModule(UserModule);
 
-@Component
+import PlayerCard from '../components/PlayerCard.vue';
+import RegisterDialog from '../components/RegisterDialog.vue';
+import apiService from '../services/api.service';
+
+@Component({
+  components: { PlayerCard, RegisterDialog },
+  computed:{
+    ...mapState(['userStore']),
+  }
+})
 export default class NavBar extends Vue{
   logout(){
     userStore.logout().then(() => {

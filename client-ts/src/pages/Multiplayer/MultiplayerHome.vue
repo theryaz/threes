@@ -1,94 +1,73 @@
 <template>
   <v-container id="MultiplayerHome">
-    <RegisterDialog
-    :show="showRegisterDialog"
-    v-on:onRegister="onRegister"
-    v-on:onContinue="onContinue"
-    v-on:onHasAccount="onHasAccount"/>
-    <LoginDialog
-    :show="showLoginDialog"
-    v-on:onGoRegister="onGoRegister"
-    v-on:onLogin="onLogin"/>
-
-  <v-row dense>
-    <!-- <v-col>
-      <v-spacer>
-      </v-spacer>
-      <v-switch
-        inset
-        flat
-        class="ma-0"
-        color="primary"
-        v-model="autoJoin">
-        <template v-slot:label>
-          <v-chip label outlined>
-            Auto Join
-            <template>
-              <v-progress-circular
-                color="primary"
-                :indeterminate="autoJoin"
-                :value="0"
-                size="24"
-                class="ml-2">
-              </v-progress-circular>
-            </template>
-          </v-chip>
-        </template>
-      </v-switch>
-    </v-col> -->
-    <v-col sm="12" md="6">
-      <v-form v-model="joinFormValid" @submit="joinGame">
-        <v-text-field
-          solo
-          flat
-          required
-          label="Game Id"
-          :rules="gameIdRules"
-          v-model="joinForm.gameShortId"
-        >
-          <template v-slot:append>
-            <v-btn
-              tile
-              text
-              class="ma-0"
-              color="blue"
-              type="submit"
-              :disabled="!joinFormValid"
-            > Join Game </v-btn>
-          </template>
-        </v-text-field>
-
-        <v-snackbar
-          v-model="joinFormSnackbar"
-          top
-          color="error"
-          :timeout="5000"
-        >
-          {{ gameStore.joinGameError }}
-          <v-btn
-            dark
-            text
-            @click="joinFormSnackbar = false"
+    <v-row dense>
+      <v-col sm="12" md="6">
+        <v-form v-model="joinFormValid" @submit="joinGame">
+          <v-text-field
+            solo
+            required
+            label="Game Id"
+            :rules="gameIdRules"
+            v-model="joinForm.gameShortId"
           >
-            Close
-          </v-btn>
-        </v-snackbar>
-      </v-form>
-    </v-col>
-    <v-col sm="12" md="6" class="text-right">
-      <v-btn
-        class="ma-0"
-        color="primary"
-        :loading="gameStore.hostGameLoading"
-      @click="hostGame"> Host Game </v-btn>
-    </v-col>
-  </v-row>
+            <template v-slot:append>
+              <v-btn
+                tile
+                text
+                class="ma-0"
+                color="blue"
+                type="submit"
+                :disabled="!joinFormValid"
+              > Join Game </v-btn>
+            </template>
+          </v-text-field>
 
-  <v-row dense>
-    <v-col cols="12">
-      <PlayerList :limit="5" :playerList="playerList" v-on:gameShortId="setGameShortId" />
-    </v-col>
-  </v-row>
+          <v-snackbar
+            v-model="joinFormSnackbar"
+            top
+            color="error"
+            :timeout="5000"
+          >
+            {{ gameStore.joinGameError }}
+            <v-btn
+              dark
+              text
+              @click="joinFormSnackbar = false"
+            >
+              Close
+            </v-btn>
+          </v-snackbar>
+        </v-form>
+      </v-col>
+      <v-col sm="12" md="6" class="text-right">
+        <v-btn
+          class="ma-0"
+          color="primary"
+          :loading="gameStore.hostGameLoading"
+        @click="hostGame"> Host Game </v-btn>
+      </v-col>
+      <v-col sm="12" md="6">
+        <v-btn @click.stop="showRegister = true" height="60" width="100%" text class="text-left">
+          <PlayerCard
+            :username="userStore.username"
+            :color="userStore.color"
+            :avatarIcon="userStore.avatarIcon"
+          />
+        </v-btn>
+        <RegisterDialog
+          v-model="showRegister"
+          v-on:onClose="showRegister = false"
+          v-on:onSetTempUser="onSetTempUser"
+          max-width="600"
+        />
+      </v-col>
+    </v-row>
+
+    <v-row dense>
+      <v-col cols="12">
+        <PlayerList :limit="5" :playerList="playerList" v-on:gameShortId="setGameShortId" />
+      </v-col>
+    </v-row>
 
   </v-container>
 </template>
@@ -114,7 +93,7 @@ import * as MultiplayerMutationTypes from '../../store/multiplayer/multiplayer.t
 const multiplayerStore = getModule(MultiplayerModule);
 
 import apiService from '../../services/api.service';
-import { IGameMove, IGameGridState } from '../../model/interfaces';
+import { IPlayerInfo, IGameMove, IGameGridState } from '../../model/interfaces';
 
 @Component({
   components: { PlayerCard, RegisterDialog, LoginDialog, PlayerList },
@@ -130,26 +109,21 @@ export default class MultiplayerHome extends Vue{
   private joinForm = {
     gameShortId: "",
   };
-  private showRegisterDialog: boolean = false;
-  private showLoginDialog: boolean = false;
+  private showRegister: boolean = false;
 
   private pollInterval: any = null;
 
   private autoJoin: boolean = false;
 
   beforeMount(){
-    // if(userStore.isLoggedIn === false && !userStore.username){
-    //   this.showRegisterDialog = true;
-    // }
+    userStore.loadTempUser();
   }
   mounted(){
     this.getUsers();
     apiService.socket.on(MultiplayerMutationTypes.GET_USERS, this.getUsers);
-    apiService.socket.on(UserMutationTypes.SET_TEMP_AVATAR, userStore.setTempAvatar);
   }
   beforeUnmount(){
     apiService.socket.removeListener(MultiplayerMutationTypes.GET_USERS);
-    apiService.socket.removeListener(UserMutationTypes.SET_TEMP_AVATAR);
   }
   getUsers(){
     multiplayerStore.getUsers();
@@ -187,7 +161,6 @@ export default class MultiplayerHome extends Vue{
   onContinue({ username }){
     console.log("[Multiplayer.vue] onContinue");
     userStore.setTempUsername(username);
-    this.showRegisterDialog = false;
   }
   onRegister(formData: any){
     console.log("[Multiplayer.vue] onRegister", formData);
@@ -197,25 +170,16 @@ export default class MultiplayerHome extends Vue{
       password: formData.password1,
     });
   }
-  onHasAccount(formData: any){
-    console.log("[Multiplayer.vue] onHasAccount");
-    this.showRegisterDialog = false;
-    this.showLoginDialog = true;
-  }
-  onLogin({ email, password }){
-    console.log("[Multiplayer.vue] onLogin");
-    userStore.login({ email, password }).then(result => {
-      this.showLoginDialog = false;
-    });
-  }
-  onGoRegister(formData: any){
-    console.log("[Multiplayer.vue] onGoRegister");
-    this.showLoginDialog = false;
-    this.showRegisterDialog = true;
-  }
 
   get playerList(){
     return multiplayerStore.players;
+  }
+
+  onSetTempUser(payload: IPlayerInfo){
+    console.log("onSetTempUser", payload);
+    userStore.setTempUsername(payload.username);
+    userStore.setTempAvatar(payload);
+    apiService.socket.emit(UserMutationTypes.SET_USER_INFO, payload);
   }
 
 }

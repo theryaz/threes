@@ -7,6 +7,7 @@ import { IPlayerInfo } from '@/model/interfaces';
 
 import { COLORS } from '../../model/constants'
 
+import Vuetify from '../../plugins/vuetify';
 
 interface LoginPayload{
 	jwt: string,
@@ -88,12 +89,11 @@ export default class UserModule extends VuexModule{
 		console.log("Load Auth");
 		const userAuth = window.localStorage.getItem("userAuth");
 		if(!userAuth){
-			this.setTempUsername(this.username);
 			return;
 		}
 		const payload = JSON.parse(userAuth);
 		this.context.commit(UserMutationTypes.LOGIN_SUCCESS, payload);
-  }
+	}
 
 	@Mutation [UserMutationTypes.LOGIN](){
 		this.loading = true;
@@ -138,12 +138,30 @@ export default class UserModule extends VuexModule{
 		this.joinError = errorMessage;
 	}
 
+	@Action({rawError: true}) async loadTempUser(){
+		if(this.jwt !== null) return;
+		const tempUsername = window.localStorage.getItem("tempUsername");
+		const tempAvatar = JSON.parse(window.localStorage.getItem("tempAvatar"));
+		console.log("Load Temp User", tempUsername, tempAvatar);
+		if(tempUsername){
+			this.setTempUsername(tempUsername);
+	}
+		if(tempAvatar){
+			this.setTempAvatar(tempAvatar);
+		}
+		apiService.socket.emit(UserMutationTypes.SET_USER_INFO, {
+			username: this.username,
+			color: this.color,
+			avatarIcon: this.avatarIcon,
+		});
+  }
+
 	@Action setTempUsername(username: string){
 		this.context.commit(UserMutationTypes.SET_TEMP_USERNAME, username);
-		apiService.socket.emit(UserMutationTypes.SET_TEMP_USERNAME, username);
 	}
 	@Mutation [UserMutationTypes.SET_TEMP_USERNAME](username: string){
 		this.username = username;
+		window.localStorage.setItem("tempUsername", username);
 	}
 	@Action setTempAvatar(playerInfo: IPlayerInfo){
 		this.context.commit(UserMutationTypes.SET_TEMP_AVATAR, playerInfo);
@@ -151,5 +169,6 @@ export default class UserModule extends VuexModule{
 	@Mutation [UserMutationTypes.SET_TEMP_AVATAR]({ avatarIcon, color }: IPlayerInfo){
 		this.avatarIcon = avatarIcon;
 		this.color = color;
+		window.localStorage.setItem("tempAvatar", JSON.stringify({ avatarIcon, color }));
 	}
 }

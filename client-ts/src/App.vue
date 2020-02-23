@@ -20,7 +20,8 @@ const userStore = getModule(UserModule);
 })
 export default class App extends Vue{
   beforeMount(){
-    console.log("beforeMount loadAuth");
+    const useDarkMode = window.localStorage.getItem("useDarkMode") == 'true' ? true : false;
+    this.$vuetify.theme.dark = useDarkMode;
     userStore.loadAuth();
   }
 }

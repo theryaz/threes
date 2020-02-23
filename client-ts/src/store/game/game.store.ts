@@ -111,7 +111,7 @@ export default class GameModule extends VuexModule{
 			],
 			nextNumber: 1,
 		}
-	}
+	};
 
 	// Local Multiplayer States.
 	leftGameState: IGameState = {
@@ -287,7 +287,7 @@ export default class GameModule extends VuexModule{
 		this.localGameState.history.push(move);
 	}
 	@Action({ commit: GameMutationTypes.GAME_OVER }) onGameOver({ score }: IGameOverPayload){
-		apiService.socket.emit('onLocalGameOver');
+		apiService.socket.emit('onGameOver');
 		return { score };
 	}
 	@Mutation [GameMutationTypes.GAME_OVER]({ score }: IGameOverPayload){
@@ -296,7 +296,7 @@ export default class GameModule extends VuexModule{
 	}
 	@Action({ commit: GameMutationTypes.GAME_PAUSE }) onGamePause(){ }
 	@Mutation [GameMutationTypes.GAME_PAUSE](){
-		this.remoteGameState.paused = true;	
+		this.remoteGameState.paused = true;
 	}
 
 	@Action({commit: GameMutationTypes.SINGLE_GAME_START}) onSingleGameStart(initialGridState: IGameGridState){
@@ -386,5 +386,64 @@ export default class GameModule extends VuexModule{
 	@Mutation [GameMutationTypes.RIGHT_GAME_PAUSE](){
 		this.rightGameState.paused = true;	
 	}
+
+	@Action({ commit: GameMutationTypes.ON_EXIT_MULTIPLAYER }) onExitMultiplayer(){ }
+	@Mutation [GameMutationTypes.ON_EXIT_MULTIPLAYER](){
+		apiService.socket.emit(GameMutationTypes.ON_EXIT_MULTIPLAYER);
+
+		this.isSearching = false;
+		this.isConnected = false;
+		this.remotePlayer = {
+			username: noUser.username,
+			avatarUrl: noUser.avatarUrl,
+			avatarIcon: noUser.avatarIcon,
+			color: noUser.color,
+		};
+
+		this.localGameState = {
+			status: GameStatus.WaitingToStart,
+			autoStart: false,
+			paused: true,
+			gameOver: false,
+			score: 0,
+			keyboardEnabled: true,
+			isRemote: false,
+			nextNumber: 1,
+			history: [],
+			initialGridState:{
+				cells: [
+					{c:1,r:1,value:1},
+					{c:2,r:2,value:2},
+					{c:3,r:3,value:3},
+				],
+				nextNumber: 1,
+			}
+		};
+	
+		this.remoteGameState = {
+			status: GameStatus.WaitingToStart,
+			autoStart: true,
+			paused: true,
+			gameOver: false,
+			score: 0,
+			keyboardEnabled: false,
+			isRemote: true,
+			nextNumber: 1,
+			history: [],
+			initialGridState: {
+				cells: [
+					{c:1,r:1,value:1},
+					{c:2,r:2,value:2},
+					{c:3,r:3,value:3},
+				],
+				nextNumber: 1,
+			}
+		};
+	}
+
+	@Action({ commit: GameMutationTypes.REMOTE_PLAYER_EXIT }) onRemotePlayerExit(){
+		console.log("REMOTE_PLAYER_EXIT");
+	}
+	@Mutation [GameMutationTypes.REMOTE_PLAYER_EXIT](){}
 
 }

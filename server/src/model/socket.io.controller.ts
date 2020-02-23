@@ -56,7 +56,7 @@ export class SocketIOController{
 		const logSocketState = () => {
 			console.log(`Server has ${this.connectedClients} connections`);
 			console.log(Object.keys(this.connectedPlayers).map(key => 
-				`${this.connectedPlayers[key].Username} IsReady: ${this.connectedPlayers[key].IsReady}`
+				`${JSON.stringify(this.connectedPlayers[key].toJSON(), null, 2)}`
 			).join('\n'));
 		};
 		logSocketState();
@@ -73,10 +73,6 @@ export class SocketIOController{
 			socket.on('disconnect', () =>{
 				clientLogger.info("Disconnected");
 				this.removeClient(socket.client.id);
-				this.io.emit(MultiplayerMutationTypes.GET_USERS);
-			});
-			socket.on(UserMutationTypes.SET_TEMP_USERNAME, (username: string) =>{
-				connectedPlayers[socket.client.id].onSetUsername(username);
 				this.io.emit(MultiplayerMutationTypes.GET_USERS);
 			});
 		});

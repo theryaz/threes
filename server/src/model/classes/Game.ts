@@ -13,7 +13,7 @@ import * as GameMutationTypes from '../../../../client-ts/src/store/game/game.ty
 import { IPlayerInfo, ICoords, IGameGridState, IGameMove, IGameState } from '../../../../client-ts/src/model/interfaces';
 
 const GAME_OVER_COUNTDOWN_SECONDS = 10;
-const START_CHECK_INTERVAL = 3 * 1000;
+const START_CHECK_INTERVAL = 1 * 1000;
 export class Game{
 
   get RoomId(){
@@ -63,6 +63,12 @@ export class Game{
       this.startGameInterval();
     }
   }
+  removePlayer(player: Player){
+    this.players.splice(this.players.findIndex(p => p.socketId === player.socketId),1);
+    if(this.players.length === 0){
+      this.logger.silly(`All players have left the game ${this.ShortId}`);
+    }
+  }
 
   async startGameInterval(){
     this.readyCheckInterval = setInterval(() => {
@@ -83,10 +89,12 @@ export class Game{
       this.sendPlayerInfo();
       this.emitStartGame();
       this.linkPlayerGames();
+      this.listenForPlayerExit();
       this.listenForGameOver();
     }
   }
   private sendPlayerInfo(){
+    console.log("sendPlayerInfo", this.players);
     this.players.forEach((player: Player, index: number) => {
       this.players.forEach((otherPlayer: Player, otherIndex: number) => {
         if(index === otherIndex) return;
@@ -128,30 +136,45 @@ export class Game{
   private linkPlayerGames(){
     this.players.forEach((player: Player, index: number) => {
       player.socket.on('onMove', (move: IGameMove) => {
-        this.logger.silly(`${player.Username}: ${move.direction}`);
+        // this.logger.silly(`${player.Username}: ${move.direction}`);
         this.players.forEach((p, otherIndex: number) => {
           if(index === otherIndex) return;
-          this.logger.silly(`Emit Move to ${p.Username}`);
+          // this.logger.silly(`Emit Move to ${p.Username}`);
           p.socket.emit(GameMutationTypes.REMOTE_MOVE, move);
         });
       });
     });
   }
+  private listenForPlayerExit(){
+    this.players.forEach((player: Player) => {
+      player.socket.on(GameMutationTypes.ON_EXIT_MULTIPLAYER, () => {
+        this.logger.silly(`listenForPlayerExit: ${player.Username} exited`);
+        this.players.filter(p => p.socketId !== player.socketId).forEach(p => p.socket.emit(GameMutationTypes.REMOTE_PLAYER_EXIT));
+        this.removePlayer(player);
+      });
+    });
+  }
   private listenForGameOver(){
     this.players.forEach((player: Player) => {
-      player.socket.on('onGameOver', this.startGameOverCountDown);
+      player.socket.on('onGameOver', () => {
+        this.logger.silly(`listenForGameOver: ${player.Username} emitted game over`);
+        this.players.filter(p => p.socketId !== player.socketId).forEach(p => p.socket.emit(GameMutationTypes.REMOTE_GAME_OVER));
+        this.startGameOverCountDown();
+      });
     });
   }
   async startGameOverCountDown(){
     if(this.gameOver === true) return
     this.gameOver = true;
+    this.logger.silly('startGameOverCountDown');
     let countdown = GAME_OVER_COUNTDOWN_SECONDS;
-    this.players.forEach(p => p.socket.emit(GameMutationTypes.GAME_OVER_COUNTDOWN), countdown);
+    this.players.forEach(p => p.socket.emit(GameMutationTypes.GAME_OVER_COUNTDOWN, countdown));
     while(countdown > 0){
-      sleep(1);
+      await sleep(1000);
       countdown--;
-      this.players.forEach(p => p.socket.emit(GameMutationTypes.GAME_OVER_COUNTDOWN), countdown);
+      this.logger.silly(`startGameOverCountDown ${countdown}`);
+      this.players.forEach(p => p.socket.emit(GameMutationTypes.GAME_OVER_COUNTDOWN, countdown));
     }
-    this.players.forEach(p => p.socket.emit(GameMutationTypes.GAME_OVER));
+    this.logger.silly(`startGameOverCountDown: Game Over!`);
   }
 }
