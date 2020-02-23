@@ -86,7 +86,7 @@ export default class UserModule extends VuexModule{
 		}
 	}
 	@Action({rawError: true}) async loadAuth(){
-		console.log("Load Auth");
+		// console.log("Load Auth");
 		const userAuth = window.localStorage.getItem("userAuth");
 		if(!userAuth){
 			return;
@@ -142,7 +142,7 @@ export default class UserModule extends VuexModule{
 		if(this.jwt !== null) return;
 		const tempUsername = window.localStorage.getItem("tempUsername");
 		const tempAvatar = JSON.parse(window.localStorage.getItem("tempAvatar"));
-		console.log("Load Temp User", tempUsername, tempAvatar);
+		// console.log("Load Temp User", tempUsername, tempAvatar);
 		if(tempUsername){
 			this.setTempUsername(tempUsername);
 	}

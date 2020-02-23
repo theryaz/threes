@@ -1,6 +1,7 @@
 <template>
   <v-container id="MultiplayerGame">
-    <v-row  v-bind:class="{ 'flex-row-reverse': !isHost }">
+    <v-row>
+    <!-- v-bind:class="{ 'flex-row-reverse': !isHost }" -->
       <v-col cols="6">
         <Game 
           :game-state="gameStore.localGameState"

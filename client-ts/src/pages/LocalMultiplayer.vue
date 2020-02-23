@@ -97,7 +97,7 @@ export default class LocalMultiplayer extends Vue{
   }
 
   onLeftGameStart(initialGridState: IGameGridState){
-    console.log("onLeftGameStart", initialGridState);
+    // console.log("onLeftGameStart", initialGridState);
     gameStore.onLeftGameStart(initialGridState);
   }
   onLeftMove(move: IGameMove){
@@ -105,12 +105,12 @@ export default class LocalMultiplayer extends Vue{
     gameStore.onLeftMove(move);
   }
   onLeftGameOver({ score, cells }: IGameOverPayload){
-    console.log("onLeftGameOver", score);
+    // console.log("onLeftGameOver", score);
     gameStore.onLeftGameOver({ score, cells });
   }
 
   onRightGameStart(initialGridState: IGameGridState){
-    console.log("onRightGameStart", initialGridState);
+    // console.log("onRightGameStart", initialGridState);
     gameStore.onRightGameStart(initialGridState);
   }
   onRightMove(move: IGameMove){
@@ -118,7 +118,7 @@ export default class LocalMultiplayer extends Vue{
     gameStore.onRightMove(move);
   }
   onRightGameOver({ score, cells }: IGameOverPayload){
-    console.log("onRightGameOver", score);
+    // console.log("onRightGameOver", score);
     gameStore.onRightGameOver({ score, cells });
   }
 }
