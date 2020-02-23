@@ -11,7 +11,7 @@
         >
           <PlayerCard
             :username="'WASD'"
-            :color="''"
+            color="purple"
             :avatarIcon="'fa-kiwi-bird'"
             />
         </Game>
@@ -26,7 +26,7 @@
         >
           <PlayerCard
             :username="'Arrows'"
-            :color="''"
+            color="red"
             :avatarIcon="'fa-pegasus'"
             />
         </Game>
