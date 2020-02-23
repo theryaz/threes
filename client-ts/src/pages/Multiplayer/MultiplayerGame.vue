@@ -29,22 +29,6 @@
         </Game>
       </v-col>
     </v-row>
-    <v-row v-if="isWaiting">
-      <v-col offset="3" cols="6">
-        <v-card>
-          <v-card-title>
-            Invite a friend to start the game!
-          </v-card-title>
-          <v-card-text>
-            <v-chip label><v-icon left>fa-clipboard</v-icon> {{ joinUrl }}</v-chip>
-          </v-card-text>
-          <v-card-text>
-            <br />
-            Game Id: <v-chip label>{{ gameStore.gameShortId }}</v-chip>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
   </v-container>
 </template>
 <script lang="ts">
