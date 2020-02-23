@@ -16,7 +16,7 @@
       </v-btn>
     </template>
 
-    <v-card max-width="350px" class="justify-center">
+    <v-card max-width="350px" class="text-center">
       <!-- <v-card-title class="justify-center">
         <v-color-picker
           v-model="selectedAvatar"
@@ -25,12 +25,10 @@
           :mode="'hexa'"
         />
       </v-card-title> -->
-
-      <v-item-group mandatory>
         <v-btn
           v-for="(a,index) of AvatarList"
           :key="index"
-          @click="selectedAvatar = a.icon"
+          @click="() => setAvatar(a.icon)"
           text icon outlined
           class="ma-1"
           :value="a.icon"
@@ -39,18 +37,6 @@
             {{ a.icon }}
           </v-icon>
         </v-btn>
-      </v-item-group>
-
-      <v-card-actions>
-        <v-btn color="crimson" outlined @click="onCancel">
-          Cancel
-        </v-btn>
-        <v-spacer />
-        <v-btn color="primary" @click="onSave">
-          Save
-        </v-btn>
-      </v-card-actions>
-
     </v-card>
   </v-menu>
 </template>
@@ -83,6 +69,11 @@ export default class AvatarPicker extends Vue{
       return this.avatars;
     }
     return [...AVATARS, ...this.addAvatars];
+  }
+
+  setAvatar(e){
+    this.selectedAvatar = e;
+    this.onSave();
   }
 
   onSave(){

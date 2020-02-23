@@ -19,7 +19,7 @@ export const COLORS = {
   accent: ACCENT,
   crimson: CRIMSON,
   blue: ONE_BLUE,
-  SHADOW,
+  SHADOW: SHADOW,
   light:{
     FONT_COLOR,
     FONT_COLOR_INVERT,

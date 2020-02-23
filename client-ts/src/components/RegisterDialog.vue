@@ -20,7 +20,6 @@
                 <v-text-field
                   label="Username"
                   :rules="usernameRules"
-                  :hint="usernameHint"
                   required
                   v-model="signupForm.username"
                 ></v-text-field>
@@ -54,7 +53,7 @@
           <!-- <v-btn text color="blue darken-2" @click="onHasAccount">
             <small>I have an account.</small>
           </v-btn> -->
-          <v-switch inset class="ml-5" color="primary" v-model="isRegistering" label="Remember me"></v-switch>
+          <!-- <v-switch inset class="ml-5" color="primary" v-model="isRegistering" label="Remember me"></v-switch> -->
           <v-spacer></v-spacer>
           <v-switch inset color="white" v-model="isDark">
             <template v-slot:label>
