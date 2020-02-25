@@ -1,5 +1,8 @@
 <template>
   <v-container id="home">
+    <div class="text-center">
+      <img class="mx-a" src="img/threes-network-v4.png" height="100" width="100"/>
+    </div>
     <v-row>
       <v-col>
         <Game

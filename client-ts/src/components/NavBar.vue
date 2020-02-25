@@ -7,17 +7,17 @@
   >
     <v-btn to="/" value="play" height="100%">
       <span>Play</span>
-      <v-icon>fa-gamepad</v-icon>
+      <v-icon>fad fa-gamepad</v-icon>
     </v-btn>
     
     <v-btn to="/local-multiplayer" value="local" height="100%">
       <span>Local</span>
-      <v-icon>fa-user-friends</v-icon>
+      <v-icon>fad fa-user-friends</v-icon>
     </v-btn>
 
     <v-btn to="/multiplayer" value="online" height="100%">
       <span>Online</span>
-      <v-icon>fa-users</v-icon>
+      <v-icon>fad fa-users</v-icon>
     </v-btn>
 
   </v-bottom-navigation>

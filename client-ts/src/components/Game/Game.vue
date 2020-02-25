@@ -21,7 +21,7 @@
       <v-flex>
         <v-chip class="mx-1" label transition="slide-x-transition">
           <v-avatar tile left>
-            <v-icon small>fa-abacus</v-icon>
+            <v-icon small>fad fa-abacus</v-icon>
           </v-avatar>
           {{ CurrentScore }}
         </v-chip>

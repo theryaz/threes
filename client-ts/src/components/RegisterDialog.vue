@@ -156,7 +156,7 @@ export default class RegisterDialog extends Vue{
   }
 
   onSubmit($event: Event){
-    console.log("[RegisterDialog.vue] onSubmit");
+    // console.log("[RegisterDialog.vue] onSubmit");
     $event.preventDefault();
     if(this.isRegistering == false){
       this.$emit('onSetTempUser', {

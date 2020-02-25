@@ -47,12 +47,19 @@
         @click="hostGame"> Host Game </v-btn>
       </v-col>
       <v-col sm="12" md="6">
-        <v-btn @click.stop="showRegister = true" height="60" width="100%" text class="text-left">
+        <v-btn
+          @click.stop="showRegister = true"
+          height="60"
+          width="100%"
+          text
+          class="text-left"
+          v-bind:class="{'edit-attention': playerIsDefault}"
+        >
           <PlayerCard
             :username="userStore.username"
             :color="userStore.color"
             :avatarIcon="userStore.avatarIcon"
-          />
+          /> Edit <v-icon class="ml-2">fad fa-edit</v-icon>
         </v-btn>
         <RegisterDialog
           v-model="showRegister"
@@ -94,6 +101,7 @@ const multiplayerStore = getModule(MultiplayerModule);
 
 import apiService from '../../services/api.service';
 import { IPlayerInfo, IGameMove, IGameGridState } from '../../model/interfaces';
+import { COLORS } from '../../model/constants';
 
 @Component({
   components: { PlayerCard, RegisterDialog, LoginDialog, PlayerList },
@@ -134,6 +142,10 @@ export default class MultiplayerHome extends Vue{
       v => v.length <= 6 || 'Maximum 6 characters',
       v => !!v || '',
     ];
+  }
+
+  get playerIsDefault(){
+    return userStore.username === "Player";
   }
 
   hostGame(){
@@ -185,4 +197,29 @@ export default class MultiplayerHome extends Vue{
 }
 </script>
 <style lang="scss">
+@import "src/scss/colors";
+@keyframes attention-animation {
+  0%   {
+    transform:  rotateZ(0);
+  }
+  94%  {
+    transform: rotateZ(0);
+  }
+  96%  {
+    transform: rotateZ(2deg);
+  }
+  98%  {
+    transform: rotateZ(-2deg);
+  }
+  100% {
+    transform: rotateZ(0);
+  }
+}
+
+.edit-attention{
+  box-shadow: 2px 2px 10px -8px #000;
+  animation-name: attention-animation;
+  animation-duration: 6s;
+  animation-iteration-count: infinite;
+}
 </style>

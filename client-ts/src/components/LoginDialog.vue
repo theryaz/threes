@@ -93,7 +93,7 @@ export default class LoginDialog extends Vue{
   }
 
   onSubmit($event: Event){
-    console.log("[LoginDialog.vue] onSubmit");
+    // console.log("[LoginDialog.vue] onSubmit");
     $event.preventDefault();
 
     this.$emit('onLogin', {
