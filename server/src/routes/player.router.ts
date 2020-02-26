@@ -29,7 +29,8 @@ export class PlayerRouter{
 					const player = connectedPlayers[connectedId];
 					const game = gameList.find(g => g.hasPlayer(player));
 					if(game !== undefined){
-						if(game.Players.length > 1) continue; // Don't show players playing games
+						// Don't show players playing games, or ended games with one player left
+						if(game.Players.length > 1 || game.GameOver) continue;
 						player.gameShortId = game.ShortId;
 					}
 					players.push(player);

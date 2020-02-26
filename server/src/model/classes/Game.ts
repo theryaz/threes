@@ -8,14 +8,16 @@ import { verifyJwt, createLogger, sleep, randomString } from '../../shared';
 
 import { Player } from './Player';
 
+import { socketIOController } from '../../app';
+
 import * as UserMutationTypes from '../../../../client-ts/src/store/user/user.types';
 import * as GameMutationTypes from '../../../../client-ts/src/store/game/game.types';
+import * as MultiplayerMutationTypes from '../../../../client-ts/src/store/multiplayer/multiplayer.types';
 import { IPlayerInfo, ICoords, IGameGridState, IGameMove, IGameState } from '../../../../client-ts/src/model/interfaces';
 
 const GAME_OVER_COUNTDOWN_SECONDS = 30;
 const START_CHECK_INTERVAL = 1 * 1000;
 export class Game{
-
   
   get RoomId(){
     return `Game/${this.uuid}`;
@@ -23,6 +25,10 @@ export class Game{
   
   get ShortId(){
     return this.shortId;
+  }
+
+  get GameOver(){
+    return this.gameOver;
   }
   
   private gameOverCountdown: number = GAME_OVER_COUNTDOWN_SECONDS;
@@ -65,6 +71,7 @@ export class Game{
     }
   }
   removePlayer(player: Player){
+    player.isInGame = false;
     this.players.splice(this.players.findIndex(p => p.socketId === player.socketId),1);
     if(this.players.length === 0){
       this.logger.silly(`All players have left the game ${this.ShortId}`);
@@ -152,6 +159,10 @@ export class Game{
         this.logger.silly(`listenForPlayerExit: ${player.Username} exited`);
         this.players.filter(p => p.socketId !== player.socketId).forEach(p => p.socket.emit(GameMutationTypes.REMOTE_PLAYER_EXIT));
         this.removePlayer(player);
+        this.gameOver = true;
+        
+        // TODO Don't push updates to the client like this
+        socketIOController.io.emit(MultiplayerMutationTypes.GET_USERS);
       });
     });
   }

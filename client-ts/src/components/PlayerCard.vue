@@ -9,11 +9,12 @@
         {{ username }}
       </span>
     </v-col>
-    <v-col v-if="player" class="d-flex align-content-center flex-wrap justify-end">
+    <v-col v-if="player" class="d-flex align-content-center flex-wrap justify-end pr-2">
       <v-btn v-on:click="onJoinGame" v-if="player.isInGame" color="blue" dark>
         Join Game
       </v-btn>
-      <span v-else>
+      <span v-else class="caption">
+        Waiting for Game
       </span>
     </v-col>
   </v-row>

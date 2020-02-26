@@ -75,7 +75,7 @@ export default class MultiplayerGame extends Vue{
     return gameStore.localGameState.gameOver && gameStore.remoteGameState.gameOver;
   }
   get isWinner(){
-    return gameStore.localGameState.score > gameStore.remoteGameState.score;
+    return gameStore.localGameState.score >= gameStore.remoteGameState.score;
   }
 
   get isWaiting(){

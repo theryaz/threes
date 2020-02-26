@@ -13,17 +13,21 @@ interface RandomTextOption{
   weight: number,
 }
 const winningTexts: RandomTextOption[] = [
-  { text:"You won, Amazing!", weight: 1 },
-  { text:"You won, Congrats!", weight: 1 },
-  { text:"You won, Wicked!", weight: 1 },
-  { text:"You won, Awesome!", weight: 1 },
-  { text:"You won, Cool!", weight: 1 },
+  { text:"You won. Amazing!", weight: 1 },
+  { text:"You won. Congrats!", weight: 1 },
+  { text:"You won. Wicked!", weight: 1 },
+  { text:"You won. Awesome!", weight: 1 },
+  { text:"You won. Cool!", weight: 1 },
+  { text:"You won. Impressive!", weight: 1 },
 ];
 
 const losingTexts: RandomTextOption[] = [
   { text: "You won a chance to win next time.", weight: 0.1 },
-  { text: "You lost. :(", weight: 0.25 },
-  { text: "You lost.", weight: 1 },
+  { text: "You lost. You'll get there.", weight: 0.25 },
+  { text: "You lost. Ouch.", weight: 0.5 },
+  { text: "You lost. Oof.", weight: 0.75 },
+  { text: "You lost. Devastating.", weight: 0.75 },
+  { text: "You lost. Bummer.", weight: 1 },
 ];
 
 @Component
