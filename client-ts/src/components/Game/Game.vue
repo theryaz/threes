@@ -35,7 +35,7 @@
           </v-chip>
         </v-expand-x-transition>
         <v-expand-x-transition>
-          <v-chip dark class="mx-1" label :color="CountDownColor" v-show="showCountdown">
+          <v-chip dark class="mx-1" label :color="CountDownColor" v-show="showCountdown && gameOverCountDown > 0">
             <v-avatar tile left>
               <v-icon small>fa-clock</v-icon>
             </v-avatar>
@@ -70,6 +70,7 @@ import UserModule from '../../store/user/user.store';
 const userStore = getModule(UserModule);
 
 import { COLORS } from '../../model/constants';
+import { IGameOverPayload } from '../../model/interfaces';
 
 function getRandom(min: number, max: number){
   return Math.floor(Math.random() * max) + min;
@@ -176,7 +177,7 @@ export default class Game extends Vue{
       }
       this.$emit('onMove', move);
     });
-    apiService.socket.on(GameMutationTypes.REMOTE_GAME_OVER, (score: number) => {
+    apiService.socket.on(GameMutationTypes.REMOTE_GAME_OVER, ({ score }: IGameOverPayload) => {
       this.$emit('gameOver', { score: score, cells: this.cells });
     });
   }

@@ -288,8 +288,9 @@ export default class GameModule extends VuexModule{
 	@Action({ commit: GameMutationTypes.REMOTE_GAME_OVER }) onRemoteGameOver({ score }: IGameOverPayload){
 		return { score };
 	}
-	@Mutation [GameMutationTypes.REMOTE_GAME_OVER](){
+	@Mutation [GameMutationTypes.REMOTE_GAME_OVER]({ score }: IGameOverPayload){
 		this.remoteGameState.gameOver = true;
+		this.remoteGameState.score = score;
 		this.remoteGameState.status = GameStatus.GameOver;
 	}
 	@Action({ commit: GameMutationTypes.REMOTE_GAME_PAUSE }) onRemoteGamePause(){ }
@@ -318,7 +319,7 @@ export default class GameModule extends VuexModule{
 		this.localGameState.history.push(move);
 	}
 	@Action({ commit: GameMutationTypes.GAME_OVER }) onGameOver({ score }: IGameOverPayload){
-		apiService.socket.emit('onGameOver');
+		apiService.socket.emit(GameMutationTypes.GAME_OVER, { score });
 		return { score };
 	}
 	@Mutation [GameMutationTypes.GAME_OVER]({ score }: IGameOverPayload){

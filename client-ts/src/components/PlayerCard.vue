@@ -9,12 +9,11 @@
         {{ username }}
       </span>
     </v-col>
-    <v-col v-if="player" class="text-right">
-      <span v-if="player.isInGame">
-        In Game
-      </span>
+    <v-col v-if="player" class="d-flex align-content-center flex-wrap justify-end">
+      <v-btn v-on:click="onJoinGame" v-if="player.isInGame" color="blue" dark>
+        Join Game
+      </v-btn>
       <span v-else>
-        In Lobby
       </span>
     </v-col>
   </v-row>
@@ -22,6 +21,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import { IPlayer } from '../model/interfaces';
+
 @Component
 export default class PlayerCard extends Vue{
   @Prop({default: "crimson"}) color: string;
@@ -29,5 +29,9 @@ export default class PlayerCard extends Vue{
   @Prop({default: "fa-user"}) avatarIcon: string;
   @Prop({default: "Player"}) username: string;
   @Prop() player: IPlayer;
+
+  onJoinGame(){
+    this.$emit('onJoinGame');
+  }
 }
 </script>

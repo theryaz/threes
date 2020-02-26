@@ -16,20 +16,21 @@ const GAME_OVER_COUNTDOWN_SECONDS = 30;
 const START_CHECK_INTERVAL = 1 * 1000;
 export class Game{
 
+  
   get RoomId(){
     return `Game/${this.uuid}`;
   }
-
+  
   get ShortId(){
     return this.shortId;
   }
   
+  private gameOverCountdown: number = GAME_OVER_COUNTDOWN_SECONDS;
   private shortId: string;
   private logger: winston.Logger;
   private uuid: string;
   
   private readyCheckInterval;
-  private gameOverCountdown;
 
   private gameOver = false;
 
@@ -156,25 +157,31 @@ export class Game{
   }
   private listenForGameOver(){
     this.players.forEach((player: Player) => {
-      player.socket.on('onGameOver', () => {
+      player.socket.on(GameMutationTypes.GAME_OVER, ({ score }) => {
         this.logger.silly(`listenForGameOver: ${player.Username} emitted game over`);
-        this.players.filter(p => p.socketId !== player.socketId).forEach(p => p.socket.emit(GameMutationTypes.REMOTE_GAME_OVER));
+        this.players.filter(p => p.socketId !== player.socketId).forEach(p => p.socket.emit(GameMutationTypes.REMOTE_GAME_OVER, { score }));
         this.startGameOverCountDown();
       });
     });
   }
   async startGameOverCountDown(){
-    if(this.gameOver === true) return
+    if(this.gameOver === true){
+      this.gameOverCountdown = 0;
+      return;
+    }
     this.gameOver = true;
     this.logger.silly('startGameOverCountDown');
-    let countdown = GAME_OVER_COUNTDOWN_SECONDS;
-    this.players.forEach(p => p.socket.emit(GameMutationTypes.GAME_OVER_COUNTDOWN, countdown));
-    while(countdown > 0){
+    this.gameOverCountdown = GAME_OVER_COUNTDOWN_SECONDS;
+    this.emitGameOverCountdown();
+    while(this.gameOverCountdown > 0){
       await sleep(1000);
-      countdown--;
-      this.logger.silly(`startGameOverCountDown ${countdown}`);
-      this.players.forEach(p => p.socket.emit(GameMutationTypes.GAME_OVER_COUNTDOWN, countdown));
+      this.gameOverCountdown--;
+      this.logger.silly(`startGameOverCountDown ${this.gameOverCountdown}`);
+      this.emitGameOverCountdown();
     }
     this.logger.silly(`startGameOverCountDown: Game Over!`);
+  }
+  emitGameOverCountdown(){
+    this.players.forEach(p => p.socket.emit(GameMutationTypes.GAME_OVER_COUNTDOWN, this.gameOverCountdown));
   }
 }

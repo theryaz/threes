@@ -5,7 +5,6 @@
       v-for="player in PlayerList"
       :key="player.socket"
       class="mt-2 pl-2 pr-2"
-      @click="() => emitGameId(player)"
     >
       <PlayerCard
         :color="player.user.color"
@@ -13,6 +12,7 @@
         :username="player.username"
         :avatarUrl="player.user.avatarUrl"
         :avatarIcon="player.user.avatarIcon"
+        v-on:onJoinGame="() => joinGame(player)"
       />
     </v-card>
   </v-container>
@@ -24,6 +24,10 @@ import { Component, Prop,  Vue } from 'vue-property-decorator';
 
 import PlayerCard from './PlayerCard.vue';
 import { IPlayer } from '../model/interfaces';
+
+import GameModule from '../store/game/game.store';
+import * as GameMutationTypes from '../store/game/game.types';
+const gameStore = getModule(GameModule);
 
 @Component({
   components: { PlayerCard },
@@ -39,9 +43,14 @@ export default class PlayerList extends Vue{
     return this.playerList.slice(0, this.limit);
   }
 
-  emitGameId(player: IPlayer){
+  joinGame(player: IPlayer){
     if(player.gameShortId){
-      this.$emit('gameShortId', player.gameShortId);
+      gameStore.joinGame(player.gameShortId).then((success) => {
+        if(success){
+          // console.log("Joined Game!");
+          this.$router.push('/multiplayer/game');
+        }
+      });
     }
   }
 }

@@ -29,6 +29,9 @@
           />
         </Game>
       </v-col>
+      <v-col class="mt-4 text-center">
+        <BackToLobby v-on:click="goBackToLobby" :isWinner="isWinner" :show="GameIsOver"/>
+      </v-col>
     </v-row>
   </v-container>
 </template>
@@ -39,6 +42,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import PlayerCard from '../../components/PlayerCard.vue';
 import RegisterDialog from '../../components/RegisterDialog.vue';
 import LoginDialog from '../../components/LoginDialog.vue';
+import BackToLobby from './BackToLobby.vue';
 
 import UserModule from '../../store/user/user.store';
 const userStore = getModule(UserModule);
@@ -56,7 +60,7 @@ import { PlayerStatus, GameStatus } from '../../model/enums';
 import { IGameMove, IGameGridState, ICellValue } from '../../model/interfaces';
 
 @Component({
-  components: { PlayerCard, RegisterDialog, LoginDialog },
+  components: { BackToLobby, PlayerCard, RegisterDialog, LoginDialog },
   computed:{
     ...mapState(['userStore']),
     ...mapState(['gameStore']),
@@ -67,7 +71,12 @@ export default class MultiplayerGame extends Vue{
   private showRegisterDialog: boolean = false;
   private showLoginDialog: boolean = false;
 
-  // private localGrid: Grid = new Grid();
+  get GameIsOver(){
+    return gameStore.localGameState.gameOver && gameStore.remoteGameState.gameOver;
+  }
+  get isWinner(){
+    return gameStore.localGameState.score > gameStore.remoteGameState.score;
+  }
 
   get isWaiting(){
     return gameStore.localGameState.status === GameStatus.WaitingToStart;
@@ -89,6 +98,10 @@ export default class MultiplayerGame extends Vue{
   }
   mounted(){
     // console.log("Multiplayer Game Mounted")
+  }
+
+  goBackToLobby(){
+    this.$router.push('/multiplayer/game');
   }
 
   get userStore(){
