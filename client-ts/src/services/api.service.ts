@@ -27,6 +27,7 @@ class ApiService{
 		
 		this.socket.on(GameMutationTypes.SET_REMOTE_PLAYER_INFO, gameStore.onSetRemotePlayerInfo);
 		this.socket.on(GameMutationTypes.GAME_START, gameStore.onGameStart);
+		this.socket.on(GameMutationTypes.REMOTE_PLAYER_EXIT, gameStore.onRemotePlayerExit);
 	}
 
 

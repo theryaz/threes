@@ -4,7 +4,7 @@
     <!-- v-bind:class="{ 'flex-row-reverse': !isHost }" -->
       <v-col cols="6">
         <Game 
-          :game-state="gameStore.localGameState"
+          :gameState="gameStore.localGameState"
           v-on:gameStart="onLocalGameStart"
           v-on:gameOver="onLocalGameOver"
           v-on:onMove="onLocalMove"
@@ -18,7 +18,8 @@
       </v-col>
       <v-col cols="6">
         <Game
-          :game-state="gameStore.remoteGameState"
+          :gameState="gameStore.remoteGameState"
+          :remotePlayerInfo="gameStore.remotePlayer"
           v-on:gameStart="onRemoteGameStart"
           v-on:gameOver="onRemoteGameOver"
           v-on:onMove="onRemoteMove">

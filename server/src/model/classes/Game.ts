@@ -67,7 +67,7 @@ export class Game{
     this.players.push(player);
     this.logger.debug(`${player.Username} joined`);
     if(this.players.length === 2){
-      this.startGameInterval();
+      this.startGame();
     }
   }
   removePlayer(player: Player){

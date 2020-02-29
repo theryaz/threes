@@ -19,6 +19,13 @@
     <div class="playing-grid" ref="grid"></div>
     <v-layout class="mt-1">
       <v-flex>
+        <v-chip class="mx-1" label transition="slide-x-transition" color="secondary" v-show="PlayerIsDisconnected">
+          <v-avatar tile left>
+            <v-icon small>fad fa-unlink</v-icon>
+          </v-avatar>
+          Disconnected
+        </v-chip>
+
         <v-chip class="mx-1" label transition="slide-x-transition">
           <v-avatar tile left>
             <v-icon small>fad fa-abacus</v-icon>
@@ -56,7 +63,7 @@
 <script lang="ts">
 import { Vuetify } from 'vuetify';
 import apiService from '../../services/api.service';
-import { ICoords, IGameState, ICellValue, IGameMove, IGameGridState, IKeyboardControls } from '../../model/interfaces';
+import { ICoords, IGameState, ICellValue, IGameMove, IGameGridState, IKeyboardControls, IRemotePlayerInfo } from '../../model/interfaces';
 import { ICell } from '../../model/views';
 import { Direction, INDEXES, R_INDEXES } from './model/constants';
 import * as GameMutationTypes from '../../store/game/game.types';
@@ -71,6 +78,7 @@ const userStore = getModule(UserModule);
 
 import { COLORS } from '../../model/constants';
 import { IGameOverPayload } from '../../model/interfaces';
+import { RemotePlayerStatus } from '../../model/enums';
 
 function getRandom(min: number, max: number){
   return Math.floor(Math.random() * max) + min;
@@ -94,6 +102,10 @@ export default class Game extends Vue{
     }
   }
 
+  get PlayerIsDisconnected(){
+    return this.remotePlayerInfo && this.remotePlayerInfo.status === RemotePlayerStatus.Disconnected;
+  }
+
   $refs:{
     grid: HTMLDivElement,
   };
@@ -108,6 +120,7 @@ export default class Game extends Vue{
   private keydownListenerFn: (this: Window, ev: KeyboardEvent) => any;
 
   @Prop({type: Object}) private gameState: IGameState;
+  @Prop({type: Object}) private remotePlayerInfo: IRemotePlayerInfo;
   @Prop({type: Boolean, default: false}) private showRules: boolean;
   
   gameOverCheckTimeout: any | null  = null;

@@ -25,8 +25,9 @@ const losingTexts: RandomTextOption[] = [
   { text: "You won a chance to win next time.", weight: 0.1 },
   { text: "You lost. You'll get there.", weight: 0.25 },
   { text: "You lost. Ouch.", weight: 0.5 },
-  { text: "You lost. Oof.", weight: 0.75 },
-  { text: "You lost. Devastating.", weight: 0.75 },
+  { text: "You lost. You Tried.", weight: 0.5 },
+  { text: "You lost. Oof.", weight: 1 },
+  { text: "You lost. Devastating.", weight: 1 },
   { text: "You lost. Bummer.", weight: 1 },
 ];
 

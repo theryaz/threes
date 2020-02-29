@@ -2,11 +2,11 @@ import store from '../store';
 import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators';
 import apiService from '../../services/api.service';
 import { ICell } from '../../model/views';
-import { IPlayerInfo, IGameState, IGameMove, IGameGridState, IGameOverPayload, ICellValue } from '../../model/interfaces';
+import { IRemotePlayerInfo, IPlayerInfo, IGameState, IGameMove, IGameGridState, IGameOverPayload, ICellValue } from '../../model/interfaces';
 import Game from '../../components/Game/Game.vue';
 
 import * as GameMutationTypes from './game.types';
-import { PlayerStatus, GameStatus } from '@/model/enums';
+import { PlayerStatus, GameStatus, RemotePlayerStatus } from '@/model/enums';
 
 const noUser: IPlayerInfo = {
 	username: "Waiting for Player",
@@ -44,11 +44,13 @@ export default class GameModule extends VuexModule{
 	isPaused: boolean = false;
 	isSearching: boolean = false;
 	isConnected: boolean = false;
-	remotePlayer: IPlayerInfo = {
+	
+	remotePlayer: IRemotePlayerInfo = {
 		username: noUser.username,
 		avatarUrl: noUser.avatarUrl,
 		avatarIcon: noUser.avatarIcon,
 		color: noUser.color,
+		status: RemotePlayerStatus.WaitingForPlayer,
 	};
 
 	singleGameState: IGameState = {
@@ -259,12 +261,22 @@ export default class GameModule extends VuexModule{
 		this.remotePlayer.avatarUrl = playerInfo.avatarUrl;
 		this.remotePlayer.avatarIcon = playerInfo.avatarIcon;
 		this.remotePlayer.color = playerInfo.color;
+		this.remotePlayer.status = RemotePlayerStatus.WaitingForPlayer;
 	}
-	@Mutation [GameMutationTypes.CLEAR_REMOTE_PLAYER_INFO](playerInfo: IPlayerInfo){
+	@Action({ commit: GameMutationTypes.CLEAR_REMOTE_PLAYER_INFO }) clearRemotePlayerInfo(){}
+	@Mutation [GameMutationTypes.CLEAR_REMOTE_PLAYER_INFO](){
 		this.remotePlayer.username = noUser.username;
 		this.remotePlayer.avatarUrl = noUser.avatarUrl;
 		this.remotePlayer.avatarIcon = noUser.avatarIcon;
 		this.remotePlayer.color = noUser.color;
+		this.remotePlayer.status = RemotePlayerStatus.WaitingForPlayer;
+	}
+
+	@Action({ commit: GameMutationTypes.REMOTE_PLAYER_EXIT }) onRemotePlayerExit(){
+		console.log("REMOTE_PLAYER_EXIT");
+	}
+	@Mutation [GameMutationTypes.REMOTE_PLAYER_EXIT](){
+		this.remotePlayer.status = RemotePlayerStatus.Disconnected;
 	}
 
 	@Action({ commit: GameMutationTypes.REMOTE_GAME_START }) onRemoteGameStart(initialGridState: IGameGridState){
@@ -430,6 +442,7 @@ export default class GameModule extends VuexModule{
 			avatarUrl: noUser.avatarUrl,
 			avatarIcon: noUser.avatarIcon,
 			color: noUser.color,
+			status: RemotePlayerStatus.WaitingForPlayer,
 		};
 
 		this.localGameState = {
@@ -476,10 +489,5 @@ export default class GameModule extends VuexModule{
 			}
 		};
 	}
-
-	@Action({ commit: GameMutationTypes.REMOTE_PLAYER_EXIT }) onRemotePlayerExit(){
-		console.log("REMOTE_PLAYER_EXIT");
-	}
-	@Mutation [GameMutationTypes.REMOTE_PLAYER_EXIT](){}
 
 }
