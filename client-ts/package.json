@@ -12,9 +12,9 @@
     "test:e2e": "vue-cli-service test:e2e",
     "test:unit": "vue-cli-service test:unit",
     "deploy:production": "npm run build:production && npm run s3sync:production",
-    "s3sync:production": "aws s3 sync --delete --acl public-read dist s3://play.threeswithfriends.com && aws cloudfront create-invalidation --distribution-id E3P2WX3OJLCJD3 --paths /index.html",
+    "s3sync:production": "aws s3 sync --delete --acl public-read dist s3://play.s3.threeswithfriends.com && aws cloudfront create-invalidation --distribution-id E36CHZXP6RQ4LC --paths /index.html",
     "deploy:staging": "npm run build:staging && npm run s3sync:staging",
-    "s3sync:staging": "aws s3 sync --delete --acl public-read dist s3://play.staging.threeswithfriends.com && aws cloudfront create-invalidation --distribution-id EGF98SYFEN0UJ --paths /index.html",
+    "s3sync:staging": "aws s3 sync --delete --acl public-read dist s3://play.staging.s3.threeswithfriends.com && aws cloudfront create-invalidation --distribution-id E1ESQ15O8TQHAT --paths /index.html",
     "npm-install": "docker run --rm -it -v $(pwd):/app -w /app node:13.6.0 npm install",
     "generate-pwa-assets": "pwa-asset-generator threes-network-v3.png --manifest ../../manifest.json --index ../../index.html --opaque false"
   },
