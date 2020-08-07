@@ -251,6 +251,8 @@ export default class Game extends Vue{
     });
   }
   onSwipe(moveDirection: string){
+    if(this.gameState.paused === true ) return;
+    if(this.gameState.gameOver) return;
     if(this.gameState.keyboardEnabled){
       this[moveDirection]();
     }
