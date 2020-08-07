@@ -1,5 +1,6 @@
 <template>
-  <v-menu
+  <component
+    :is="RootComponent"
     v-model="showPickColor"
     :close-on-click="true"
     :close-on-content-click="false"
@@ -20,8 +21,6 @@
       <v-card-title class="justify-center">
         <v-color-picker
           v-model="selectedColor"
-          hide-canvas
-          hide-mode-switch
           :mode="'hexa'"
         />
       </v-card-title>
@@ -42,10 +41,12 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-  </v-menu>
+  </component>
 </template>
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import VMenu from 'vuetify/lib/components/VMenu';
+import VDialog from 'vuetify/lib/components/VDialog';
 import { IPlayer } from '../model/interfaces';
 import { COLORS } from '../model/constants';
 
@@ -76,6 +77,16 @@ export default class ColorPicker extends Vue{
     return [...this.getColors(), ...this.addColors];
   }
 
+  get IsMobile(): boolean {
+    return this.$vuetify.breakpoint.mobile;
+  }
+
+  get RootComponent(){
+    if (this.IsMobile) {
+      return VDialog;
+    }
+    return VMenu;
+  }
 
   getColors(){
     const colors: Color[] = [];

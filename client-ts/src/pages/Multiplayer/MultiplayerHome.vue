@@ -1,65 +1,21 @@
 <template>
   <v-container id="MultiplayerHome">
-    <v-row dense>
-      <v-col sm="12" md="6">
-        <v-form v-model="joinFormValid" @submit="joinGame">
-          <v-text-field
-            solo
-            required
-            label="Game Id"
-            :rules="gameIdRules"
-            v-model="joinForm.gameShortId"
-          >
-            <template v-slot:append>
-              <v-btn
-                tile
-                text
-                class="ma-0"
-                color="blue"
-                type="submit"
-                :disabled="!joinFormValid"
-              > Join Game </v-btn>
-            </template>
-          </v-text-field>
-
-          <v-snackbar
-            v-model="joinFormSnackbar"
-            top
-            color="error"
-            :timeout="5000"
-          >
-            {{ gameStore.joinGameError }}
-            <v-btn
-              dark
-              text
-              @click="joinFormSnackbar = false"
-            >
-              Close
-            </v-btn>
-          </v-snackbar>
-        </v-form>
-      </v-col>
-      <v-col sm="12" md="6" class="text-right">
-        <v-btn
-          class="ma-0"
-          color="primary"
-          :loading="gameStore.hostGameLoading"
-        @click="hostGame"> Host Game </v-btn>
-      </v-col>
-      <v-col sm="12" md="6">
+    <v-row>
+      <v-col cols="12" md="6">
         <v-btn
           @click.stop="showRegister = true"
           height="60"
           width="100%"
           text
           class="text-left"
-          v-bind:class="{'edit-attention': playerIsDefault}"
+          v-bind:class="{ 'edit-attention': playerIsDefault }"
         >
           <PlayerCard
             :username="userStore.username"
             :color="userStore.color"
             :avatarIcon="userStore.avatarIcon"
-          /> Edit <v-icon class="ml-2">fad fa-edit</v-icon>
+          />
+          Edit <v-icon class="ml-2">fal fa-edit</v-icon>
         </v-btn>
         <RegisterDialog
           v-model="showRegister"
@@ -68,11 +24,25 @@
           max-width="600"
         />
       </v-col>
+      <v-col cols="12" md="6" class="text-right">
+        <v-btn
+          class="ma-0"
+          color="primary"
+          :loading="gameStore.hostGameLoading"
+          @click="hostGame"
+        >
+          Host Game
+        </v-btn>
+      </v-col>
     </v-row>
 
     <v-row dense>
       <v-col cols="12">
-        <PlayerList :limit="5" :playerList="playerList" v-on:gameShortId="setGameShortId" />
+        <PlayerList
+          :limit="5"
+          :playerList="playerList"
+          v-on:gameShortId="setGameShortId"
+        />
       </v-col>
     </v-row>
 

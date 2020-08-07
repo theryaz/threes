@@ -3,9 +3,10 @@ import http from 'http';
 import body_parser from 'body-parser';
 import cors from 'cors';
 import socket from 'socket.io';
+import redisAdapter from 'socket.io-redis';
 
-import graphqlHTTP from 'express-graphql';
-import { graphqlSchema } from './schema';
+// import graphqlHTTP from 'express-graphql';
+// import { graphqlSchema } from './schema';
 
 import { createLogger } from './shared';
 const logger = createLogger('app.ts');
@@ -24,6 +25,7 @@ import userRouter from './routes/user.router';
 import gameRouter from './routes/game.router';
 import playerRouter from './routes/player.router';
 import { SocketIOController } from './model/socket.io.controller';
+import { CONFIG } from './model/constants/config';
 
 export class App{
 
@@ -35,6 +37,7 @@ export class App{
 		this.app = express();
 		this.httpServer = http.createServer(this.app);
 		this.io = socket(this.httpServer);
+		this.io.adapter(redisAdapter({ host: CONFIG.REDIS.HOST, post: CONFIG.REDIS.PORT }));
 		this.socketIOController = new SocketIOController(this.io);
 		this.socketHandlers();
 		this.middleware();

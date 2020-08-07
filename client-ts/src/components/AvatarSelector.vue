@@ -7,8 +7,12 @@
       </v-avatar>
       <v-spacer />
       <v-card-actions class="text-center">
-        
-        <AvatarPicker v-on:save="onSelectAvatarIcon" :dense="dense" />
+        <AvatarPicker
+          :background-color="selectedAvatarColor"
+          :avatar="selectedAvatarIcon"
+          @update:avatar="onSelectAvatarIcon"
+          :dense="dense"
+        />
 
         <ColorPicker v-on:save="onSelectColor" :dense="dense" />
 
@@ -24,7 +28,7 @@ import AvatarPicker from './AvatarPicker.vue';
 @Component({
   components: { AvatarPicker, ColorPicker },
 })
-export default class AvatarSelector extends Vue{
+export default class AvatarSelector extends Vue {
   @Prop({ default:false, type: Boolean }) dense: boolean;
 
   @Prop({ default: "crimson" }) color: string;

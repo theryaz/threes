@@ -6,8 +6,8 @@ services:
       - .:/app
     working_dir: /app/client-ts
     ports:
-      - 80:8080 # LAN Support
-      # - 127.3.3.3:80:8080
+      - 8080:8080
+      - 127.3.3.3:80:8080
     command: npm start
   server:
     image: node:13.6.0
@@ -17,8 +17,22 @@ services:
       - LOG_LEVEL=silly
       - NODE_ENV=local
     ports:
-      - 4280:4280 # LAN Support
-      # - 127.3.3.4:80:4280
+      - 4280:4280
+    working_dir: /app/server
+    volumes:
+      - .:/app
+    command: npm start
+  server2:
+    image: node:13.6.0
+    environment:
+      - MONGO_URL=mongodb://mongo/threeswithfriends
+      - JWT_SECRET=changeme
+      - LOG_LEVEL=silly
+      - NODE_ENV=local
+      - PORT=4281
+    ports:
+      - 4281:4281 # LAN Support
+      - 127.3.3.4:80:4280
     working_dir: /app/server
     volumes:
       - .:/app
@@ -29,3 +43,7 @@ services:
       - ./mongo_data:/data/db
     logging:
       driver: syslog
+  redis:
+    image: redis:5.0.7
+    # logging:
+    #   driver: syslog

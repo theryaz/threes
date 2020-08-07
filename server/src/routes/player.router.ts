@@ -9,6 +9,7 @@ import { asyncWrap } from '../shared/async-wrap';
 
 import { NotFoundError, UnauthorizedError } from '../errors';
 import { Player } from '../model/classes/Player';
+import { socketIOController } from '../app';
 
 
 export class PlayerRouter{

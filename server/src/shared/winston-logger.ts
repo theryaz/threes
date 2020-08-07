@@ -32,17 +32,13 @@ const errorPrinter = logform.format(info => {
 
 const objectHunter = logform.format(info => {
   if (info.object) return info;
-
   const splat = info[tripleBeam.SPLAT] || [];
   info.object = splat.find(obj => obj instanceof Object);
-
   return info;
 });
 const objectPrinter = logform.format(info => {
   if (!info.object) return info;
-
   info.message += ` ${JSON.stringify(info.object, null, 2)}`;
-
   return info;
 });
 

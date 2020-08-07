@@ -1,9 +1,12 @@
 <template>
-  <v-slide-y-transition>
-    <v-btn v-show="show" @click="() => this.clickAction()" class="mt-4" :color="Color" :dark="!isWinner">
-      <v-icon class="mr-2">fad fa-chevron-circle-left</v-icon> {{ Message }}
-    </v-btn>
-  </v-slide-y-transition>
+  <v-btn
+  v-if="show"
+  @click="() => this.clickAction()"
+  class="mt-4 bring-to-front"
+  :color="Color"
+  :dark="!isWinner">
+    <v-icon class="mr-2">fal fa-chevron-circle-left</v-icon> {{ Message }}
+  </v-btn>
 </template>
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
@@ -69,3 +72,8 @@ export default class BackToLobby extends Vue{
 
 }
 </script>
+<style lang="scss" scoped>
+.bring-to-front{
+  z-index: 10;
+}
+</style>

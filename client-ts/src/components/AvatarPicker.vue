@@ -1,88 +1,82 @@
 <template>
-  <v-menu
+  <v-dialog
     v-model="showPickAvatar"
     :close-on-click="true"
     :close-on-content-click="false"
-    >
+  >
 
     <template v-slot:activator="{ on }">
-      <v-btn v-on="on" color="primary">
-        <v-icon v-bind:class="{'mr-2': !dense}">
-          fa-user
-        </v-icon>
-        <template v-if="!dense">
-          Image
-        </template>
-      </v-btn>
+      <slot name="activator" :on="on">
+        <v-btn v-on="on" color="primary">
+          <v-icon v-bind:class="{ 'mr-2': !dense }">
+            fa-user
+          </v-icon>
+          <template v-if="!dense">
+            Image
+          </template>
+        </v-btn>
+      </slot>
     </template>
 
-    <v-card max-width="350px" class="text-center">
-      <!-- <v-card-title class="justify-center">
-        <v-color-picker
-          v-model="selectedAvatar"
-          hide-canvas
-          hide-mode-switch
-          :mode="'hexa'"
-        />
-      </v-card-title> -->
-        <v-btn
-          v-for="(a,index) of AvatarList"
+    <v-card width="100%" class="text-center">
+      <v-card-text>
+        <v-avatar
+          v-for="(avatar, index) of AvatarList"
           :key="index"
-          @click="() => setAvatar(a.icon)"
-          text icon outlined
+          @click="() => onSave(avatar)"
           class="ma-1"
-          :value="a.icon"
+          :color="backgroundColor"
         >
-          <v-icon>
-            {{ a.icon }}
+          <v-icon :color="iconColor">
+            {{ avatar }}
           </v-icon>
-        </v-btn>
+        </v-avatar>
+      </v-card-text>
     </v-card>
-  </v-menu>
+  </v-dialog>
 </template>
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
-import { IPlayer } from '../model/interfaces';
-import { AVATARS } from '../model/constants';
+import { Component, Vue, Prop } from "vue-property-decorator";
+import { IPlayer } from "../model/interfaces";
+import { AVATARS } from "../model/constants";
 
-import { capitalize } from '../shared';
-
-interface IAvatarIcon{
-  icon: string,
-}
+import { capitalize } from "../shared";
 
 @Component
-export default class AvatarPicker extends Vue{
+export default class AvatarPicker extends Vue {
   @Prop({ default: false, type: Boolean }) dense: boolean;
 
-  @Prop({ default: () => [] }) avatars: IAvatarIcon[];
-  @Prop({ default: () => [] }) addAvatars: IAvatarIcon[];
+  @Prop({ default: () => [] }) avatars: string[];
+  @Prop({ default: () => [] }) addAvatars: string[];
 
-  @Prop({ default: "fa-user" }) avatar: IAvatarIcon;
+  @Prop({ default: "white" }) iconColor: string;
+  @Prop({ default: "primary" }) backgroundColor: string;
 
-  private showPickAvatar: boolean = false;
+  @Prop({ default: "fa-user" }) avatar: string;
+  updateAvatar(value: string){
+    this.$emit("update:avatar", value);
+  }
 
-  private selectedAvatar: IAvatarIcon = this.avatar;
+  private showPickAvatar = false;
+
+  get IsMobile(): boolean {
+    return this.$vuetify.breakpoint.mobile;
+  }
 
   get AvatarList(){
-    if(this.avatars.length > 0){
+    if (this.avatars.length > 0) {
       return this.avatars;
     }
     return [...AVATARS, ...this.addAvatars];
   }
 
-  setAvatar(e){
-    this.selectedAvatar = e;
-    this.onSave();
-  }
-
-  onSave(){
-    this.$emit('save', this.selectedAvatar);
+  onSave(a: string){
+    this.updateAvatar(a);
     this.showPickAvatar = false;
   }
   onCancel(){
     this.showPickAvatar = false;
-    this.$emit('close');
+    this.$emit("close");
   }
 }
 </script>

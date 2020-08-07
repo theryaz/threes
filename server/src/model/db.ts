@@ -7,7 +7,7 @@ try{
   let envs = loadEnvs(['MONGO_URL']);
   MONGO_URL = envs['MONGO_URL'];
 }catch(e){
-  MONGO_URL = 'mongodb://127.0.0.1:27107/veden';
+  MONGO_URL = 'mongodb://127.0.0.1:27107/threeswithfriends';
 }
 
 logger.info('Connecting to MongoDB: ' + MONGO_URL);

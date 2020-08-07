@@ -13,8 +13,18 @@ import GameModule from '../store/game/game.store';
 import * as GameMutationTypes from '../store/game/game.types';
 const gameStore = getModule(GameModule);
 
+// DEBUGGING
+let USE_API = API_URL;
+if(window.location.origin === "http://192.168.132.196"){
+	console.log("Using Alternate Server");
+	USE_API = 'http://192.168.132.196:4281';
+}
+console.log("window.location.origin", window.location.origin);
+console.log("API_URL", USE_API);
+// REMOVE this when done with debugging multiple servers
+
 class ApiService{
-	public socket: SocketIOClient.Socket = io.connect(API_URL);
+	public socket: SocketIOClient.Socket = io.connect(USE_API);
 	constructor(private baseUrl: string){
 		// console.log("ApiService Initialized baseUrl: ", this.baseUrl);
 		this.setupSocketIO();

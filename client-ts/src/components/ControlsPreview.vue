@@ -21,7 +21,7 @@
   </span>
 </template>
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import { Component, Vue, Prop } from "vue-property-decorator";
 
 @Component
 export default class ControlsPreview extends Vue{
@@ -35,10 +35,10 @@ export default class ControlsPreview extends Vue{
     moveRight: 39,
   };
   private icons = {
-    moveUp: 'fad fa-arrow-alt-square-up',
-    moveLeft: 'fad fa-arrow-alt-square-left',
-    moveDown: 'fad fa-arrow-alt-square-down',
-    moveRight: 'fad fa-arrow-alt-square-right',
+    moveUp: "fal fa-arrow-alt-square-up",
+    moveLeft: "fal fa-arrow-alt-square-left",
+    moveDown: "fal fa-arrow-alt-square-down",
+    moveRight: "fal fa-arrow-alt-square-right",
   };
 
   private UpPressed: boolean = false;

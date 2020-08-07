@@ -1,8 +1,9 @@
 <template>
-  <v-container id="multiplayer">
+  <v-container fluid id="multiplayer">
     <v-row>
       <v-col cols="6">
-        <Game 
+        <Game
+          auto-size
           :keyboardControls="wasdKeys"
           :game-state="gameStore.leftGameState"
           v-on:gameStart="onLeftGameStart"
@@ -13,11 +14,12 @@
             :username="'WASD'"
             color="purple"
             :avatarIcon="'fa-kiwi-bird'"
-            />
+          />
         </Game>
       </v-col>
       <v-col cols="6">
-        <Game 
+        <Game
+          auto-size
           :keyboardControls="arrowKeys"
           :game-state="gameStore.rightGameState"
           v-on:gameStart="onRightGameStart"

@@ -1,51 +1,48 @@
 <template>
-  <v-bottom-navigation
-    absolute
-    grow
-    horizontal
-    color="primary"
-  >
+  <v-bottom-navigation app grow horizontal color="primary">
     <v-btn to="/" value="play" height="100%">
       <span>Play</span>
-      <v-icon>fad fa-gamepad</v-icon>
+      <v-icon>fal fa-gamepad</v-icon>
     </v-btn>
-    
-    <v-btn to="/local-multiplayer" value="local" height="100%">
+
+    <v-btn v-if="ShowLocal" to="/local-multiplayer" value="local" height="100%">
       <span>Local</span>
-      <v-icon>fad fa-user-friends</v-icon>
+      <v-icon>fal fa-user-friends</v-icon>
     </v-btn>
 
     <v-btn to="/multiplayer" value="online" height="100%">
       <span>Online</span>
-      <v-icon>fad fa-users</v-icon>
+      <v-icon>fal fa-users</v-icon>
     </v-btn>
-
   </v-bottom-navigation>
 </template>
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue } from "vue-property-decorator";
 
-import { mapState } from 'vuex';
-import { getModule } from 'vuex-module-decorators';
+import { mapState } from "vuex";
+import { getModule } from "vuex-module-decorators";
 
-import * as UserMutationTypes from '../store/user/user.types';
-import UserModule from '../store/user/user.store';
+import * as UserMutationTypes from "../store/user/user.types";
+import UserModule from "../store/user/user.store";
 const userStore = getModule(UserModule);
 
-import PlayerCard from '../components/PlayerCard.vue';
-import RegisterDialog from '../components/RegisterDialog.vue';
-import apiService from '../services/api.service';
+import PlayerCard from "../components/PlayerCard.vue";
+import RegisterDialog from "../components/RegisterDialog.vue";
+import apiService from "../services/api.service";
 
 @Component({
   components: { PlayerCard, RegisterDialog },
-  computed:{
-    ...mapState(['userStore']),
+  computed: {
+    ...mapState(["userStore"]),
   }
 })
-export default class NavBar extends Vue{
+export default class NavBar extends Vue {
+  get ShowLocal() {
+    return this.$vuetify.breakpoint.mdAndUp;
+  }
   logout(){
     userStore.logout().then(() => {
-      this.$router.push('/');
+      this.$router.push("/");
     });
   }
 }

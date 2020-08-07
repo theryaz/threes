@@ -1,34 +1,47 @@
 <template>
-  <div class="game-component" :style="componentStyle">
-    <div id="title">
-      <table>
-        <tr>
-          <td class="text-right">
-            <slot>
-              Next Number:
-            </slot>
-          </td>
-          <td>
-            <div class="cell preview">
-              <Cell :dark="this.$vuetify.theme.dark" :value="gameState.nextNumber" />
-            </div>
-          </td>
-        </tr>
-      </table>
-    </div>
-    <div class="playing-grid" ref="grid"></div>
-    <v-layout class="mt-1">
-      <v-flex>
+  <div class="game-component" :style="GameComponentStyle" v-touch="{
+      left: () => onSwipe('moveLeft'),
+      right: () => onSwipe('moveRight'),
+      up: () => onSwipe('moveUp'),
+      down: () => onSwipe('moveDown'),
+    }">
+    <v-overlay
+      absolute
+      opacity="0.05"
+      :value="showOverlay"
+      @input="$emit('update:show-overlay')"
+    >
+      <slot name="overlay" :toggle="toggleOverlay"></slot>
+    </v-overlay>
+    <slot :size="GameSize" :game-state="gameState">
+      <div id="title" :style="TitleStyle">
+        <table>
+          <tr>
+            <td class="text-right">
+                Next Number:
+            </td>
+            <td>
+              <div>
+                <Cell :absolute="false" :size="GameSize" :dark="this.$vuetify.theme.dark" :value="gameState.nextNumber" />
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </slot>
+    <div class="playing-grid" ref="grid" :style="PlayingGridStyle"></div>
+    <v-row class="mt-1">
+      <v-col>
         <v-chip class="mx-1" label transition="slide-x-transition" color="secondary" v-show="PlayerIsDisconnected">
           <v-avatar tile left>
-            <v-icon small>fad fa-unlink</v-icon>
+            <v-icon small>fal fa-unlink</v-icon>
           </v-avatar>
           Disconnected
         </v-chip>
 
         <v-chip class="mx-1" label transition="slide-x-transition">
           <v-avatar tile left>
-            <v-icon small>fad fa-abacus</v-icon>
+            <v-icon small>fal fa-abacus</v-icon>
           </v-avatar>
           {{ CurrentScore }}
         </v-chip>
@@ -49,15 +62,23 @@
             Game over in {{ gameOverCountDown }}!
           </v-chip>
         </v-expand-x-transition>
-      </v-flex>
-    </v-layout>
-    <v-layout class="justify-center mt-4" v-if="!gameState.isMultiplayer">
-      <v-expand-x-transition>
-        <v-btn color="primary" text v-show="gameState.gameOver" @click="this.initializeGame">
+      </v-col>
+    </v-row>
+    <v-row class="justify-center" v-if="!gameState.isMultiplayer">
+      <v-btn
+        color="primary"
+        v-bind="RestartButtonProps"
+        v-if="gameState.gameOver"
+        @click="this.initializeGame"
+      >
+        <v-icon v-if="IsMobile">
+          fal fa-undo
+        </v-icon>
+        <template v-else>
           Restart
-        </v-btn>
-      </v-expand-x-transition>
-    </v-layout>
+        </template>
+      </v-btn>
+    </v-row>
   </div>
 </template>
 <script lang="ts">
@@ -91,6 +112,38 @@ function getRandom(min: number, max: number){
   }
 })
 export default class Game extends Vue{
+
+  @Prop({ type: Boolean, default: false }) showOverlay: boolean;
+  @Prop({ type: Boolean, default: false }) autoSize: boolean;
+  @Prop({ type: Number, default: 100 }) size: number;
+
+  get IsMobile() {
+    return this.$vuetify.breakpoint.mobile;
+  }
+
+  get RestartButtonProps(){
+    if(this.IsMobile){
+      return {
+        absolute: true,
+        bottom: true,
+        right: true,
+        fab: true,
+      };
+    }
+    return {
+      text: true,
+    };
+  }
+
+  get ScreenHeight(){
+    return this.$vuetify.breakpoint.height;
+  }
+  get GameSize(){
+    if(this.autoSize){
+      return this.ScreenHeight / 8;
+    }
+    return this.size;
+  }
 
   private showCountdown: boolean = false;
   private gameOverCountDown: number = 0;
@@ -127,6 +180,9 @@ export default class Game extends Vue{
   cells: ICell[]  = [];
   nextNumber: number;
 
+  toggleOverlay(){
+    this.$emit('update:show-overlay', !this.showOverlay);
+  }
   beforeMount(){
     // console.log("Game.vue Grid");
     this.setupInputs(); 
@@ -194,6 +250,11 @@ export default class Game extends Vue{
       this.$emit('gameOver', { score: score, cells: this.cells });
     });
   }
+  onSwipe(moveDirection: string){
+    if(this.gameState.keyboardEnabled){
+      this[moveDirection]();
+    }
+  }
   listenForGameOverCountdown(){
     apiService.socket.on(GameMutationTypes.GAME_OVER_COUNTDOWN, (countdown: number) => {
       console.log("GAME_OVER_COUNTDOWN", countdown);
@@ -216,10 +277,36 @@ export default class Game extends Vue{
   getRandom(min,max){
     return Math.floor(Math.random() * max) + min;
   }
-  get componentStyle(){
+  get GameHeight(){
+    return this.GameSize * 5.65;
+  }
+  get GameWidth(){
+    return this.CellWidth * 5;
+  }
+  get CellHeight(){
+    return this.GameSize;
+  }
+  get CellWidth(){
+    return this.GameSize * 0.8;
+  }
+  get GameComponentStyle(){
     return {
       background: COLORS[this.theme].gameBackground,
+      height: `${(this.GameHeight)}px`,
+      width: `${(this.GameWidth)}px`,
     };
+  }
+  get PlayingGridStyle(){
+    return {
+      'height': `${this.CellHeight * 4}px`,
+      'width': `${this.CellWidth * 4}px`,
+    };
+  }
+  get TitleStyle(){
+    return {
+      'height': `${this.CellHeight}px`,
+      'line-height': `${this.CellHeight}px`,
+    }
   }
   get theme(){
     return this.$vuetify.theme.dark ? 'dark' : 'light';
@@ -354,6 +441,7 @@ export default class Game extends Vue{
     c.row = coords.r;
     c.col = coords.c;
     c.value = value;
+    c.size = this.GameSize;
     return c;
   }
   spawnCellInGrid(cell: ICell){
@@ -621,77 +709,41 @@ export default class Game extends Vue{
 };
 </script>
 <style lang="scss">
-  @import "src/scss/colors";
-  @import "src/scss/buttons";
-  @import "src/scss/cell";
-  #title{
-    height: $height;
-    line-height: $height;
-    table{
-      width: 100%;
-      line-height: 1rem;
-    }
-    div.flex{
-      line-height: 64px;
-    }
-    // font-size: 1.25rem;
-    // font-weight: bold;
-    .preview{
-      display: inline-block;
-      position: static;
-      transform: scale(0.7);
-    }
-  }
-
-  .playing-grid{
-    position: relative;
-    width: ($width * 4);
-    height: ($height * 4);
-    margin: auto;
-    border-radius: 2px;
-  }
-
-  .game-component{
-    width: ($width * 5);
-    height: ($height * 5.4);
-    position: relative;
-    margin: auto;
-    box-shadow: 0px 0px 5px -2px $shadow;
-    text-align: center;
-  }
-  #game-overlay{
-    position: absolute;
-    top: 0;
-    left: 0;
-    background-color: rgba(1, 1, 1, 0.2);
+@import "src/scss/colors";
+@import "src/scss/buttons";
+#title{
+  table{
     width: 100%;
-    height: 100%;
-    z-index: 1000;
-    border-radius: 5px;
-    text-align: center;
-    display: flex;
-    div.card{
-      display: flex;
-      flex-direction: column;
-      background-color: $background;
-      margin: auto;
-      padding: 10px;
-      border-radius: 5px;
-      min-width: $size * 3;
-      min-height: $size * 3;
-      box-shadow: 2px 2px 20px -1px #333;
-      h3{
-        flex-grow: 1;
-      }
-      div.buttons{
-        margin: 1.0rem 0;
-      }
-    }
+    line-height: 1rem;
   }
+  div.flex{
+    line-height: 64px;
+  }
+  // font-size: 1.25rem;
+  // font-weight: bold;
+  .preview{
+    display: inline-block;
+    position: static;
+    transform: scale(0.7);
+  }
+}
 
-  .new-high-score{
-    font-size: 1rem;
-    font-weight: bold;
-    letter-spacing: 2px;
-  }
+.playing-grid{
+  position: relative;
+  margin: auto;
+  border-radius: 2px;
+}
+.game-component{
+  touch-action: none;
+  position: relative;
+  margin: auto;
+  box-shadow: 0px 0px 5px -2px $shadow;
+  text-align: center;
+}
+
+.new-high-score{
+  font-size: 1rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
 </style>
