@@ -8,7 +8,7 @@ const configEnvs = loadEnvs([
 
 export const CONFIG = {
   REDIS:{
-    HOST: configEnvs['REDIS_HOST'] || 'redis',
+    HOST: configEnvs['REDIS_HOST'] || null,
     PORT: +configEnvs['REDIS_PORT'] || 6379,
   },
   SOCKETS:{

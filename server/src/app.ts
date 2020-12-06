@@ -37,7 +37,9 @@ export class App{
 		this.app = express();
 		this.httpServer = http.createServer(this.app);
 		this.io = socket(this.httpServer);
-		this.io.adapter(redisAdapter({ host: CONFIG.REDIS.HOST, post: CONFIG.REDIS.PORT }));
+		if(CONFIG.REDIS.HOST){
+			this.io.adapter(redisAdapter({ host: CONFIG.REDIS.HOST, post: CONFIG.REDIS.PORT }));
+		}
 		this.socketIOController = new SocketIOController(this.io);
 		this.socketHandlers();
 		this.middleware();

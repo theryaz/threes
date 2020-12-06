@@ -4,7 +4,7 @@ import { logger, loadEnvs } from '../shared';
 import { JWT_EXPIRY_SECONDS } from '../model/constants';
 import { Jwt, JwtData } from '../model/interfaces';
 
-const { JWT_SECRET } = loadEnvs(["JWT_SECRET"]);
+const { JWT_SECRET } = loadEnvs(["JWT_SECRET"], false);
 
 export function verifyJwt(token: string): Promise<Jwt>{
 	return new Promise((resolve, reject) => {
