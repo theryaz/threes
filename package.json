@@ -1,6 +1,9 @@
 {
 	"scripts": {
-		"heroku-postbuild": "cd server && npm install && ls node_modules/.bin",
+		"heroku-postbuild": "cd server && npm install",
 		"start": "cd server && npm run start-js"
+	},
+	"devDependencies": {
+		"tsc": "^1.20150623.0"
 	}
 }
