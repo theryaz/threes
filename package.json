@@ -1,9 +1,7 @@
 {
 	"scripts": {
-		"heroku-postbuild": "cd server && npm install",
+		"postinstall": "npm install --prefix server",
 		"start": "cd server && npm run start-js"
 	},
-	"devDependencies": {
-		"typescript": "^4.1.2"
-	}
+	"devDependencies": {}
 }
