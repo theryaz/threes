@@ -6,7 +6,6 @@
   "scripts": {
     "start": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/server.ts",
     "start-js": "node ./dist/server/src/server.js",
-    "postinstall": "tsc && cp package.json ./dist/server",
     "build": "tsc && cp package.json ./dist/server",
     "mongo": "docker-compose -f ../docker-compose.yml exec mongo mongo mongodb://mongo/threeswithfriends",
     "test": "echo \"Error: no test specified\" && exit 1"
