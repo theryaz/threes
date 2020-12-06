@@ -1,5 +1,6 @@
 {
 	"scripts": {
+		"tsc": "./server/node_modules/.bin/tsc",
 		"heroku-postbuild": "cd server && npm install",
 		"start": "cd server && npm run start-js"
 	}
