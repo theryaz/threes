@@ -1,6 +1,6 @@
 <template>
   <v-container fluid id="home">
-    <div class="text-center">
+    <div class="text-center mb-6">
       <img class="mx-a" src="img/threes-network-v4.png" :height="LogoSize" :width="LogoSize"/>
     </div>
     <div>

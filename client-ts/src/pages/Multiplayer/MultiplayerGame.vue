@@ -12,11 +12,23 @@
           v-on:gameOver="onLocalGameOver"
           v-on:onMove="onLocalMove"
         >
-          <PlayerCard
-            :username="userStore.username"
-            :color="userStore.color"
-            :avatarIcon="userStore.avatarIcon"
-          />
+          <template v-slot:default="{ size, gameState }">
+            <div class="px-12 py-2">
+              <PlayerCard
+                class="d-inline-block mr-2"
+                :username="userStore.username"
+                :color="userStore.color"
+                :avatarIcon="userStore.avatarIcon"
+              />
+              <Cell
+                class="d-inline-block"
+                :absolute="false"
+                :dark="$vuetify.theme.dark"
+                :size="size * 0.7"
+                :value="gameState.nextNumber"
+              />
+            </div>
+          </template>
           <template v-slot:overlay v-if="IsMobile">
             <BackToLobby
               v-on:click="goBackToLobby"
@@ -60,6 +72,7 @@
 import { mapState } from "vuex";
 import { getModule } from "vuex-module-decorators";
 import { Component, Vue } from "vue-property-decorator";
+import Cell from "../../components/Game/Cell.vue";
 import PlayerCard from "../../components/PlayerCard.vue";
 import RegisterDialog from "../../components/RegisterDialog.vue";
 import LoginDialog from "../../components/LoginDialog.vue";
@@ -81,7 +94,7 @@ import { PlayerStatus, GameStatus } from "../../model/enums";
 import { IGameMove, IGameGridState, ICellValue } from "../../model/interfaces";
 
 @Component({
-  components: { BackToLobby, PlayerCard, RegisterDialog, LoginDialog },
+  components: { BackToLobby, Cell, PlayerCard, RegisterDialog, LoginDialog },
   computed:{
     ...mapState(["userStore"]),
     ...mapState(["gameStore"]),

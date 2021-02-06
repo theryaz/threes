@@ -1,0 +1,7 @@
+{
+	"scripts": {
+		"postinstall": "npm install --prefix server && npm run build-heroku --prefix server",
+		"start": "cd server && npm run start-js"
+	},
+	"devDependencies": {}
+}
