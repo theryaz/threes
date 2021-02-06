@@ -82,7 +82,6 @@
   </div>
 </template>
 <script lang="ts">
-import { Vuetify } from 'vuetify';
 import apiService from '../../services/api.service';
 import { ICoords, IGameState, ICellValue, IGameMove, IGameGridState, IKeyboardControls, IRemotePlayerInfo } from '../../model/interfaces';
 import { ICell } from '../../model/views';
