@@ -11,12 +11,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: cd client-ts && npm ci && npm run build
+      - run: npm --prefix client-ts ci && npm --prefix client-ts run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_THREESWITHFRIENDS2 }}'
           channelId: live
           projectId: threeswithfriends2
+          entryPoint: "./client-ts" 
         env:
           FIREBASE_CLI_PREVIEWS: hostingchannels
