@@ -12,9 +12,17 @@ import apiService from '@/services/api.service';
 	store: store
 })
 export default class SocketModule extends VuexModule{
+  offlineMode: boolean = false;
   isConnected: boolean = false;
   socketId: string | null = null;
   socketError: string | null = null;
+
+  @Action setOffline(offline: boolean = true) {
+    this.context.commit(SocketMutationTypes.SET_OFFLINE_MODE, offline);
+  }
+  @Mutation [SocketMutationTypes.SET_OFFLINE_MODE](offlineMode: boolean = true) {
+    this.offlineMode = offlineMode;
+  }
 
   @Action onConnected(){
     // console.log("onConnected");

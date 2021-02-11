@@ -9,11 +9,12 @@
       <span>Local</span>
       <v-icon>fal fa-user-friends</v-icon>
     </v-btn>
-
-    <v-btn to="/multiplayer" value="online" height="100%">
-      <span>Online</span>
-      <v-icon>fal fa-users</v-icon>
-    </v-btn>
+    <v-expand-x-transition v-if="IsOnline">
+      <v-btn to="/multiplayer" value="online" height="100%">
+        <span>Online</span>
+        <v-icon>fal fa-users</v-icon>
+      </v-btn>
+    </v-expand-x-transition>
   </v-bottom-navigation>
 </template>
 <script lang="ts">
@@ -22,13 +23,14 @@ import { Component, Vue } from "vue-property-decorator";
 import { mapState } from "vuex";
 import { getModule } from "vuex-module-decorators";
 
-import * as UserMutationTypes from "../store/user/user.types";
 import UserModule from "../store/user/user.store";
 const userStore = getModule(UserModule);
 
+import SocketModule from "../store/socket/socket.store";
+const socketStore = getModule(SocketModule);
+
 import PlayerCard from "../components/PlayerCard.vue";
 import RegisterDialog from "../components/RegisterDialog.vue";
-import apiService from "../services/api.service";
 
 @Component({
   components: { PlayerCard, RegisterDialog },
@@ -44,6 +46,9 @@ export default class NavBar extends Vue {
     userStore.logout().then(() => {
       this.$router.push("/");
     });
+  }
+  get IsOnline(): boolean{
+    return socketStore.offlineMode === false;
   }
 }
 </script>

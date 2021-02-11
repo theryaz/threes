@@ -1,9 +1,5 @@
 module.exports = {
   configureWebpack:{
-    devServer:{
-      disableHostCheck: true,
-      public: "local.threeswithfriends.com:80",
-    }
   },
   // https://github.com/vuetifyjs/vuetify/issues/7977
   css: {
