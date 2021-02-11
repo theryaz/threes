@@ -13,24 +13,43 @@ import GameModule from '../store/game/game.store';
 import * as GameMutationTypes from '../store/game/game.types';
 const gameStore = getModule(GameModule);
 
-// DEBUGGING
-let USE_API = API_URL;
-if(window.location.origin === "http://192.168.132.196"){
-	console.log("Using Alternate Server");
-	USE_API = 'http://192.168.132.196:4281';
-}
-console.log("window.location.origin", window.location.origin);
-console.log("API_URL", USE_API);
-// REMOVE this when done with debugging multiple servers
+const FALLBACK_URL = 'http://192.168.132.125:4280'
 
 class ApiService{
-	public socket: SocketIOClient.Socket = io.connect(USE_API);
+	useFallback: boolean = false;
+	get ApiUrl(): string{
+		if (this.useFallback) return FALLBACK_URL
+		return this.baseUrl;
+	}
+	public socket: SocketIOClient.Socket = io.connect(this.ApiUrl);
 	constructor(private baseUrl: string){
-		// console.log("ApiService Initialized baseUrl: ", this.baseUrl);
-		this.setupSocketIO();
+		console.log("ApiService Initialized baseUrl: ", this.baseUrl);
+		this.setupBackendApi();
 	}
 
-	setupSocketIO(){
+	async setupBackendApi(): Promise<void>{
+		const res = await Http.get(`${this.ApiUrl}/healthcheck`).catch(() => null);
+		const isAlive = res !== null && res.status === 200;
+		if(!isAlive){
+			this.useFallback = true;
+		}
+		const res2 = await Http.get(`${FALLBACK_URL}/healthcheck`).catch(() => null);
+		const altIsAlive = res2 !== null && res2.status === 200;
+		if (!altIsAlive){
+			this.socket.disconnect();
+			socketStore.setOffline();
+			return;
+		}else{
+			console.log("Using fallback API", { apiUrl: this.ApiUrl });
+		}
+		this.setupSocketIO(this.ApiUrl);
+	}
+
+	setupSocketIO(apiUrl?: string){
+		if (apiUrl){
+			this.socket.disconnect();
+			this.socket = io.connect(apiUrl);
+		}
 		this.socket.on(SocketMutationTypes.CONNECTED, socketStore.onConnected);
 		this.socket.on(SocketMutationTypes.DISCONNECTED, socketStore.onDisconnected);
 		this.socket.on(SocketMutationTypes.EVENT, socketStore.onEvent);
@@ -47,7 +66,7 @@ class ApiService{
 			['x-client-id']: this.socket.id,
 			Authorization: this.getAuthHeader(),
 		};
-		return Http.get(`${this.baseUrl}${uri}`, { headers });
+		return Http.get(`${this.ApiUrl}${uri}`, { headers });
 	}
 	post(uri: string, payload: {[field:string]: any}, headers={}){
 		headers = {
@@ -55,7 +74,7 @@ class ApiService{
 			['x-client-id']: this.socket.id,
 			Authorization: this.getAuthHeader(),
 		};
-		return Http.post(`${this.baseUrl}${uri}`, payload, { headers });
+		return Http.post(`${this.ApiUrl}${uri}`, payload, { headers });
 	}
 	put(uri: string, payload: {[field:string]: any}, headers={}){
 		headers = {
@@ -63,7 +82,7 @@ class ApiService{
 			['x-client-id']: this.socket.id,
 			Authorization: this.getAuthHeader(),
 		};
-		return Http.put(`${this.baseUrl}${uri}`, payload, { headers });
+		return Http.put(`${this.ApiUrl}${uri}`, payload, { headers });
 	}
 	delete(uri: string, headers={}){
 		headers = {
@@ -71,7 +90,7 @@ class ApiService{
 			['x-client-id']: this.socket.id,
 			Authorization: this.getAuthHeader(),
 		};
-		return Http.delete(`${this.baseUrl}${uri}`, { headers });
+		return Http.delete(`${this.ApiUrl}${uri}`, { headers });
 	}
 	download(uri: string, headers={}, method='get'){
 		headers = {
@@ -79,7 +98,7 @@ class ApiService{
 			['x-client-id']: this.socket.id,
 			Authorization: this.getAuthHeader(),
 		};
-		return Http[method](`${this.baseUrl}${uri}`, { headers, responseTye: 'arraybuffer' });
+		return Http[method](`${this.ApiUrl}${uri}`, { headers, responseTye: 'arraybuffer' });
 	}
 
 	getAuthHeader(){

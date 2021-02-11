@@ -22,21 +22,6 @@ services:
     volumes:
       - .:/app
     command: npm start
-  server2:
-    image: node:13.6.0
-    environment:
-      - MONGO_URL=mongodb://mongo/threeswithfriends
-      - JWT_SECRET=changeme
-      - LOG_LEVEL=silly
-      - NODE_ENV=local
-      - PORT=4281
-    ports:
-      - 4281:4281 # LAN Support
-      - 127.3.3.4:80:4280
-    working_dir: /app/server
-    volumes:
-      - .:/app
-    command: npm start
   mongo:
     image: mongo:4.0.9
     volumes:
