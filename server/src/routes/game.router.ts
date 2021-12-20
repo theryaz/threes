@@ -3,9 +3,7 @@ import { socketIOController } from '../app';
 import { gameList, connectedPlayers } from '../model/socket.io.controller';
 
 import * as express from 'express';
-import { sanitizeBody, authentication, loadClientId } from '../middleware'
-
-import { logger } from '../shared';
+import { sanitizeBody, loadClientId } from '../middleware'
 import { asyncWrap } from '../shared/async-wrap';
 
 import { NotFoundError, BadRequestError } from '../errors';

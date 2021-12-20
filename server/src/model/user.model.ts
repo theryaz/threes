@@ -61,7 +61,7 @@ export class User{
         username,
         email,
         role: role,
-        _id: user._id,
+        _id: user._id.toHexString(),
       },
       maxAge: JWT_EXPIRY_SECONDS
     });

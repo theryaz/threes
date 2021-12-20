@@ -31,9 +31,9 @@ import AvatarPicker from './AvatarPicker.vue';
 export default class AvatarSelector extends Vue {
   @Prop({ default:false, type: Boolean }) dense: boolean;
 
-  @Prop({ default: "crimson" }) color: string;
-  @Prop({ default: "fa-user" }) avatarIcon: string;
-  @Prop({ default: null }) avatarUrl: string;
+  @Prop({ default: "crimson" }) color!: string;
+  @Prop({ default: "fa-user" }) avatarIcon!: string;
+  @Prop({ default: null }) avatarUrl!: string;
 
   private selectedAvatarColor = this.color;
   private selectedAvatarIcon = this.avatarIcon;

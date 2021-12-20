@@ -1,19 +1,14 @@
 import winston from 'winston';
 import uuid from 'uuid/v4';
-import { Socket } from 'socket.io';
-
-import { Document } from 'mongoose';
-import { User, UserModel } from '../db';
-import { verifyJwt, createLogger, sleep, randomString } from '../../shared';
+import { createLogger, sleep, randomString } from '../../shared';
 
 import { Player } from './Player';
 
 import { socketIOController } from '../../app';
 
-import * as UserMutationTypes from '../../../../client-ts/src/store/user/user.types';
 import * as GameMutationTypes from '../../../../client-ts/src/store/game/game.types';
 import * as MultiplayerMutationTypes from '../../../../client-ts/src/store/multiplayer/multiplayer.types';
-import { IPlayerInfo, ICoords, IGameGridState, IGameMove, IGameState } from '../../../../client-ts/src/model/interfaces';
+import { IGameGridState, IGameMove } from '../../../../client-ts/src/model/interfaces';
 
 const GAME_OVER_COUNTDOWN_SECONDS = 30;
 const START_CHECK_INTERVAL = 1 * 1000;

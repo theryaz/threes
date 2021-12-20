@@ -1,16 +1,15 @@
 version: "3"
 services:
   client:
-    image: node:13.6.0
+    image: node:16.13.1-alpine
     volumes:
       - .:/app
     working_dir: /app/client-ts
     ports:
       - 8080:8080
-      - 127.3.3.3:80:8080
     command: npm start
   server:
-    image: node:13.6.0
+    image: node:16.13.1-alpine
     environment:
       - MONGO_URL=mongodb://mongo/threeswithfriends
       - JWT_SECRET=changeme
@@ -22,28 +21,16 @@ services:
     volumes:
       - .:/app
     command: npm start
-  server2:
-    image: node:13.6.0
-    environment:
-      - MONGO_URL=mongodb://mongo/threeswithfriends
-      - JWT_SECRET=changeme
-      - LOG_LEVEL=silly
-      - NODE_ENV=local
-      - PORT=4281
-    ports:
-      - 4281:4281 # LAN Support
-      - 127.3.3.4:80:4280
-    working_dir: /app/server
-    volumes:
-      - .:/app
-    command: npm start
   mongo:
     image: mongo:4.0.9
     volumes:
-      - ./mongo_data:/data/db
+      - mongo_data:/data/db
     logging:
-      driver: syslog
+      driver: none
   redis:
     image: redis:5.0.7
     # logging:
     #   driver: syslog
+
+volumes:
+  mongo_data:

@@ -11,7 +11,7 @@ try{
 }
 
 logger.info('Connecting to MongoDB: ' + MONGO_URL);
-mongoose.connect(MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect(MONGO_URL);
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB Connection error:'));
@@ -20,4 +20,3 @@ db.once('open', function() {
 });
 
 export { User, UserModel } from './user.model';
-export { Game, GameModel } from './game.model';

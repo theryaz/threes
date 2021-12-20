@@ -27,7 +27,7 @@ export default class GameModule extends VuexModule{
     return Math.floor(Math.random() * max) + min;
   }
 	private randomGridState(n: number = 3): IGameGridState{
-		let cells: ICellValue[] = [];
+		const cells: ICellValue[] = [];
 		for(let i = 0; i < 3; i ++){
 			cells.push({
 				value: this.getRandom(1,3),

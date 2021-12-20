@@ -70,7 +70,7 @@ export default class UserModule extends VuexModule{
   @Action({ rawError: true }) async login({ email, password }: LoginParams){
 		this.context.commit(UserMutationTypes.LOGIN);
 		try{
-			let response = await apiService.post('/v1/user/login', { email, password });
+			const response = await apiService.post('/v1/user/login', { email, password });
 			const payload: LoginPayload = {
 				jwt: response.body.jwt,
 				username: response.body.username,
@@ -115,7 +115,7 @@ export default class UserModule extends VuexModule{
   @Action({rawError: true, commit: UserMutationTypes.REGISTER_SUCCESS}) async register({ username, email, password }: RegisterParams){
 		this.context.commit(UserMutationTypes.REGISTER);
 		try{
-			let response = await apiService.post('/v1/user/register', { username, email, password });
+			const response = await apiService.post('/v1/user/register', { username, email, password });
 			return {
 				jwt: response.body.jwt,
 				role: response.body.role,

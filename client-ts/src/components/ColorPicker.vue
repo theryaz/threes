@@ -61,10 +61,10 @@ interface Color{
 export default class ColorPicker extends Vue{
   @Prop({ default: false, type: Boolean }) dense: boolean;
   
-  @Prop({ default: () => [] }) colors: Color[];
-  @Prop({ default: () => [] }) addColors: Color[];
+  @Prop({ default: () => [] }) colors!: Color[];
+  @Prop({ default: () => [] }) addColors!: Color[];
 
-  @Prop({ default: "crimson" }) color: string;
+  @Prop({ default: "crimson" }) color!: string;
 
   private showPickColor: boolean = false;
 
