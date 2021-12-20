@@ -1,4 +1,4 @@
-FROM node:13.6.0-alpine
+FROM node:16.13.1-alpine
 
 COPY dist /app
 COPY node_modules /app/server/node_modules

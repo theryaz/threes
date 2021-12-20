@@ -15,7 +15,7 @@
     "s3sync:production": "aws s3 sync --delete --acl public-read dist s3://play.s3.threeswithfriends.com && aws cloudfront create-invalidation --distribution-id E36CHZXP6RQ4LC --paths /index.html",
     "deploy:staging": "npm run build:staging && npm run s3sync:staging",
     "s3sync:staging": "aws s3 sync --delete --acl public-read dist s3://play.staging.s3.threeswithfriends.com && aws cloudfront create-invalidation --distribution-id E1ESQ15O8TQHAT --paths /index.html",
-    "npm-install": "docker run --rm -it -v $(pwd):/app -w /app node:13.6.0 npm install",
+    "npm-install": "docker run --rm -it -v $(pwd):/app -w /app node:node:16.13.1-alpine npm install",
     "generate-pwa-assets": "pwa-asset-generator threes-network-v3.png --manifest ../../manifest.json --index ../../index.html --opaque false"
   },
   "dependencies": {
@@ -55,6 +55,7 @@
     "chai": "^4.3.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
+    "firebase-tools": "^9.23.3",
     "sass": "^1.26.5",
     "sass-loader": "^8.0.2",
     "typescript": "~4.1.5",

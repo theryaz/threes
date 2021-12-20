@@ -9,6 +9,7 @@ if(process.env.VUE_APP_ENVIRONMENT_NAME == "staging") {
 
 }else if(process.env.VUE_APP_ENVIRONMENT_NAME == "production") {
 
-	API_URL = 'https://api.threeswithfriends.com';
+	API_URL = 'https://threeswithfriends.herokuapp.com';
+	// API_URL = 'https://api.threeswithfriends.com';
 
 }
