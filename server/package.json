@@ -23,7 +23,7 @@
     "graphql": "^14.4.2",
     "jsonwebtoken": "^8.5.1",
     "mongo-sanitize": "^1.1.0",
-    "mongoose": "~6.0.14",
+    "mongoose": "~6.4.6",
     "socket.io": "^2.3.0",
     "uuid": "^3.3.2",
     "winston": "^3.2.1",
